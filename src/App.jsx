@@ -247,6 +247,7 @@ function App() {
 
   const audioRef = useRef(null)
   const homeCardRef = useRef(null)
+  const qrCardRef = useRef(null)
 
   const [activeTab, setActiveTab] = useState(initialSave.activeTab)
   const [closetTab, setClosetTab] = useState(initialSave.closetTab)
@@ -276,6 +277,7 @@ function App() {
   const [uploadFile, setUploadFile] = useState(null)
   const [isUploading, setIsUploading] = useState(false)
   const [isSavingHomeImage, setIsSavingHomeImage] = useState(false)
+  const [isSavingQrImage, setIsSavingQrImage] = useState(false)
 
   const [qrMessage, setQrMessage] = useState('')
 
@@ -394,6 +396,22 @@ function App() {
     return item.creatorName || '不明'
   }
 
+  const buildPngFromRef = async (ref, filename) => {
+    if (!ref.current) return
+
+    const dataUrl = await toPng(ref.current, {
+      cacheBust: true,
+      pixelRatio: 3,
+      backgroundColor: '#ffffff',
+      skipFonts: true,
+    })
+
+    const link = document.createElement('a')
+    link.download = filename
+    link.href = dataUrl
+    link.click()
+  }
+
   const renderAvatarLayers = (stageClassName = 'characterStage') => (
     <div className={stageClassName}>
       <img
@@ -450,25 +468,26 @@ function App() {
   }
 
   const handleSaveHomeImage = async () => {
-    if (!homeCardRef.current) return
-
     try {
       setIsSavingHomeImage(true)
-
-      const dataUrl = await toPng(homeCardRef.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-        backgroundColor: '#ffffff',
-      })
-
-      const link = document.createElement('a')
-      link.download = `${nickname || DEFAULT_NICKNAME}-home-card.png`
-      link.href = dataUrl
-      link.click()
+      await buildPngFromRef(homeCardRef, `${nickname || DEFAULT_NICKNAME}-home-card.png`)
     } catch (error) {
       alert(`ホーム画像の保存に失敗したよ: ${error.message}`)
     } finally {
       setIsSavingHomeImage(false)
+    }
+  }
+
+  const handleSaveQrImage = async () => {
+    if (!selectedQrItem) return
+
+    try {
+      setIsSavingQrImage(true)
+      await buildPngFromRef(qrCardRef, `${selectedQrItem.name}-qr-card.png`)
+    } catch (error) {
+      alert(`QR画像の保存に失敗したよ: ${error.message}`)
+    } finally {
+      setIsSavingQrImage(false)
     }
   }
 
@@ -1048,44 +1067,56 @@ function App() {
                     </label>
 
                     {selectedQrItem && (
-                      <div className="qrCard">
-                        <div className="qrCardHeader">
-                          <span className="qrCardBadge">QR配布カード</span>
-                          <div className="qrCardTitleBlock">
-                            <div className="qrItemName">{selectedQrItem.name}</div>
-                            <div className="creatorLine">
-                              作った人：{getDisplayCreatorName(selectedQrItem)}
+                      <>
+                        <div ref={qrCardRef} className="qrCard">
+                          <div className="qrCardHeader">
+                            <span className="qrCardBadge">QR配布カード</span>
+                            <div className="qrCardTitleBlock">
+                              <div className="qrItemName">{selectedQrItem.name}</div>
+                              <div className="creatorLine">
+                                作った人：{getDisplayCreatorName(selectedQrItem)}
+                              </div>
+                              <div className="qrCardCategory">
+                                {selectedQrItem.category === 'upper'
+                                  ? '上の服'
+                                  : selectedQrItem.category === 'lower'
+                                  ? '下の服'
+                                  : 'アクセサリー'}
+                              </div>
                             </div>
-                            <div className="qrCardCategory">
-                              {selectedQrItem.category === 'upper'
-                                ? '上の服'
-                                : selectedQrItem.category === 'lower'
-                                ? '下の服'
-                                : 'アクセサリー'}
+                          </div>
+
+                          <div className="qrCardMain">
+                            <div className="qrPreviewPane">
+                              <div className="qrPreviewAvatar">
+                                {renderAvatarLayers('qrAvatarStage')}
+                              </div>
+                              <div className="namePlate compact">
+                                {nickname || DEFAULT_NICKNAME}
+                              </div>
+                            </div>
+
+                            <div className="qrCodePane">
+                              <div className="qrCanvasWrap">
+                                <QRCodeCanvas value={qrValue} size={220} includeMargin />
+                              </div>
+                              <p className="qrHelpText">
+                                読み込むとこの服を追加できるよ
+                              </p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="qrCardMain">
-                          <div className="qrPreviewPane">
-                            <div className="qrPreviewAvatar">
-                              {renderAvatarLayers('qrAvatarStage')}
-                            </div>
-                            <div className="namePlate compact">
-                              {nickname || DEFAULT_NICKNAME}
-                            </div>
-                          </div>
-
-                          <div className="qrCodePane">
-                            <div className="qrCanvasWrap">
-                              <QRCodeCanvas value={qrValue} size={190} includeMargin />
-                            </div>
-                            <p className="qrHelpText">
-                              読み込むとこの服を追加できるよ
-                            </p>
-                          </div>
+                        <div className="qrSaveArea">
+                          <button
+                            className="primaryButton"
+                            onClick={handleSaveQrImage}
+                            disabled={isSavingQrImage}
+                          >
+                            {isSavingQrImage ? '保存中…' : 'QR画像を保存'}
+                          </button>
                         </div>
-                      </div>
+                      </>
                     )}
                   </>
                 )}

@@ -209,7 +209,8 @@ a {
   text-align: left;
 }
 
-.homeSaveArea {
+.homeSaveArea,
+.qrSaveArea {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -660,6 +661,12 @@ a {
   line-height: 1.7;
   color: var(--muted);
   font-weight: 600;
+}
+
+.qrCanvasWrap canvas {
+  display: block;
+  width: 220px !important;
+  height: 220px !important;
 }
 
 .settingsLayoutWide {
