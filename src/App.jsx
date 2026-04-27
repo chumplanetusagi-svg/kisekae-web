@@ -238,6 +238,45 @@ function getRandomVoiceUrl() {
   return HOME_VOICE_URLS[index]
 }
 
+async function waitForImagesInElement(element) {
+  const images = Array.from(element.querySelectorAll('img'))
+
+  await Promise.all(
+    images.map((img) => {
+      if (img.complete && img.naturalWidth > 0) {
+        return Promise.resolve()
+      }
+
+      return new Promise((resolve) => {
+        const done = () => resolve()
+        img.addEventListener('load', done, { once: true })
+        img.addEventListener('error', done, { once: true })
+      })
+    })
+  )
+}
+
+async function downloadPngFromRef(targetRef, fileName) {
+  if (!targetRef.current) {
+    throw new Error('保存する要素が見つからないよ')
+  }
+
+  const element = targetRef.current
+  await waitForImagesInElement(element)
+
+  const dataUrl = await toPng(element, {
+    cacheBust: true,
+    pixelRatio: 3,
+    backgroundColor: '#ffffff',
+    skipFonts: true,
+  })
+
+  const link = document.createElement('a')
+  link.download = fileName
+  link.href = dataUrl
+  link.click()
+}
+
 function App() {
   const initialSaveRef = useRef(null)
   if (!initialSaveRef.current) {
@@ -396,22 +435,6 @@ function App() {
     return item.creatorName || '不明'
   }
 
-  const buildPngFromRef = async (ref, filename) => {
-    if (!ref.current) return
-
-    const dataUrl = await toPng(ref.current, {
-      cacheBust: true,
-      pixelRatio: 3,
-      backgroundColor: '#ffffff',
-      skipFonts: true,
-    })
-
-    const link = document.createElement('a')
-    link.download = filename
-    link.href = dataUrl
-    link.click()
-  }
-
   const renderAvatarLayers = (stageClassName = 'characterStage') => (
     <div className={stageClassName}>
       <img
@@ -470,9 +493,10 @@ function App() {
   const handleSaveHomeImage = async () => {
     try {
       setIsSavingHomeImage(true)
-      await buildPngFromRef(homeCardRef, `${nickname || DEFAULT_NICKNAME}-home-card.png`)
+      await downloadPngFromRef(homeCardRef, `${nickname || DEFAULT_NICKNAME}-home-card.png`)
     } catch (error) {
       alert(`ホーム画像の保存に失敗したよ: ${error.message}`)
+      console.error(error)
     } finally {
       setIsSavingHomeImage(false)
     }
@@ -483,9 +507,10 @@ function App() {
 
     try {
       setIsSavingQrImage(true)
-      await buildPngFromRef(qrCardRef, `${selectedQrItem.name}-qr-card.png`)
+      await downloadPngFromRef(qrCardRef, `${selectedQrItem.name}-qr-card.png`)
     } catch (error) {
       alert(`QR画像の保存に失敗したよ: ${error.message}`)
+      console.error(error)
     } finally {
       setIsSavingQrImage(false)
     }

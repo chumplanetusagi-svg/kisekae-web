@@ -654,6 +654,12 @@ a {
   box-shadow: 0 12px 26px rgba(181, 196, 255, 0.16);
 }
 
+.qrCanvasWrap canvas {
+  display: block;
+  width: 220px !important;
+  height: 220px !important;
+}
+
 .qrHelpText,
 .infoText,
 .emptyText {
@@ -661,12 +667,6 @@ a {
   line-height: 1.7;
   color: var(--muted);
   font-weight: 600;
-}
-
-.qrCanvasWrap canvas {
-  display: block;
-  width: 220px !important;
-  height: 220px !important;
 }
 
 .settingsLayoutWide {
