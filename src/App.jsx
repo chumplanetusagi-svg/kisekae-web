@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
-import { toPng } from 'html-to-image'
 import { supabase } from './supabase'
 import './App.css'
 
@@ -13,7 +12,6 @@ const MAX_ACCESSORIES = 5
 const DEFAULT_BASE_CREATOR = 'はむまよろーる様'
 const DEFAULT_BASE_CREATOR_URL = 'https://x.com/hamumayo_roll'
 
-// 今は1つだけ使う素体
 const DEFAULT_BASE_ITEMS = [
   {
     id: 'default-base-1',
@@ -209,10 +207,7 @@ function loadSaveData() {
 }
 
 function fileToSafePath(fileName) {
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}-${fileName.replace(
-    /[^\w.\-]/g,
-    '_'
-  )}`
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}-${fileName.replace(/[^\w.\-]/g, '_')}`
 }
 
 function normalizeImportedItem(item) {
@@ -238,46 +233,236 @@ function getRandomVoiceUrl() {
   return HOME_VOICE_URLS[index]
 }
 
-async function waitForImagesInElement(element) {
-  const images = Array.from(element.querySelectorAll('img'))
-
-  await Promise.all(
-    images.map((img) => {
-      if (img.complete && img.naturalWidth > 0) {
-        return Promise.resolve()
-      }
-
-      return new Promise((resolve) => {
-        const done = () => resolve()
-        img.addEventListener('load', done, { once: true })
-        img.addEventListener('error', done, { once: true })
-      })
-    })
-  )
+function roundedRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath()
+  ctx.moveTo(x + radius, y)
+  ctx.lineTo(x + width - radius, y)
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius)
+  ctx.lineTo(x + width, y + height - radius)
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height)
+  ctx.lineTo(x + radius, y + height)
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius)
+  ctx.lineTo(x, y + radius)
+  ctx.quadraticCurveTo(x, y, x + radius, y)
+  ctx.closePath()
 }
 
-async function downloadPngFromRef(targetRef, fileName) {
-  if (!targetRef.current) {
-    throw new Error('保存する要素が見つからないよ')
-  }
+function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 6) {
+  const lines = []
+  const paragraphs = String(text || '').split('\n')
 
-  const element = targetRef.current
-  await waitForImagesInElement(element)
+  paragraphs.forEach((paragraph) => {
+    if (!paragraph) {
+      lines.push('')
+      return
+    }
 
-  const dataUrl = await toPng(element, {
-    cacheBust: true,
-    pixelRatio: 3,
-    backgroundColor: '#ffffff',
-    skipFonts: true,
+    let current = ''
+    for (const char of paragraph) {
+      const test = current + char
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current)
+        current = char
+      } else {
+        current = test
+      }
+    }
+    if (current) lines.push(current)
   })
 
+  lines.slice(0, maxLines).forEach((line, index) => {
+    ctx.fillText(line, x, y + index * lineHeight)
+  })
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error(`画像を読み込めなかったよ: ${src}`))
+    img.src = src
+  })
+}
+
+function downloadCanvas(canvas, fileName) {
   const link = document.createElement('a')
   link.download = fileName
-  link.href = dataUrl
+  link.href = canvas.toDataURL('image/png')
   link.click()
 }
 
-function App() {
+async function drawAvatarCanvas({
+  baseImageUrl,
+  upperImageUrl = '',
+  lowerImageUrl = '',
+  accessoryImageUrls = [],
+  size = 900,
+}) {
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+
+  const grad = ctx.createLinearGradient(0, 0, 0, size)
+  grad.addColorStop(0, '#dff1ff')
+  grad.addColorStop(1, '#f3eefe')
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, size, size)
+
+  const urls = [baseImageUrl, lowerImageUrl, upperImageUrl, ...accessoryImageUrls].filter(Boolean)
+
+  for (const url of urls) {
+    const img = await loadImage(url)
+    ctx.drawImage(img, 0, 0, size, size)
+  }
+
+  return canvas
+}
+
+async function createHomeCanvas({
+  nickname,
+  concept,
+  baseImageUrl,
+  lowerImageUrl,
+  upperImageUrl,
+  accessoryImageUrls,
+}) {
+  const width = 1400
+  const height = 1700
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, width, height)
+
+  ctx.fillStyle = '#f7fbff'
+  roundedRect(ctx, 60, 60, width - 120, height - 120, 42)
+  ctx.fill()
+
+  const avatarCanvas = await drawAvatarCanvas({
+    baseImageUrl,
+    lowerImageUrl,
+    upperImageUrl,
+    accessoryImageUrls,
+    size: 860,
+  })
+  ctx.drawImage(avatarCanvas, 270, 110, 860, 860)
+
+  ctx.fillStyle = '#ffffff'
+  roundedRect(ctx, 450, 1010, 500, 90, 45)
+  ctx.fill()
+
+  ctx.fillStyle = '#5f6fc3'
+  ctx.font = 'bold 42px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(nickname || DEFAULT_NICKNAME, 700, 1055)
+
+  ctx.fillStyle = '#ffffff'
+  roundedRect(ctx, 170, 1150, 1060, 360, 30)
+  ctx.fill()
+
+  ctx.fillStyle = '#6d7fd7'
+  ctx.font = 'bold 34px sans-serif'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'top'
+  drawWrappedText(
+    ctx,
+    (concept && concept.trim()) || 'コンセプトはまだ未設定だよ',
+    210,
+    1195,
+    980,
+    54,
+    5
+  )
+
+  return canvas
+}
+
+async function createQrCardCanvas({
+  itemName,
+  itemCategoryLabel,
+  creatorName,
+  nickname,
+  baseImageUrl,
+  qrItemUpperImageUrl = '',
+  qrItemLowerImageUrl = '',
+  qrItemAccessoryImageUrls = [],
+  qrCanvas,
+}) {
+  const width = 1600
+  const height = 1180
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, width, height)
+
+  ctx.fillStyle = '#fbfdff'
+  roundedRect(ctx, 40, 40, width - 80, height - 80, 40)
+  ctx.fill()
+
+  ctx.fillStyle = '#8fbfff'
+  roundedRect(ctx, 90, 90, 190, 56, 28)
+  ctx.fill()
+
+  ctx.fillStyle = '#ffffff'
+  ctx.font = 'bold 24px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('QR配布カード', 185, 118)
+
+  ctx.fillStyle = '#5f6fc3'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'top'
+  ctx.font = 'bold 54px sans-serif'
+  ctx.fillText(itemName, 90, 185)
+
+  ctx.fillStyle = '#98a7de'
+  ctx.font = 'bold 28px sans-serif'
+  ctx.fillText(`作った人：${creatorName}`, 90, 260)
+  ctx.fillText(itemCategoryLabel, 90, 308)
+
+  const avatarCanvas = await drawAvatarCanvas({
+    baseImageUrl,
+    upperImageUrl: qrItemUpperImageUrl,
+    lowerImageUrl: qrItemLowerImageUrl,
+    accessoryImageUrls: qrItemAccessoryImageUrls,
+    size: 620,
+  })
+  ctx.drawImage(avatarCanvas, 120, 390, 620, 620)
+
+  ctx.fillStyle = '#ffffff'
+  roundedRect(ctx, 285, 1035, 290, 72, 36)
+  ctx.fill()
+
+  ctx.fillStyle = '#5f6fc3'
+  ctx.font = 'bold 30px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(nickname || DEFAULT_NICKNAME, 430, 1071)
+
+  ctx.fillStyle = '#ffffff'
+  roundedRect(ctx, 980, 430, 420, 420, 30)
+  ctx.fill()
+
+  ctx.drawImage(qrCanvas, 1040, 490, 300, 300)
+
+  ctx.fillStyle = '#98a7de'
+  ctx.font = 'bold 24px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'top'
+  ctx.fillText('読み込むとこの服を追加できるよ', 1190, 885)
+
+  return canvas
+}
+
+export default function App() {
   const initialSaveRef = useRef(null)
   if (!initialSaveRef.current) {
     initialSaveRef.current = loadSaveData()
@@ -285,8 +470,7 @@ function App() {
   const initialSave = initialSaveRef.current
 
   const audioRef = useRef(null)
-  const homeCardRef = useRef(null)
-  const qrCardRef = useRef(null)
+  const qrCanvasWrapRef = useRef(null)
 
   const [activeTab, setActiveTab] = useState(initialSave.activeTab)
   const [closetTab, setClosetTab] = useState(initialSave.closetTab)
@@ -299,15 +483,11 @@ function App() {
   const [equippedBaseId] = useState(initialSave.equippedBaseId)
   const [equippedUpperId, setEquippedUpperId] = useState(initialSave.equippedUpperId)
   const [equippedLowerId, setEquippedLowerId] = useState(initialSave.equippedLowerId)
-  const [equippedAccessoryIds, setEquippedAccessoryIds] = useState(
-    initialSave.equippedAccessoryIds
-  )
+  const [equippedAccessoryIds, setEquippedAccessoryIds] = useState(initialSave.equippedAccessoryIds)
 
   const [favoriteUpperId, setFavoriteUpperId] = useState(initialSave.favoriteUpperId)
   const [favoriteLowerId, setFavoriteLowerId] = useState(initialSave.favoriteLowerId)
-  const [favoriteAccessoryIds, setFavoriteAccessoryIds] = useState(
-    initialSave.favoriteAccessoryIds
-  )
+  const [favoriteAccessoryIds, setFavoriteAccessoryIds] = useState(initialSave.favoriteAccessoryIds)
 
   const [selectedQrItemId, setSelectedQrItemId] = useState(initialSave.selectedQrItemId)
 
@@ -322,23 +502,11 @@ function App() {
 
   const allItems = useMemo(() => [...DEFAULT_ITEMS, ...customItems], [customItems])
 
-  const upperItems = useMemo(
-    () => allItems.filter((item) => item.category === 'upper'),
-    [allItems]
-  )
-  const lowerItems = useMemo(
-    () => allItems.filter((item) => item.category === 'lower'),
-    [allItems]
-  )
-  const accessoryItems = useMemo(
-    () => allItems.filter((item) => item.category === 'accessory'),
-    [allItems]
-  )
+  const upperItems = useMemo(() => allItems.filter((item) => item.category === 'upper'), [allItems])
+  const lowerItems = useMemo(() => allItems.filter((item) => item.category === 'lower'), [allItems])
+  const accessoryItems = useMemo(() => allItems.filter((item) => item.category === 'accessory'), [allItems])
 
-  const qrShareableItems = useMemo(
-    () => allItems.filter((item) => item.qrShareable),
-    [allItems]
-  )
+  const qrShareableItems = useMemo(() => allItems.filter((item) => item.qrShareable), [allItems])
 
   const equippedBase = useMemo(
     () => allItems.find((item) => item.id === equippedBaseId) || DEFAULT_BASE_ITEMS[0],
@@ -368,6 +536,10 @@ function App() {
     return accessoryItems
   }, [closetTab, upperItems, lowerItems, accessoryItems])
 
+  const qrPreviewUpper = selectedQrItem?.category === 'upper' ? selectedQrItem : null
+  const qrPreviewLower = selectedQrItem?.category === 'lower' ? selectedQrItem : null
+  const qrPreviewAccessories = selectedQrItem?.category === 'accessory' ? [selectedQrItem] : []
+
   useEffect(() => {
     const saveData = {
       activeTab,
@@ -385,7 +557,6 @@ function App() {
       favoriteAccessoryIds,
       selectedQrItemId,
     }
-
     localStorage.setItem(LS_KEY, JSON.stringify(saveData))
   }, [
     activeTab,
@@ -435,42 +606,6 @@ function App() {
     return item.creatorName || '不明'
   }
 
-  const renderAvatarLayers = (stageClassName = 'characterStage') => (
-    <div className={stageClassName}>
-      <img
-        className="layerImage"
-        src={equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl}
-        alt={equippedBase?.name || '素体'}
-        crossOrigin="anonymous"
-      />
-      {equippedLower && (
-        <img
-          className="layerImage"
-          src={equippedLower.imageUrl}
-          alt={equippedLower.name}
-          crossOrigin="anonymous"
-        />
-      )}
-      {equippedUpper && (
-        <img
-          className="layerImage"
-          src={equippedUpper.imageUrl}
-          alt={equippedUpper.name}
-          crossOrigin="anonymous"
-        />
-      )}
-      {equippedAccessories.map((item) => (
-        <img
-          key={item.id}
-          className="layerImage"
-          src={item.imageUrl}
-          alt={item.name}
-          crossOrigin="anonymous"
-        />
-      ))}
-    </div>
-  )
-
   const handleCharacterClick = async () => {
     try {
       const randomVoiceUrl = getRandomVoiceUrl()
@@ -486,14 +621,24 @@ function App() {
       audioRef.current.currentTime = 0
       await audioRef.current.play()
     } catch {
-      // 失敗しても何もしない
+      // noop
     }
   }
 
   const handleSaveHomeImage = async () => {
     try {
       setIsSavingHomeImage(true)
-      await downloadPngFromRef(homeCardRef, `${nickname || DEFAULT_NICKNAME}-home-card.png`)
+
+      const canvas = await createHomeCanvas({
+        nickname,
+        concept,
+        baseImageUrl: equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl,
+        lowerImageUrl: equippedLower?.imageUrl || '',
+        upperImageUrl: equippedUpper?.imageUrl || '',
+        accessoryImageUrls: equippedAccessories.map((item) => item.imageUrl),
+      })
+
+      downloadCanvas(canvas, `${nickname || DEFAULT_NICKNAME}-home-card.png`)
     } catch (error) {
       alert(`ホーム画像の保存に失敗したよ: ${error.message}`)
       console.error(error)
@@ -507,7 +652,32 @@ function App() {
 
     try {
       setIsSavingQrImage(true)
-      await downloadPngFromRef(qrCardRef, `${selectedQrItem.name}-qr-card.png`)
+
+      const qrCanvas = qrCanvasWrapRef.current?.querySelector('canvas')
+      if (!qrCanvas) {
+        throw new Error('QRコードが見つからないよ')
+      }
+
+      const itemCategoryLabel =
+        selectedQrItem.category === 'upper'
+          ? '上の服'
+          : selectedQrItem.category === 'lower'
+          ? '下の服'
+          : 'アクセサリー'
+
+      const canvas = await createQrCardCanvas({
+        itemName: selectedQrItem.name,
+        itemCategoryLabel,
+        creatorName: getDisplayCreatorName(selectedQrItem),
+        nickname,
+        baseImageUrl: equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl,
+        qrItemUpperImageUrl: qrPreviewUpper?.imageUrl || '',
+        qrItemLowerImageUrl: qrPreviewLower?.imageUrl || '',
+        qrItemAccessoryImageUrls: qrPreviewAccessories.map((item) => item.imageUrl),
+        qrCanvas,
+      })
+
+      downloadCanvas(canvas, `${selectedQrItem.name}-qr-card.png`)
     } catch (error) {
       alert(`QR画像の保存に失敗したよ: ${error.message}`)
       console.error(error)
@@ -532,12 +702,10 @@ function App() {
         if (prev.includes(item.id)) {
           return prev.filter((id) => id !== item.id)
         }
-
         if (prev.length >= MAX_ACCESSORIES) {
           alert(`アクセサリーは最大${MAX_ACCESSORIES}個までだよ`)
           return prev
         }
-
         return [...prev, item.id]
       })
     }
@@ -559,12 +727,10 @@ function App() {
         if (prev.includes(item.id)) {
           return prev.filter((id) => id !== item.id)
         }
-
         if (prev.length >= MAX_ACCESSORIES) {
           alert(`お気に入りアクセは最大${MAX_ACCESSORIES}個までだよ`)
           return prev
         }
-
         return [...prev, item.id]
       })
     }
@@ -581,12 +747,10 @@ function App() {
       setEquippedUpperId(null)
       return
     }
-
     if (category === 'lower') {
       setEquippedLowerId(null)
       return
     }
-
     if (category === 'accessory') {
       setEquippedAccessoryIds([])
     }
@@ -603,7 +767,6 @@ function App() {
       alert('名前を入れてね')
       return
     }
-
     if (!uploadFile) {
       alert('画像を選んでね')
       return
@@ -616,13 +779,9 @@ function App() {
 
       const { error: uploadError } = await supabase.storage
         .from(STORAGE_BUCKET)
-        .upload(filePath, uploadFile, {
-          upsert: false,
-        })
+        .upload(filePath, uploadFile, { upsert: false })
 
-      if (uploadError) {
-        throw uploadError
-      }
+      if (uploadError) throw uploadError
 
       const { data: publicUrlData } = supabase.storage
         .from(STORAGE_BUCKET)
@@ -673,11 +832,9 @@ function App() {
     if (equippedAccessoryIds.includes(itemId)) {
       setEquippedAccessoryIds((prev) => prev.filter((id) => id !== itemId))
     }
-
     if (favoriteAccessoryIds.includes(itemId)) {
       setFavoriteAccessoryIds((prev) => prev.filter((id) => id !== itemId))
     }
-
     if (selectedQrItemId === itemId) {
       setSelectedQrItemId(null)
     }
@@ -705,7 +862,6 @@ function App() {
         }
 
         const importedItem = normalizeImportedItem(parsed.item)
-
         if (!importedItem) {
           throw new Error('QRのデータ形式が正しくないよ')
         }
@@ -776,6 +932,78 @@ function App() {
         },
       })
     : ''
+
+  const renderAvatarLayers = (stageClassName = 'characterStage') => (
+    <div className={stageClassName}>
+      <img
+        className="layerImage"
+        src={equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl}
+        alt={equippedBase?.name || '素体'}
+        crossOrigin="anonymous"
+      />
+      {equippedLower && (
+        <img
+          className="layerImage"
+          src={equippedLower.imageUrl}
+          alt={equippedLower.name}
+          crossOrigin="anonymous"
+        />
+      )}
+      {equippedUpper && (
+        <img
+          className="layerImage"
+          src={equippedUpper.imageUrl}
+          alt={equippedUpper.name}
+          crossOrigin="anonymous"
+        />
+      )}
+      {equippedAccessories.map((item) => (
+        <img
+          key={item.id}
+          className="layerImage"
+          src={item.imageUrl}
+          alt={item.name}
+          crossOrigin="anonymous"
+        />
+      ))}
+    </div>
+  )
+
+  const renderQrPreviewLayers = (stageClassName = 'qrAvatarStage') => (
+    <div className={stageClassName}>
+      <img
+        className="layerImage"
+        src={equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl}
+        alt={equippedBase?.name || '素体'}
+        crossOrigin="anonymous"
+      />
+      {qrPreviewLower && (
+        <img
+          className="layerImage"
+          src={qrPreviewLower.imageUrl}
+          alt={qrPreviewLower.name}
+          crossOrigin="anonymous"
+        />
+      )}
+      {qrPreviewUpper && (
+        <img
+          className="layerImage"
+          src={qrPreviewUpper.imageUrl}
+          alt={qrPreviewUpper.name}
+          crossOrigin="anonymous"
+        />
+      )}
+      {qrPreviewAccessories.map((item) => (
+        <img
+          key={item.id}
+          className="layerImage"
+          src={item.imageUrl}
+          alt={item.name}
+          crossOrigin="anonymous"
+        />
+      ))}
+    </div>
+  )
 
   const renderItemCard = (item) => (
     <div key={item.id} className="itemCard">
@@ -859,28 +1087,16 @@ function App() {
           </div>
 
           <div className="tabRow">
-            <button
-              className={`tabButton ${activeTab === 'home' ? 'active' : ''}`}
-              onClick={() => setActiveTab('home')}
-            >
+            <button className={`tabButton ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
               ホーム
             </button>
-            <button
-              className={`tabButton ${activeTab === 'closet' ? 'active' : ''}`}
-              onClick={() => setActiveTab('closet')}
-            >
+            <button className={`tabButton ${activeTab === 'closet' ? 'active' : ''}`} onClick={() => setActiveTab('closet')}>
               クローゼット
             </button>
-            <button
-              className={`tabButton ${activeTab === 'qr' ? 'active' : ''}`}
-              onClick={() => setActiveTab('qr')}
-            >
+            <button className={`tabButton ${activeTab === 'qr' ? 'active' : ''}`} onClick={() => setActiveTab('qr')}>
               QR
             </button>
-            <button
-              className={`tabButton ${activeTab === 'settings' ? 'active' : ''}`}
-              onClick={() => setActiveTab('settings')}
-            >
+            <button className={`tabButton ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
               設定
             </button>
           </div>
@@ -890,7 +1106,7 @@ function App() {
           {activeTab === 'home' && (
             <div className="homeSingleWrap">
               <section className="mainCard homeOnlyCard">
-                <div ref={homeCardRef} className="homeCaptureCard">
+                <div className="homeCaptureCard">
                   <div className="homeCaptureInner">
                     <button className="homeAvatarButton" onClick={handleCharacterClick}>
                       {renderAvatarLayers('homeAvatarStage')}
@@ -905,16 +1121,10 @@ function App() {
                 </div>
 
                 <div className="homeSaveArea">
-                  <button
-                    className="primaryButton"
-                    onClick={handleSaveHomeImage}
-                    disabled={isSavingHomeImage}
-                  >
+                  <button className="primaryButton" onClick={handleSaveHomeImage} disabled={isSavingHomeImage}>
                     {isSavingHomeImage ? '保存中…' : 'ホーム画像を保存'}
                   </button>
-                  <p className="infoText">
-                    今見えているホームカードを、そのまま1枚画像で保存できるよ。
-                  </p>
+                  <p className="infoText">今見えているホームカードを、そのまま1枚画像で保存できるよ。</p>
                 </div>
               </section>
             </div>
@@ -925,7 +1135,6 @@ function App() {
               <section className="leftColumn">
                 <div className="mainCard previewCard">
                   {renderAvatarLayers('characterStage smallStage')}
-
                   <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
 
                   <div className="miniActions">
@@ -984,9 +1193,7 @@ function App() {
                     </button>
                   </div>
 
-                  <p className="infoText">
-                    個人でアップした服は、作った人が自動でニックネーム表記になるよ。
-                  </p>
+                  <p className="infoText">個人でアップした服は、作った人が自動でニックネーム表記になるよ。</p>
                 </div>
               </section>
 
@@ -998,11 +1205,7 @@ function App() {
                       className="ghostButton"
                       onClick={() =>
                         handleUnequipCategory(
-                          closetTab === 'upper'
-                            ? 'upper'
-                            : closetTab === 'lower'
-                            ? 'lower'
-                            : 'accessory'
+                          closetTab === 'upper' ? 'upper' : closetTab === 'lower' ? 'lower' : 'accessory'
                         )
                       }
                     >
@@ -1011,26 +1214,17 @@ function App() {
                   </div>
 
                   <div className="closetTabRow">
-                    <button
-                      className={`closetTabButton ${closetTab === 'upper' ? 'active' : ''}`}
-                      onClick={() => setClosetTab('upper')}
-                    >
+                    <button className={`closetTabButton ${closetTab === 'upper' ? 'active' : ''}`} onClick={() => setClosetTab('upper')}>
                       上の服
                       <span className="closetTabCount">{upperItems.length}</span>
                     </button>
 
-                    <button
-                      className={`closetTabButton ${closetTab === 'lower' ? 'active' : ''}`}
-                      onClick={() => setClosetTab('lower')}
-                    >
+                    <button className={`closetTabButton ${closetTab === 'lower' ? 'active' : ''}`} onClick={() => setClosetTab('lower')}>
                       下の服
                       <span className="closetTabCount">{lowerItems.length}</span>
                     </button>
 
-                    <button
-                      className={`closetTabButton ${closetTab === 'accessory' ? 'active' : ''}`}
-                      onClick={() => setClosetTab('accessory')}
-                    >
+                    <button className={`closetTabButton ${closetTab === 'accessory' ? 'active' : ''}`} onClick={() => setClosetTab('accessory')}>
                       アクセ
                       <span className="closetTabCount">{accessoryItems.length}</span>
                     </button>
@@ -1039,16 +1233,10 @@ function App() {
                   <div className="closetTabPanel">
                     <div className="closetTabHeaderLine">
                       <div className="closetTabTitle">
-                        {closetTab === 'upper'
-                          ? '上の服一覧'
-                          : closetTab === 'lower'
-                          ? '下の服一覧'
-                          : 'アクセサリー一覧'}
+                        {closetTab === 'upper' ? '上の服一覧' : closetTab === 'lower' ? '下の服一覧' : 'アクセサリー一覧'}
                       </div>
                       <div className="closetTabHint">
-                        {closetTab === 'accessory'
-                          ? `最大${MAX_ACCESSORIES}個まで付けられるよ`
-                          : '着たいものを選んでね'}
+                        {closetTab === 'accessory' ? `最大${MAX_ACCESSORIES}個まで付けられるよ` : '着たいものを選んでね'}
                       </div>
                     </div>
 
@@ -1065,9 +1253,7 @@ function App() {
                 <h2 className="sectionTitle">服をQRで配る</h2>
 
                 {qrShareableItems.length === 0 ? (
-                  <p className="emptyText">
-                    アップロード服がまだないよ。先にクローゼットから追加してね。
-                  </p>
+                  <p className="emptyText">アップロード服がまだないよ。先にクローゼットから追加してね。</p>
                 ) : (
                   <>
                     <label className="fieldLabel">
@@ -1079,13 +1265,7 @@ function App() {
                       >
                         {qrShareableItems.map((item) => (
                           <option key={item.id} value={item.id}>
-                            {item.name}（
-                            {item.category === 'upper'
-                              ? '上の服'
-                              : item.category === 'lower'
-                              ? '下の服'
-                              : 'アクセ'}
-                            ）
+                            {item.name}（{item.category === 'upper' ? '上の服' : item.category === 'lower' ? '下の服' : 'アクセ'}）
                           </option>
                         ))}
                       </select>
@@ -1093,14 +1273,12 @@ function App() {
 
                     {selectedQrItem && (
                       <>
-                        <div ref={qrCardRef} className="qrCard">
+                        <div className="qrCard">
                           <div className="qrCardHeader">
                             <span className="qrCardBadge">QR配布カード</span>
                             <div className="qrCardTitleBlock">
                               <div className="qrItemName">{selectedQrItem.name}</div>
-                              <div className="creatorLine">
-                                作った人：{getDisplayCreatorName(selectedQrItem)}
-                              </div>
+                              <div className="creatorLine">作った人：{getDisplayCreatorName(selectedQrItem)}</div>
                               <div className="qrCardCategory">
                                 {selectedQrItem.category === 'upper'
                                   ? '上の服'
@@ -1114,30 +1292,22 @@ function App() {
                           <div className="qrCardMain">
                             <div className="qrPreviewPane">
                               <div className="qrPreviewAvatar">
-                                {renderAvatarLayers('qrAvatarStage')}
+                                {renderQrPreviewLayers('qrAvatarStage')}
                               </div>
-                              <div className="namePlate compact">
-                                {nickname || DEFAULT_NICKNAME}
-                              </div>
+                              <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
                             </div>
 
                             <div className="qrCodePane">
-                              <div className="qrCanvasWrap">
+                              <div ref={qrCanvasWrapRef} className="qrCanvasWrap">
                                 <QRCodeCanvas value={qrValue} size={220} includeMargin />
                               </div>
-                              <p className="qrHelpText">
-                                読み込むとこの服を追加できるよ
-                              </p>
+                              <p className="qrHelpText">読み込むとこの服を追加できるよ</p>
                             </div>
                           </div>
                         </div>
 
                         <div className="qrSaveArea">
-                          <button
-                            className="primaryButton"
-                            onClick={handleSaveQrImage}
-                            disabled={isSavingQrImage}
-                          >
+                          <button className="primaryButton" onClick={handleSaveQrImage} disabled={isSavingQrImage}>
                             {isSavingQrImage ? '保存中…' : 'QR画像を保存'}
                           </button>
                         </div>
@@ -1168,22 +1338,13 @@ function App() {
                 </div>
 
                 <div className="settingsTabRow">
-                  <button
-                    className={`settingsTabButton ${settingsTab === 'profile' ? 'active' : ''}`}
-                    onClick={() => setSettingsTab('profile')}
-                  >
+                  <button className={`settingsTabButton ${settingsTab === 'profile' ? 'active' : ''}`} onClick={() => setSettingsTab('profile')}>
                     プロフィール
                   </button>
-                  <button
-                    className={`settingsTabButton ${settingsTab === 'terms' ? 'active' : ''}`}
-                    onClick={() => setSettingsTab('terms')}
-                  >
+                  <button className={`settingsTabButton ${settingsTab === 'terms' ? 'active' : ''}`} onClick={() => setSettingsTab('terms')}>
                     利用規約
                   </button>
-                  <button
-                    className={`settingsTabButton ${settingsTab === 'credits' ? 'active' : ''}`}
-                    onClick={() => setSettingsTab('credits')}
-                  >
+                  <button className={`settingsTabButton ${settingsTab === 'credits' ? 'active' : ''}`} onClick={() => setSettingsTab('credits')}>
                     クレジット
                   </button>
                 </div>
@@ -1228,18 +1389,10 @@ function App() {
                 {settingsTab === 'terms' && (
                   <div className="settingsPanel">
                     <div className="rulesBox">
-                      <p className="rulesText">
-                        ・既存の服や、ほかの人が作った服を自分で作ったことにしないでね。
-                      </p>
-                      <p className="rulesText">
-                        ・QRで受け取った服は、作った人の名前を消したり、自分の作品として再配布しないでね。
-                      </p>
-                      <p className="rulesText">
-                        ・配布するときは、相手や制作者さんが嫌がる使い方をしないでね。
-                      </p>
-                      <p className="rulesText">
-                        ・著作権や利用条件がある素材は、それぞれのルールを守って使ってね。
-                      </p>
+                      <p className="rulesText">・既存の服や、ほかの人が作った服を自分で作ったことにしないでね。</p>
+                      <p className="rulesText">・QRで受け取った服は、作った人の名前を消したり、自分の作品として再配布しないでね。</p>
+                      <p className="rulesText">・配布するときは、相手や制作者さんが嫌がる使い方をしないでね。</p>
+                      <p className="rulesText">・著作権や利用条件がある素材は、それぞれのルールを守って使ってね。</p>
                     </div>
                   </div>
                 )}
@@ -1285,5 +1438,3 @@ function App() {
     </div>
   )
 }
-
-export default App

@@ -113,8 +113,7 @@ a {
   gap: 24px;
 }
 
-.mainCard,
-.sideCard {
+.mainCard {
   background: var(--card);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(207, 220, 255, 0.95);
@@ -767,8 +766,7 @@ a {
     font-size: 26px;
   }
 
-  .mainCard,
-  .sideCard {
+  .mainCard {
     padding: 18px;
     border-radius: 24px;
   }
