@@ -4,6 +4,23 @@ import { BrowserMultiFormatReader } from '@zxing/browser'
 import { supabase } from './supabase'
 import './App.css'
 
+import {
+  DndContext,
+  PointerSensor,
+  KeyboardSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  sortableKeyboardCoordinates,
+  arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
 const STORAGE_BUCKET = 'clothes'
 const LS_KEY = 'kisekae-app-save'
 const DEFAULT_NICKNAME = 'ふれろっぷ'
@@ -167,6 +184,17 @@ const DEFAULT_ITEMS = [
   ...DEFAULT_ACCESSORY_ITEMS,
 ]
 
+const DEFAULT_LAYER_ORDER = [
+  'base',
+  'lower',
+  'upper',
+  'accessory-1',
+  'accessory-2',
+  'accessory-3',
+  'accessory-4',
+  'accessory-5',
+]
+
 const DEFAULT_SAVE = {
   activeTab: 'home',
   closetTab: 'upper',
@@ -182,6 +210,7 @@ const DEFAULT_SAVE = {
   favoriteLowerId: 'default-lower-1',
   favoriteAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
   selectedQrItemId: null,
+  equippedLayerOrder: DEFAULT_LAYER_ORDER,
 }
 
 function loadSaveData() {
@@ -200,6 +229,9 @@ function loadSaveData() {
       favoriteAccessoryIds: Array.isArray(parsed?.favoriteAccessoryIds)
         ? parsed.favoriteAccessoryIds
         : DEFAULT_SAVE.favoriteAccessoryIds,
+      equippedLayerOrder: Array.isArray(parsed?.equippedLayerOrder)
+        ? parsed.equippedLayerOrder
+        : DEFAULT_LAYER_ORDER,
     }
   } catch {
     return DEFAULT_SAVE
@@ -294,8 +326,8 @@ function downloadCanvas(canvas, fileName) {
 
 async function drawAvatarCanvas({
   baseImageUrl,
-  upperImageUrl = '',
   lowerImageUrl = '',
+  upperImageUrl = '',
   accessoryImageUrls = [],
   size = 900,
 }) {
@@ -430,8 +462,8 @@ async function createQrCardCanvas({
 
   const avatarCanvas = await drawAvatarCanvas({
     baseImageUrl,
-    upperImageUrl: qrItemUpperImageUrl,
     lowerImageUrl: qrItemLowerImageUrl,
+    upperImageUrl: qrItemUpperImageUrl,
     accessoryImageUrls: qrItemAccessoryImageUrls,
     size: 620,
   })
@@ -462,6 +494,57 @@ async function createQrCardCanvas({
   return canvas
 }
 
+function ensureLayerOrder(order) {
+  const safe = Array.isArray(order) ? [...order] : []
+  DEFAULT_LAYER_ORDER.forEach((key) => {
+    if (!safe.includes(key)) safe.push(key)
+  })
+  return safe
+}
+
+function SortableLayerRow({ entry, index }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: entry.layerKey })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`layerRowDrag ${isDragging ? 'dragging' : ''}`}
+    >
+      <div className="layerRowDragLeft">
+        <button
+          type="button"
+          className="dragHandle"
+          aria-label={`${entry.item.name} をドラッグ`}
+          {...attributes}
+          {...listeners}
+        >
+          ⠿
+        </button>
+
+        <div className="layerRowNumberDrag">{index + 1}</div>
+
+        <div className="layerRowTextDrag">
+          <div className="layerRowNameDrag">{entry.item.name}</div>
+          <div className="layerRowMetaDrag">
+            {entry.layerKey === 'lower'
+              ? '下の服'
+              : entry.layerKey === 'upper'
+              ? '上の服'
+              : 'アクセサリー'}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const initialSaveRef = useRef(null)
   if (!initialSaveRef.current) {
@@ -490,6 +573,9 @@ export default function App() {
   const [favoriteAccessoryIds, setFavoriteAccessoryIds] = useState(initialSave.favoriteAccessoryIds)
 
   const [selectedQrItemId, setSelectedQrItemId] = useState(initialSave.selectedQrItemId)
+  const [equippedLayerOrder, setEquippedLayerOrder] = useState(
+    ensureLayerOrder(initialSave.equippedLayerOrder)
+  )
 
   const [uploadName, setUploadName] = useState('')
   const [uploadCategory, setUploadCategory] = useState('upper')
@@ -500,13 +586,34 @@ export default function App() {
 
   const [qrMessage, setQrMessage] = useState('')
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 4 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
   const allItems = useMemo(() => [...DEFAULT_ITEMS, ...customItems], [customItems])
 
-  const upperItems = useMemo(() => allItems.filter((item) => item.category === 'upper'), [allItems])
-  const lowerItems = useMemo(() => allItems.filter((item) => item.category === 'lower'), [allItems])
-  const accessoryItems = useMemo(() => allItems.filter((item) => item.category === 'accessory'), [allItems])
+  const upperItems = useMemo(
+    () => allItems.filter((item) => item.category === 'upper'),
+    [allItems]
+  )
+  const lowerItems = useMemo(
+    () => allItems.filter((item) => item.category === 'lower'),
+    [allItems]
+  )
+  const accessoryItems = useMemo(
+    () => allItems.filter((item) => item.category === 'accessory'),
+    [allItems]
+  )
 
-  const qrShareableItems = useMemo(() => allItems.filter((item) => item.qrShareable), [allItems])
+  const qrShareableItems = useMemo(
+    () => allItems.filter((item) => item.qrShareable),
+    [allItems]
+  )
 
   const equippedBase = useMemo(
     () => allItems.find((item) => item.id === equippedBaseId) || DEFAULT_BASE_ITEMS[0],
@@ -530,11 +637,25 @@ export default function App() {
     [qrShareableItems, selectedQrItemId]
   )
 
-  const currentClosetItems = useMemo(() => {
-    if (closetTab === 'upper') return upperItems
-    if (closetTab === 'lower') return lowerItems
-    return accessoryItems
-  }, [closetTab, upperItems, lowerItems, accessoryItems])
+  const layeredEquippedItems = useMemo(() => {
+    const layers = {
+      lower: equippedLower,
+      upper: equippedUpper,
+      'accessory-1': equippedAccessories[0] || null,
+      'accessory-2': equippedAccessories[1] || null,
+      'accessory-3': equippedAccessories[2] || null,
+      'accessory-4': equippedAccessories[3] || null,
+      'accessory-5': equippedAccessories[4] || null,
+    }
+
+    return ensureLayerOrder(equippedLayerOrder)
+      .filter((layerKey) => layerKey !== 'base')
+      .map((layerKey) => ({
+        layerKey,
+        item: layers[layerKey] || null,
+      }))
+      .filter((entry) => entry.item)
+  }, [equippedLower, equippedUpper, equippedAccessories, equippedLayerOrder])
 
   const qrPreviewUpper = selectedQrItem?.category === 'upper' ? selectedQrItem : null
   const qrPreviewLower = selectedQrItem?.category === 'lower' ? selectedQrItem : null
@@ -556,6 +677,7 @@ export default function App() {
       favoriteLowerId,
       favoriteAccessoryIds,
       selectedQrItemId,
+      equippedLayerOrder,
     }
     localStorage.setItem(LS_KEY, JSON.stringify(saveData))
   }, [
@@ -573,6 +695,7 @@ export default function App() {
     favoriteLowerId,
     favoriteAccessoryIds,
     selectedQrItemId,
+    equippedLayerOrder,
   ])
 
   useEffect(() => {
@@ -629,13 +752,20 @@ export default function App() {
     try {
       setIsSavingHomeImage(true)
 
+      const accessoryUrlsInLayerOrder = layeredEquippedItems
+        .filter((entry) => entry.layerKey.startsWith('accessory-'))
+        .map((entry) => entry.item.imageUrl)
+
+      const lowerUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'lower')?.item?.imageUrl || ''
+      const upperUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'upper')?.item?.imageUrl || ''
+
       const canvas = await createHomeCanvas({
         nickname,
         concept,
         baseImageUrl: equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl,
-        lowerImageUrl: equippedLower?.imageUrl || '',
-        upperImageUrl: equippedUpper?.imageUrl || '',
-        accessoryImageUrls: equippedAccessories.map((item) => item.imageUrl),
+        lowerImageUrl: lowerUrl,
+        upperImageUrl: upperUrl,
+        accessoryImageUrls: accessoryUrlsInLayerOrder,
       })
 
       downloadCanvas(canvas, `${nickname || DEFAULT_NICKNAME}-home-card.png`)
@@ -840,6 +970,19 @@ export default function App() {
     }
   }
 
+  const handleLayerDragEnd = (event) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const visibleIds = layeredEquippedItems.map((entry) => entry.layerKey)
+    const oldIndex = visibleIds.indexOf(String(active.id))
+    const newIndex = visibleIds.indexOf(String(over.id))
+    if (oldIndex < 0 || newIndex < 0) return
+
+    const movedVisible = arrayMove(visibleIds, oldIndex, newIndex)
+    setEquippedLayerOrder(['base', ...movedVisible])
+  }
+
   const handleReadQrImage = async (event) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -897,6 +1040,7 @@ export default function App() {
     setEquippedUpperId(DEFAULT_SAVE.equippedUpperId)
     setEquippedLowerId(DEFAULT_SAVE.equippedLowerId)
     setEquippedAccessoryIds(DEFAULT_SAVE.equippedAccessoryIds)
+    setEquippedLayerOrder(DEFAULT_LAYER_ORDER)
   }
 
   const handleResetSettings = () => {
@@ -916,6 +1060,7 @@ export default function App() {
     setFavoriteLowerId(DEFAULT_SAVE.favoriteLowerId)
     setFavoriteAccessoryIds(DEFAULT_SAVE.favoriteAccessoryIds)
     setSelectedQrItemId(null)
+    setEquippedLayerOrder(DEFAULT_LAYER_ORDER)
   }
 
   const qrValue = selectedQrItem
@@ -933,41 +1078,36 @@ export default function App() {
       })
     : ''
 
-  const renderAvatarLayers = (stageClassName = 'characterStage') => (
-    <div className={stageClassName}>
-      <img
-        className="layerImage"
-        src={equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl}
-        alt={equippedBase?.name || '素体'}
-        crossOrigin="anonymous"
-      />
-      {equippedLower && (
-        <img
-          className="layerImage"
-          src={equippedLower.imageUrl}
-          alt={equippedLower.name}
-          crossOrigin="anonymous"
-        />
-      )}
-      {equippedUpper && (
-        <img
-          className="layerImage"
-          src={equippedUpper.imageUrl}
-          alt={equippedUpper.name}
-          crossOrigin="anonymous"
-        />
-      )}
-      {equippedAccessories.map((item) => (
-        <img
-          key={item.id}
-          className="layerImage"
-          src={item.imageUrl}
-          alt={item.name}
-          crossOrigin="anonymous"
-        />
-      ))}
-    </div>
-  )
+  const renderAvatarLayers = (stageClassName = 'characterStage') => {
+    const layerMap = {
+      base: equippedBase,
+      lower: equippedLower,
+      upper: equippedUpper,
+      'accessory-1': equippedAccessories[0] || null,
+      'accessory-2': equippedAccessories[1] || null,
+      'accessory-3': equippedAccessories[2] || null,
+      'accessory-4': equippedAccessories[3] || null,
+      'accessory-5': equippedAccessories[4] || null,
+    }
+
+    return (
+      <div className={stageClassName}>
+        {ensureLayerOrder(equippedLayerOrder).map((layerKey) => {
+          const item = layerMap[layerKey]
+          if (!item) return null
+          return (
+            <img
+              key={`${layerKey}-${item.id}`}
+              className="layerImage"
+              src={item.imageUrl}
+              alt={item.name}
+              crossOrigin="anonymous"
+            />
+          )
+        })}
+      </div>
+    )
+  }
 
   const renderQrPreviewLayers = (stageClassName = 'qrAvatarStage') => (
     <div className={stageClassName}>
@@ -1076,6 +1216,75 @@ export default function App() {
       </div>
     </div>
   )
+
+  const renderClosetBody = () => {
+    if (closetTab === 'upper') {
+      return (
+        <div className="closetTabPanel">
+          <div className="closetTabHeaderLine">
+            <div className="closetTabTitle">上の服一覧</div>
+            <div className="closetTabHint">着たいものを選んでね</div>
+          </div>
+          <div className="itemGrid">{upperItems.map(renderItemCard)}</div>
+        </div>
+      )
+    }
+
+    if (closetTab === 'lower') {
+      return (
+        <div className="closetTabPanel">
+          <div className="closetTabHeaderLine">
+            <div className="closetTabTitle">下の服一覧</div>
+            <div className="closetTabHint">着たいものを選んでね</div>
+          </div>
+          <div className="itemGrid">{lowerItems.map(renderItemCard)}</div>
+        </div>
+      )
+    }
+
+    if (closetTab === 'accessory') {
+      return (
+        <div className="closetTabPanel">
+          <div className="closetTabHeaderLine">
+            <div className="closetTabTitle">アクセサリー一覧</div>
+            <div className="closetTabHint">最大{MAX_ACCESSORIES}個まで付けられるよ</div>
+          </div>
+          <div className="itemGrid">{accessoryItems.map(renderItemCard)}</div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="layerManagerDrag">
+        <p className="infoText">
+          持ち手をつかんで上下に移動すると、重ね順を変えられるよ。
+          <br />
+          上にあるものほど奥、下にあるものほど手前に表示されるよ。
+        </p>
+
+        {layeredEquippedItems.length === 0 ? (
+          <p className="emptyText">いま着ているものがないよ。</p>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleLayerDragEnd}
+          >
+            <SortableContext
+              items={layeredEquippedItems.map((entry) => entry.layerKey)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="layerListDrag">
+                {layeredEquippedItems.map((entry, index) => (
+                  <SortableLayerRow key={entry.layerKey} entry={entry} index={index} />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="appShell">
@@ -1201,16 +1410,22 @@ export default function App() {
                 <div className="mainCard">
                   <div className="sectionHeader">
                     <h2 className="sectionTitle">クローゼット</h2>
-                    <button
-                      className="ghostButton"
-                      onClick={() =>
-                        handleUnequipCategory(
-                          closetTab === 'upper' ? 'upper' : closetTab === 'lower' ? 'lower' : 'accessory'
-                        )
-                      }
-                    >
-                      {closetTab === 'accessory' ? 'アクセを外す' : '脱ぐ'}
-                    </button>
+                    {closetTab !== 'layer' && (
+                      <button
+                        className="ghostButton"
+                        onClick={() =>
+                          handleUnequipCategory(
+                            closetTab === 'upper'
+                              ? 'upper'
+                              : closetTab === 'lower'
+                              ? 'lower'
+                              : 'accessory'
+                          )
+                        }
+                      >
+                        {closetTab === 'accessory' ? 'アクセを外す' : '脱ぐ'}
+                      </button>
+                    )}
                   </div>
 
                   <div className="closetTabRow">
@@ -1228,20 +1443,13 @@ export default function App() {
                       アクセ
                       <span className="closetTabCount">{accessoryItems.length}</span>
                     </button>
+
+                    <button className={`closetTabButton ${closetTab === 'layer' ? 'active' : ''}`} onClick={() => setClosetTab('layer')}>
+                      重ね順
+                    </button>
                   </div>
 
-                  <div className="closetTabPanel">
-                    <div className="closetTabHeaderLine">
-                      <div className="closetTabTitle">
-                        {closetTab === 'upper' ? '上の服一覧' : closetTab === 'lower' ? '下の服一覧' : 'アクセサリー一覧'}
-                      </div>
-                      <div className="closetTabHint">
-                        {closetTab === 'accessory' ? `最大${MAX_ACCESSORIES}個まで付けられるよ` : '着たいものを選んでね'}
-                      </div>
-                    </div>
-
-                    <div className="itemGrid">{currentClosetItems.map(renderItemCard)}</div>
-                  </div>
+                  {renderClosetBody()}
                 </div>
               </section>
             </div>
