@@ -26,6 +26,8 @@ const LS_KEY = 'kisekae-app-save'
 const DEFAULT_NICKNAME = 'ふれろっぷ'
 const MAX_ACCESSORIES = 5
 
+const assetUrl = (path) => `${import.meta.env.BASE_URL}${String(path).replace(/^\/+/, '')}`
+
 const DEFAULT_BASE_CREATOR = 'はむまよろーる様'
 const DEFAULT_BASE_CREATOR_URL = 'https://x.com/hamumayo_roll'
 
@@ -34,7 +36,7 @@ const DEFAULT_BASE_ITEMS = [
     id: 'default-base-1',
     name: 'いつもの素体',
     category: 'base',
-    imageUrl: '/images/base/body-default.png',
+    imageUrl: assetUrl('images/base/body-default.png'),
     source: 'default',
     creatorName: DEFAULT_BASE_CREATOR,
     creatorUrl: DEFAULT_BASE_CREATOR_URL,
@@ -43,9 +45,9 @@ const DEFAULT_BASE_ITEMS = [
 ]
 
 const HOME_VOICE_URLS = [
-  '/voices/home-1.mp3',
-  '/voices/home-2.mp3',
-  '/voices/home-3.mp3',
+  assetUrl('voices/home-1.mp3'),
+  assetUrl('voices/home-2.mp3'),
+  assetUrl('voices/home-3.mp3'),
 ]
 
 const SPECIAL_VOICE_RULES = [
@@ -54,21 +56,21 @@ const SPECIAL_VOICE_RULES = [
     upperId: 'default-upper-1',
     lowerId: null,
     accessoryIds: ['default-accessory-2', 'default-accessory-1'],
-    voiceUrl: '/voices/いつものふく.mp3',
+    voiceUrl: assetUrl('voices/いつものふく.mp3'),
   },
   {
     id: 'special-detective',
     upperId: 'default-upper-3',
     lowerId: 'default-lower-2',
     accessoryIds: ['default-accessory-2'],
-    voiceUrl: '/voices/執事ボイス.mp3',
+    voiceUrl: assetUrl('voices/執事ボイス.mp3'),
   },
   {
     id: 'special-pajama',
     upperId: 'default-upper-2',
     lowerId: 'default-lower-1',
     accessoryIds: ['default-accessory-11', 'default-accessory-12'],
-    voiceUrl: '/voices/地雷ちゃん.mp3',
+    voiceUrl: assetUrl('voices/地雷ちゃん.mp3'),
   },
 ]
 
@@ -77,7 +79,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-1',
     name: 'いつものふく',
     category: 'upper',
-    imageUrl: '/images/tops/top-default-1.png',
+    imageUrl: assetUrl('images/tops/top-default-1.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -87,7 +89,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-2',
     name: 'ピンクブラウス',
     category: 'upper',
-    imageUrl: '/images/tops/top-default-2.png',
+    imageUrl: assetUrl('images/tops/top-default-2.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -97,7 +99,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-3',
     name: '燕尾服上',
     category: 'upper',
-    imageUrl: '/images/tops/top-default-3.png',
+    imageUrl: assetUrl('images/tops/top-default-3.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -107,7 +109,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-4',
     name: 'ボーダートップス',
     category: 'upper',
-    imageUrl: '/images/tops/top-default-4.png',
+    imageUrl: assetUrl('images/tops/top-default-4.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -117,7 +119,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-5',
     name: 'セーラー服',
     category: 'upper',
-    imageUrl: '/images/tops/top-default-5.png',
+    imageUrl: assetUrl('images/tops/top-default-5.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -127,7 +129,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-6',
     name: 'パーカー緑',
     category: 'upper',
-    imageUrl: '/images/tops/top-default-6.png',
+    imageUrl: assetUrl('images/tops/top-default-6.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -137,7 +139,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-7',
     name: '探偵服',
     category: 'upper',
-    imageUrl: '/images/tops/top-default-7.png',
+    imageUrl: assetUrl('images/tops/top-default-7.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -147,7 +149,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-8',
     name: 'パジャマ上',
     category: 'upper',
-    imageUrl: '/images/tops/top-default-8.png',
+    imageUrl: assetUrl('images/tops/top-default-8.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -160,7 +162,7 @@ const DEFAULT_LOWER_ITEMS = [
     id: 'default-lower-1',
     name: 'ふりるスカート黒',
     category: 'lower',
-    imageUrl: '/images/bottoms/bottom-default-1.png',
+    imageUrl: assetUrl('images/bottoms/bottom-default-1.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -170,7 +172,7 @@ const DEFAULT_LOWER_ITEMS = [
     id: 'default-lower-2',
     name: '燕尾服下',
     category: 'lower',
-    imageUrl: '/images/bottoms/bottom-default-2.png',
+    imageUrl: assetUrl('images/bottoms/bottom-default-2.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -180,7 +182,7 @@ const DEFAULT_LOWER_ITEMS = [
     id: 'default-lower-4',
     name: 'サロペット',
     category: 'lower',
-    imageUrl: '/images/bottoms/bottom-default-4.png',
+    imageUrl: assetUrl('images/bottoms/bottom-default-4.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -190,7 +192,7 @@ const DEFAULT_LOWER_ITEMS = [
     id: 'default-lower-5',
     name: 'セーラースカート',
     category: 'lower',
-    imageUrl: '/images/bottoms/bottom-default-5.png',
+    imageUrl: assetUrl('images/bottoms/bottom-default-5.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -200,7 +202,7 @@ const DEFAULT_LOWER_ITEMS = [
     id: 'default-lower-6',
     name: 'サスペンダーズボン',
     category: 'lower',
-    imageUrl: '/images/bottoms/bottom-default-6.png',
+    imageUrl: assetUrl('images/bottoms/bottom-default-6.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -210,7 +212,7 @@ const DEFAULT_LOWER_ITEMS = [
     id: 'default-lower-7',
     name: 'パジャマズボン',
     category: 'lower',
-    imageUrl: '/images/bottoms/bottom-default-7.png',
+    imageUrl: assetUrl('images/bottoms/bottom-default-7.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -223,7 +225,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-1',
     name: 'いつもの帽子',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-1.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-1.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -233,7 +235,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-2',
     name: 'モノクル',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-2.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-2.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -243,7 +245,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-3',
     name: 'リボン右',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-3.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-3.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -253,7 +255,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-4',
     name: 'リボン左',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-4.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-4.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -263,7 +265,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-11',
     name: 'リボン左右',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-11.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-11.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -273,7 +275,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-5',
     name: '編み上げリボン右',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-5.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-5.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -283,7 +285,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-6',
     name: '編み上げリボン左',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-6.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-6.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -293,7 +295,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-12',
     name: '編み上げリボン左右',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-12.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-12.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -303,7 +305,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-7',
     name: 'パーカー手',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-7.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-7.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -313,7 +315,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-8',
     name: '悪魔の角と牙',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-8.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-8.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -323,7 +325,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-9',
     name: '探偵帽子',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-9.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-9.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -333,7 +335,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-10',
     name: '歯車のカバン',
     category: 'accessory',
-    imageUrl: '/images/accessories/accessory-default-10.png',
+    imageUrl: assetUrl('images/accessories/accessory-default-10.png'),
     source: 'default',
     creatorName: 'ふれろっぷ',
     creatorUrl: 'https://x.com/hureroppu',
@@ -371,6 +373,7 @@ const DEFAULT_SAVE = {
   equippedLowerId: null,
   equippedAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
   favoriteUpperId: 'default-upper-1',
+  favoriteLowerId: null,
   favoriteAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
   selectedQrItemId: null,
   equippedLayerOrder: DEFAULT_LAYER_ORDER,
@@ -515,7 +518,7 @@ async function drawAvatarCanvas({
 }) {
   const canvas = document.createElement('canvas')
   canvas.width = size
-  canvas.height = size
+    canvas.height = size
   const ctx = canvas.getContext('2d')
 
   const grad = ctx.createLinearGradient(0, 0, 0, size)
@@ -1035,7 +1038,7 @@ export default function App() {
       alert(`QR画像の保存に失敗したよ: ${error.message}`)
       console.error(error)
     } finally {
-      setIsSavingQrImage(false)
+            setIsSavingQrImage(false)
     }
   }
 
@@ -1556,8 +1559,7 @@ export default function App() {
             </button>
           </div>
         </header>
-
-        <main className="contentArea">
+                <main className="contentArea">
           {activeTab === 'home' && (
             <div className="homeSingleWrap">
               <section className="mainCard homeOnlyCard">
