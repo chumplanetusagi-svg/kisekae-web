@@ -48,6 +48,30 @@ const HOME_VOICE_URLS = [
   '/voices/home-3.mp3',
 ]
 
+const SPECIAL_VOICE_RULES = [
+  {
+    id: 'special-default-look',
+    upperId: 'default-upper-1',
+    lowerId: null,
+    accessoryIds: ['default-accessory-2', 'default-accessory-1'],
+    voiceUrl: '/voices/いつものふく.mp3',
+  },
+  {
+    id: 'special-detective',
+    upperId: 'default-upper-3',
+    lowerId: 'default-lower-2',
+    accessoryIds: ['default-accessory-2'],
+    voiceUrl: '/voices/執事ボイス.mp3',
+  },
+  {
+    id: 'special-pajama',
+    upperId: 'default-upper-2',
+    lowerId: 'default-lower-1',
+    accessoryIds: ['default-accessory-11', 'default-accessory-12'],
+    voiceUrl: '/voices/地雷ちゃん.mp3',
+  },
+]
+
 const DEFAULT_UPPER_ITEMS = [
   {
     id: 'default-upper-1',
@@ -79,6 +103,56 @@ const DEFAULT_UPPER_ITEMS = [
     creatorUrl: 'https://x.com/hamumayo_roll',
     qrShareable: false,
   },
+  {
+    id: 'default-upper-4',
+    name: 'ボーダートップス',
+    category: 'upper',
+    imageUrl: '/images/tops/top-default-4.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-upper-5',
+    name: 'セーラー服',
+    category: 'upper',
+    imageUrl: '/images/tops/top-default-5.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-upper-6',
+    name: 'パーカー緑',
+    category: 'upper',
+    imageUrl: '/images/tops/top-default-6.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-upper-7',
+    name: '探偵服',
+    category: 'upper',
+    imageUrl: '/images/tops/top-default-7.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-upper-8',
+    name: 'パジャマ上',
+    category: 'upper',
+    imageUrl: '/images/tops/top-default-8.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
 ]
 
 const DEFAULT_LOWER_ITEMS = [
@@ -103,13 +177,43 @@ const DEFAULT_LOWER_ITEMS = [
     qrShareable: false,
   },
   {
-    id: 'default-lower-3',
-    name: 'プリーツスカート黄色',
+    id: 'default-lower-4',
+    name: 'サロペット',
     category: 'lower',
-    imageUrl: '/images/bottoms/bottom-default-3.png',
+    imageUrl: '/images/bottoms/bottom-default-4.png',
     source: 'default',
-    creatorName: 'はむまよろーる様',
-    creatorUrl: 'https://x.com/hamumayo_roll',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-lower-5',
+    name: 'セーラースカート',
+    category: 'lower',
+    imageUrl: '/images/bottoms/bottom-default-5.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-lower-6',
+    name: 'サスペンダーズボン',
+    category: 'lower',
+    imageUrl: '/images/bottoms/bottom-default-6.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-lower-7',
+    name: 'パジャマズボン',
+    category: 'lower',
+    imageUrl: '/images/bottoms/bottom-default-7.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
     qrShareable: false,
   },
 ]
@@ -156,6 +260,16 @@ const DEFAULT_ACCESSORY_ITEMS = [
     qrShareable: false,
   },
   {
+    id: 'default-accessory-11',
+    name: 'リボン左右',
+    category: 'accessory',
+    imageUrl: '/images/accessories/accessory-default-11.png',
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
     id: 'default-accessory-5',
     name: '編み上げリボン右',
     category: 'accessory',
@@ -173,6 +287,56 @@ const DEFAULT_ACCESSORY_ITEMS = [
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-12',
+    name: '編み上げリボン左右',
+    category: 'accessory',
+    imageUrl: '/images/accessories/accessory-default-12.png',
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-7',
+    name: 'パーカー手',
+    category: 'accessory',
+    imageUrl: '/images/accessories/accessory-default-7.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-8',
+    name: '悪魔の角と牙',
+    category: 'accessory',
+    imageUrl: '/images/accessories/accessory-default-8.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-9',
+    name: '探偵帽子',
+    category: 'accessory',
+    imageUrl: '/images/accessories/accessory-default-9.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-10',
+    name: '歯車のカバン',
+    category: 'accessory',
+    imageUrl: '/images/accessories/accessory-default-10.png',
+    source: 'default',
+    creatorName: 'ふれろっぷ',
+    creatorUrl: 'https://x.com/hureroppu',
     qrShareable: false,
   },
 ]
@@ -204,10 +368,9 @@ const DEFAULT_SAVE = {
   customItems: [],
   equippedBaseId: 'default-base-1',
   equippedUpperId: 'default-upper-1',
-  equippedLowerId: 'default-lower-1',
+  equippedLowerId: null,
   equippedAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
   favoriteUpperId: 'default-upper-1',
-  favoriteLowerId: 'default-lower-1',
   favoriteAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
   selectedQrItemId: null,
   equippedLayerOrder: DEFAULT_LAYER_ORDER,
@@ -263,6 +426,25 @@ function getRandomVoiceUrl() {
   if (!HOME_VOICE_URLS.length) return null
   const index = Math.floor(Math.random() * HOME_VOICE_URLS.length)
   return HOME_VOICE_URLS[index]
+}
+
+function normalizeIds(ids) {
+  return [...(Array.isArray(ids) ? ids : [])].sort()
+}
+
+function findSpecialVoiceRule({ upperId, lowerId, accessoryIds }) {
+  const currentAccessories = normalizeIds(accessoryIds)
+
+  return (
+    SPECIAL_VOICE_RULES.find((rule) => {
+      const ruleAccessories = normalizeIds(rule.accessoryIds || [])
+      return (
+        (rule.upperId ?? null) === (upperId ?? null) &&
+        (rule.lowerId ?? null) === (lowerId ?? null) &&
+        JSON.stringify(ruleAccessories) === JSON.stringify(currentAccessories)
+      )
+    }) || null
+  )
 }
 
 function roundedRect(ctx, x, y, width, height, radius) {
@@ -350,6 +532,16 @@ async function drawAvatarCanvas({
   }
 
   return canvas
+}
+
+async function createBaseOnlyCanvas({ baseImageUrl }) {
+  return drawAvatarCanvas({
+    baseImageUrl,
+    lowerImageUrl: '',
+    upperImageUrl: '',
+    accessoryImageUrls: [],
+    size: 1200,
+  })
 }
 
 async function createHomeCanvas({
@@ -583,6 +775,7 @@ export default function App() {
   const [isUploading, setIsUploading] = useState(false)
   const [isSavingHomeImage, setIsSavingHomeImage] = useState(false)
   const [isSavingQrImage, setIsSavingQrImage] = useState(false)
+  const [isSavingBaseImage, setIsSavingBaseImage] = useState(false)
 
   const [qrMessage, setQrMessage] = useState('')
 
@@ -709,6 +902,13 @@ export default function App() {
     }
   }, [qrShareableItems, selectedQrItemId])
 
+  useEffect(() => {
+    if (activeTab !== 'home' && audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+    }
+  }, [activeTab])
+
   const isEquipped = (item) => {
     if (item.category === 'upper') return equippedUpperId === item.id
     if (item.category === 'lower') return equippedLowerId === item.id
@@ -731,14 +931,20 @@ export default function App() {
 
   const handleCharacterClick = async () => {
     try {
-      const randomVoiceUrl = getRandomVoiceUrl()
-      if (!randomVoiceUrl) return
+      const matchedRule = findSpecialVoiceRule({
+        upperId: equippedUpperId,
+        lowerId: equippedLowerId,
+        accessoryIds: equippedAccessoryIds,
+      })
+
+      const voiceUrl = matchedRule?.voiceUrl || getRandomVoiceUrl()
+      if (!voiceUrl) return
 
       if (!audioRef.current) {
-        audioRef.current = new Audio(randomVoiceUrl)
+        audioRef.current = new Audio(voiceUrl)
       } else {
         audioRef.current.pause()
-        audioRef.current.src = randomVoiceUrl
+        audioRef.current.src = voiceUrl
       }
 
       audioRef.current.currentTime = 0
@@ -774,6 +980,23 @@ export default function App() {
       console.error(error)
     } finally {
       setIsSavingHomeImage(false)
+    }
+  }
+
+  const handleSaveBaseImage = async () => {
+    try {
+      setIsSavingBaseImage(true)
+
+      const canvas = await createBaseOnlyCanvas({
+        baseImageUrl: equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl,
+      })
+
+      downloadCanvas(canvas, `${nickname || DEFAULT_NICKNAME}-base-only.png`)
+    } catch (error) {
+      alert(`素体画像の保存に失敗したよ: ${error.message}`)
+      console.error(error)
+    } finally {
+      setIsSavingBaseImage(false)
     }
   }
 
@@ -1145,77 +1368,100 @@ export default function App() {
     </div>
   )
 
-  const renderItemCard = (item) => (
-    <div key={item.id} className="itemCard">
-      <div className="itemPreview">
-        <img src={item.imageUrl} alt={item.name} crossOrigin="anonymous" />
-        <div className="previewCreatorBadge">{getDisplayCreatorName(item)}</div>
-      </div>
+  const renderItemCard = (item) => {
+    const equipped = isEquipped(item)
 
-      <div className="itemInfo">
-        <div className="itemName">{item.name}</div>
+    return (
+      <div key={item.id} className="itemCard">
+        <div className="itemPreview">
+          <img src={item.imageUrl} alt={item.name} crossOrigin="anonymous" />
+          <div className="previewCreatorBadge">{getDisplayCreatorName(item)}</div>
+        </div>
 
-        <div className="itemMeta">
-          <span
-            className={`miniBadge ${
-              item.source === 'default'
-                ? 'default'
+        <div className="itemInfo">
+          <div className="itemName">{item.name}</div>
+
+          <div className="itemMeta">
+            <span
+              className={`miniBadge ${
+                item.source === 'default'
+                  ? 'default'
+                  : item.source === 'imported'
+                  ? 'imported'
+                  : 'custom'
+              }`}
+            >
+              {item.source === 'default'
+                ? '既存'
                 : item.source === 'imported'
-                ? 'imported'
-                : 'custom'
-            }`}
-          >
-            {item.source === 'default'
-              ? '既存'
-              : item.source === 'imported'
-              ? '受け取り'
-              : 'アップロード'}
-          </span>
+                ? '受け取り'
+                : 'アップロード'}
+            </span>
 
-          {isEquipped(item) && <span className="miniBadge equipped">着用中</span>}
-          {isFavorite(item) && <span className="miniBadge favorite">お気に入り</span>}
+            {equipped && <span className="miniBadge equipped">着用中</span>}
+            {isFavorite(item) && <span className="miniBadge favorite">お気に入り</span>}
+          </div>
+        </div>
+
+        <div className="itemActions">
+          <button
+            className="primaryButton small"
+            onClick={() => {
+              if (item.category === 'upper') {
+                if (equippedUpperId === item.id) {
+                  handleUnequipCategory('upper')
+                } else {
+                  handleEquip(item)
+                }
+                return
+              }
+
+              if (item.category === 'lower') {
+                if (equippedLowerId === item.id) {
+                  handleUnequipCategory('lower')
+                } else {
+                  handleEquip(item)
+                }
+                return
+              }
+
+              if (item.category === 'accessory') {
+                handleEquip(item)
+              }
+            }}
+          >
+            {item.category === 'upper'
+              ? equippedUpperId === item.id
+                ? '脱ぐ'
+                : '着る'
+              : item.category === 'lower'
+              ? equippedLowerId === item.id
+                ? '脱ぐ'
+                : '着る'
+              : equippedAccessoryIds.includes(item.id)
+              ? 'はずす'
+              : 'つける'}
+          </button>
+
+          <button className="secondaryButton small" onClick={() => handleToggleFavorite(item)}>
+            {isFavorite(item) ? 'お気に入り解除' : 'お気に入り登録'}
+          </button>
+
+          {item.source === 'custom' && (
+            <button className="secondaryButton small" onClick={() => setSelectedQrItemId(item.id)}>
+              QRにする
+            </button>
+          )}
+
+          {item.source !== 'default' && (
+            <button className="dangerButton small" onClick={() => handleDeleteCustomItem(item.id)}>
+              削除
+            </button>
+          )}
         </div>
       </div>
-
-      <div className="itemActions">
-        <button className="primaryButton small" onClick={() => handleEquip(item)}>
-          {item.category === 'accessory'
-            ? equippedAccessoryIds.includes(item.id)
-              ? 'はずす'
-              : 'つける'
-            : '着る'}
-        </button>
-
-        {item.category === 'upper' && isEquipped(item) && (
-          <button className="secondaryButton small" onClick={() => handleUnequipCategory('upper')}>
-            脱ぐ
-          </button>
-        )}
-
-        {item.category === 'lower' && isEquipped(item) && (
-          <button className="secondaryButton small" onClick={() => handleUnequipCategory('lower')}>
-            脱ぐ
-          </button>
-        )}
-
-        <button className="secondaryButton small" onClick={() => handleToggleFavorite(item)}>
-          {isFavorite(item) ? 'お気に入り解除' : 'お気に入り登録'}
-        </button>
-
-        {item.source === 'custom' && (
-          <button className="secondaryButton small" onClick={() => setSelectedQrItemId(item.id)}>
-            QRにする
-          </button>
-        )}
-
-        {item.source !== 'default' && (
-          <button className="dangerButton small" onClick={() => handleDeleteCustomItem(item.id)}>
-            削除
-          </button>
-        )}
-      </div>
-    </div>
-  )
+    )
+  }
 
   const renderClosetBody = () => {
     if (closetTab === 'upper') {
@@ -1291,8 +1537,8 @@ export default function App() {
       <div className="appFrame">
         <header className="topHeader">
           <div>
-            <p className="subTitle">Pastel Kisekae</p>
-            <h1 className="pageTitle">着せ替えアプリ</h1>
+            <p className="subTitle">Hureroppu Closet</p>
+            <h1 className="pageTitle">ろぷのクローゼット</h1>
           </div>
 
           <div className="tabRow">
@@ -1356,6 +1602,13 @@ export default function App() {
                     <button className="primaryButton" onClick={handleApplyFavorites}>
                       お気に入りを着る
                     </button>
+                    <button
+                      className="secondaryButton"
+                      onClick={handleSaveBaseImage}
+                      disabled={isSavingBaseImage}
+                    >
+                      {isSavingBaseImage ? '保存中…' : '素体を保存'}
+                    </button>
                   </div>
                 </div>
 
@@ -1370,7 +1623,7 @@ export default function App() {
                         type="text"
                         value={uploadName}
                         onChange={(e) => setUploadName(e.target.value)}
-                        placeholder="例：しゅわしゅわトップス"
+                        placeholder="例：アイドル衣装"
                       />
                     </label>
 
@@ -1577,7 +1830,7 @@ export default function App() {
                           className="textArea"
                           value={concept}
                           onChange={(e) => setConcept(e.target.value)}
-                          placeholder="例：配信向けのふんわりパステル衣装 / ちょっとおでかけ風 / キラキラVTuber感"
+                          placeholder="例：いつものふれろっぷ / ちょっとおでかけ風 / お嬢様風"
                           rows={5}
                         />
                       </label>
@@ -1600,7 +1853,11 @@ export default function App() {
                       <p className="rulesText">・既存の服や、ほかの人が作った服を自分で作ったことにしないでね。</p>
                       <p className="rulesText">・QRで受け取った服は、作った人の名前を消したり、自分の作品として再配布しないでね。</p>
                       <p className="rulesText">・配布するときは、相手や制作者さんが嫌がる使い方をしないでね。</p>
+                      <p className="rulesText">・ここで保存したものはAIなどに取り込まないでね。</p>
                       <p className="rulesText">・著作権や利用条件がある素材は、それぞれのルールを守って使ってね。</p>
+                      <p className="rulesText">・公序良俗に反するものは公開しないでください。</p>
+                      <p className="rulesText">・こちらはふれろっぷ個ちゃむで制作してるよ。調査員等に問い合わせはしないでね。</p>
+                      <p className="rulesText">・こちらのサイトでの個人間でのトラブルにおきましては当方は一切の責任等は取れないよ。</p>
                     </div>
                   </div>
                 )}
@@ -1608,7 +1865,7 @@ export default function App() {
                 {settingsTab === 'credits' && (
                   <div className="settingsPanel creditsPanel">
                     <div className="creditCard">
-                      <div className="summaryLabel">素体</div>
+                      <div className="summaryLabel">素体・洋服製作者様</div>
                       <div className="summaryValue">はむまよろーる様</div>
                       <div className="creditLinkWrap">
                         <a
@@ -1623,16 +1880,16 @@ export default function App() {
                     </div>
 
                     <div className="creditCard">
-                      <div className="summaryLabel">既存服メイン制作者</div>
-                      <div className="summaryValue">はむまよろーる様</div>
+                      <div className="summaryLabel">サイト制作</div>
+                      <div className="summaryValue">ふれろっぷ</div>
                       <div className="creditLinkWrap">
                         <a
-                          href="https://x.com/hamumayo_roll"
+                          href="https://youtube.com/@hureroppu?si=WEKCPysvMjmOJvx4"
                           target="_blank"
                           rel="noreferrer"
                           className="creditLink"
                         >
-                          https://x.com/hamumayo_roll
+                          https://youtube.com/@hureroppu?si=WEKCPysvMjmOJvx4
                         </a>
                       </div>
                     </div>
