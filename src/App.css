@@ -159,3 +159,82 @@ a { color: var(--text-deep); }
   .uploadPanelCard .uploadFullWidth { grid-column: 1 / -1; }
   .uploadPanelCard .uploadSubmitButton { grid-column: 1 / -1; }
 }
+
+/* sticky support for closet preview */
+.closetPreviewArea {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.closetImageSticky {
+  position: static;
+}
+
+.closetUiNormal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.previewImageCard {
+  padding-bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .closetLayout {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .closetPreviewColumn {
+    align-self: stretch;
+    min-height: 100%;
+  }
+
+  .closetPreviewArea {
+    min-height: 100%;
+  }
+
+  .closetImageSticky {
+    position: sticky;
+    top: 72px;
+    z-index: 30;
+  }
+
+  .previewImageCard {
+    padding: 12px;
+    margin-bottom: 0;
+  }
+
+  .smallStage,
+  .characterStage {
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .namePlate.compact {
+    margin: 8px auto 4px;
+    font-size: 13px;
+    padding: 9px 16px;
+  }
+
+  .twoColumnActions,
+  .miniActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .twoColumnActions .primaryButton,
+  .twoColumnActions .secondaryButton,
+  .miniActions .primaryButton,
+  .miniActions .secondaryButton {
+    min-height: 38px;
+    padding: 8px 6px;
+    font-size: 12px;
+    border-radius: 14px;
+  }
+}
