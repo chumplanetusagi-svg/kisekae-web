@@ -1615,51 +1615,6 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="mainCard">
-                  <h2 className="sectionTitle">服をアップロード</h2>
-
-                  <div className="formGrid">
-                    <label className="fieldLabel">
-                      名前
-                      <input
-                        className="textInput"
-                        type="text"
-                        value={uploadName}
-                        onChange={(e) => setUploadName(e.target.value)}
-                        placeholder="例：アイドル衣装"
-                      />
-                    </label>
-
-                    <label className="fieldLabel">
-                      カテゴリ
-                      <select
-                        className="textInput"
-                        value={uploadCategory}
-                        onChange={(e) => setUploadCategory(e.target.value)}
-                      >
-                        <option value="upper">上の服</option>
-                        <option value="lower">下の服</option>
-                        <option value="accessory">アクセサリー</option>
-                      </select>
-                    </label>
-
-                    <label className="fieldLabel">
-                      画像
-                      <input
-                        className="fileInput"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                      />
-                    </label>
-
-                    <button className="primaryButton" onClick={handleUpload} disabled={isUploading}>
-                      {isUploading ? 'アップロード中…' : 'アップロードする'}
-                    </button>
-                  </div>
-
-                  <p className="infoText">個人でアップした服は、作った人が自動でニックネーム表記になるよ。</p>
-                </div>
               </section>
 
               <section className="rightColumn">
@@ -1717,7 +1672,7 @@ export default function App() {
                 <h2 className="sectionTitle">服をQRで配る</h2>
 
                 {qrShareableItems.length === 0 ? (
-                  <p className="emptyText">アップロード服がまだないよ。先にクローゼットから追加してね。</p>
+                  <p className="emptyText">アップロード服がまだないよ。先にこのQRタブの下から追加してね。</p>
                 ) : (
                   <>
                     <label className="fieldLabel">
@@ -1790,6 +1745,52 @@ export default function App() {
                 </label>
 
                 <p className="infoText">{qrMessage || 'ここからQR画像を読み込めるよ'}</p>
+              </section>
+
+              <section className="mainCard">
+                <h2 className="sectionTitle">服をアップロード</h2>
+
+                <div className="formGrid">
+                  <label className="fieldLabel">
+                    名前
+                    <input
+                      className="textInput"
+                      type="text"
+                      value={uploadName}
+                      onChange={(e) => setUploadName(e.target.value)}
+                      placeholder="例：アイドル衣装"
+                    />
+                  </label>
+
+                  <label className="fieldLabel">
+                    カテゴリ
+                    <select
+                      className="textInput"
+                      value={uploadCategory}
+                      onChange={(e) => setUploadCategory(e.target.value)}
+                    >
+                      <option value="upper">上の服</option>
+                      <option value="lower">下の服</option>
+                      <option value="accessory">アクセサリー</option>
+                    </select>
+                  </label>
+
+                  <label className="fieldLabel">
+                    画像
+                    <input
+                      className="fileInput"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                    />
+                  </label>
+
+                  <button className="primaryButton" onClick={handleUpload} disabled={isUploading}>
+                    {isUploading ? 'アップロード中…' : 'アップロードする'}
+                  </button>
+                </div>
+
+                <p className="infoText">個人でアップした服は、作った人が自動でニックネーム表記になるよ。</p>
               </section>
             </div>
           )}
