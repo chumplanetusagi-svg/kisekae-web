@@ -295,11 +295,12 @@ a { color: var(--text-deep); }
   }
 
   /* 右側の服一覧をキャラの下から始める */
-  .rightColumn {
-    position: relative;
-    z-index: 1;
-    padding-top: 220px;
-  }
+.rightColumn {
+  position: relative;
+  z-index: 1;
+  padding-top: 120px;
+  margin-top: -40px;
+}
 
   /* タブ周り */
   .closetTabRow,
