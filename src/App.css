@@ -58,11 +58,15 @@ a {
 
 .topHeader {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: linear-gradient(180deg, rgba(223,241,255,0.96) 0%, rgba(238,245,255,0.94) 100%);
+  backdrop-filter: blur(10px);
+  padding-bottom: 10px;
 }
 
 .subTitle {
@@ -74,7 +78,7 @@ a {
 
 .pageTitle {
   margin: 0;
-  font-size: 44px;
+  font-size: 40px;
   line-height: 1.1;
   color: var(--text-deep);
   font-weight: 800;
@@ -82,8 +86,20 @@ a {
 
 .tabRow {
   display: flex;
-  flex-wrap: wrap;
   gap: 12px;
+}
+
+.topStickyTabRow {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.topStickyTabRow::-webkit-scrollbar {
+  display: none;
 }
 
 .tabButton {
@@ -94,6 +110,28 @@ a {
   border-radius: 999px;
   font-weight: 700;
   transition: 0.2s ease;
+}
+
+.compactTabButton {
+  flex: 0 0 auto;
+  min-width: 88px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tabEmoji {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.tabLabelShort {
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .tabButton:hover {
@@ -273,7 +311,8 @@ a {
 
 .previewCardOnlyAvatar {
   position: sticky;
-  top: 16px;
+  top: 12px;
+  z-index: 30;
 }
 
 .avatarOnlyWrap {
@@ -283,9 +322,15 @@ a {
   margin-bottom: 14px;
 }
 
-.previewCardOnlyAvatar .smallStage {
+.avatarOnlyWrapLarge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.closetStickyStage {
   width: 100%;
-  max-width: 280px;
+  max-width: 340px !important;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
 }
@@ -296,20 +341,19 @@ a {
   gap: 10px;
 }
 
-.miniActionsGridTwo {
+.miniActionsCompactGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 8px;
+  margin-top: 12px;
 }
 
-.actionGridButton {
-  width: 100%;
-  min-height: 52px;
-  white-space: normal;
-  text-align: center;
-  line-height: 1.4;
-  border-radius: 16px;
+.compactActionButton {
+  min-height: 40px;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 14px;
+  white-space: nowrap;
 }
 
 .formGrid {
@@ -354,6 +398,24 @@ a {
   margin-bottom: 18px;
 }
 
+.closetInnerStickyTabs {
+  position: sticky;
+  top: 12px;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(8px);
+  border-radius: 18px;
+  padding: 8px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scrollbar-width: none;
+}
+
+.closetInnerStickyTabs::-webkit-scrollbar {
+  display: none;
+}
+
 .closetTabButton {
   display: inline-flex;
   align-items: center;
@@ -365,6 +427,16 @@ a {
   border-radius: 999px;
   font-weight: 800;
   transition: 0.2s ease;
+}
+
+.iconTabButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 86px;
+  padding: 10px 12px;
+  white-space: nowrap;
 }
 
 .closetTabButton.active {
@@ -581,6 +653,12 @@ a {
   background: transparent;
   color: var(--text-deep);
   border: 1px dashed var(--line);
+}
+
+.compactGhostButton {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 14px;
 }
 
 .primaryButton.small,
@@ -870,8 +948,19 @@ a {
   gap: 16px;
 }
 
+.uploadPanelSmart {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid #dbe4ff;
+  border-radius: 20px;
+  padding: 14px;
+}
+
 .uploadSubmitButton {
   width: 100%;
+}
+
+.closetMainCard {
+  padding-top: 18px;
 }
 
 .closetLayoutMobileFixed {
@@ -902,17 +991,30 @@ a {
 @media (max-width: 900px) {
   .closetLayoutMobileFixed {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
   .previewCardOnlyAvatar {
-    position: sticky;
-    top: 10px;
-    z-index: 5;
+    top: 8px;
   }
 
-  .previewCardOnlyAvatar .smallStage {
-    max-width: 220px;
+  .closetStickyStage {
+    max-width: 300px !important;
+  }
+
+  .closetInnerStickyTabs {
+    top: 8px;
+  }
+
+  .closetTabRowMobileFriendly {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .iconTabButton {
+    flex: 0 0 auto;
   }
 
   .itemGrid {
@@ -925,17 +1027,6 @@ a {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-
-  .closetTabRowMobileFriendly {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-  .closetTabButton {
-    width: 100%;
-    justify-content: center;
-  }
 }
 
 @media (max-width: 640px) {
@@ -944,11 +1035,11 @@ a {
   }
 
   .pageTitle {
-    font-size: 34px;
+    font-size: 30px;
   }
 
-  .sectionTitle {
-    font-size: 26px;
+  .subTitle {
+    font-size: 11px;
   }
 
   .mainCard {
@@ -956,27 +1047,38 @@ a {
     border-radius: 20px;
   }
 
-  .tabRow {
-    width: 100%;
+  .compactTabButton {
+    min-width: 74px;
+    padding: 9px 12px;
   }
 
-  .tabButton {
-    flex: 1 1 calc(50% - 12px);
-  }
-
-  .previewCardOnlyAvatar .smallStage {
-    max-width: 200px;
-  }
-
-  .miniActionsGridTwo {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .actionGridButton {
-    min-height: 48px;
+  .tabEmoji {
     font-size: 14px;
-    padding: 10px 8px;
+  }
+
+  .tabLabelShort {
+    font-size: 12px;
+  }
+
+  .closetStickyStage {
+    max-width: 280px !important;
+  }
+
+  .miniActionsCompactGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .compactActionButton {
+    min-height: 38px;
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  .iconTabButton {
+    min-width: 76px;
+    padding: 9px 10px;
+    font-size: 13px;
   }
 
   .itemGrid {
@@ -999,15 +1101,6 @@ a {
     padding: 3px 8px;
   }
 
-  .closetTabRowMobileFriendly {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .settingsTabRow {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
   .settingsButtons {
     flex-direction: column;
   }
@@ -1018,5 +1111,9 @@ a {
   .ghostButton,
   .settingsTabButton {
     width: 100%;
+  }
+
+  .qrCardMain {
+    grid-template-columns: 1fr;
   }
 }

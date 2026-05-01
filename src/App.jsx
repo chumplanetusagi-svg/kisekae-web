@@ -1000,291 +1000,6 @@ export default function App() {
       setIsSavingBaseImage(false)
     }
   }
-    const handleSaveQrImage = async () => {
-    if (!selectedQrItem) return
-
-    try {
-      setIsSavingQrImage(true)
-
-      const qrCanvas = qrCanvasWrapRef.current?.querySelector('canvas')
-      if (!qrCanvas) {
-        throw new Error('QRコードが見つからないよ')
-      }
-
-      const itemCategoryLabel =
-        selectedQrItem.category === 'upper'
-          ? '上の服'
-          : selectedQrItem.category === 'lower'
-          ? '下の服'
-          : 'アクセサリー'
-
-      const canvas = await createQrCardCanvas({
-        itemName: selectedQrItem.name,
-        itemCategoryLabel,
-        creatorName: getDisplayCreatorName(selectedQrItem),
-        nickname,
-        baseImageUrl: equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl,
-        qrItemUpperImageUrl: qrPreviewUpper?.imageUrl || '',
-        qrItemLowerImageUrl: qrPreviewLower?.imageUrl || '',
-        qrItemAccessoryImageUrls: qrPreviewAccessories.map((item) => item.imageUrl),
-        qrCanvas,
-      })
-
-      downloadCanvas(canvas, `${selectedQrItem.name}-qr-card.png`)
-    } catch (error) {
-      alert(`QR画像の保存に失敗したよ: ${error.message}`)
-      console.error(error)
-    } finally {
-      setIsSavingQrImage(false)
-    }
-  }
-
-  const handleEquip = (item) => {
-    if (item.category === 'upper') {
-      setEquippedUpperId(item.id)
-      return
-    }
-
-    if (item.category === 'lower') {
-      setEquippedLowerId(item.id)
-      return
-    }
-
-    if (item.category === 'accessory') {
-      setEquippedAccessoryIds((prev) => {
-        if (prev.includes(item.id)) {
-          return prev.filter((id) => id !== item.id)
-        }
-        if (prev.length >= MAX_ACCESSORIES) {
-          alert(`アクセサリーは最大${MAX_ACCESSORIES}個までだよ`)
-          return prev
-        }
-        return [...prev, item.id]
-      })
-    }
-  }
-
-  const handleToggleFavorite = (item) => {
-    if (item.category === 'upper') {
-      setFavoriteUpperId((prev) => (prev === item.id ? null : item.id))
-      return
-    }
-
-    if (item.category === 'lower') {
-      setFavoriteLowerId((prev) => (prev === item.id ? null : item.id))
-      return
-    }
-
-    if (item.category === 'accessory') {
-      setFavoriteAccessoryIds((prev) => {
-        if (prev.includes(item.id)) {
-          return prev.filter((id) => id !== item.id)
-        }
-        if (prev.length >= MAX_ACCESSORIES) {
-          alert(`お気に入りアクセは最大${MAX_ACCESSORIES}個までだよ`)
-          return prev
-        }
-        return [...prev, item.id]
-      })
-    }
-  }
-
-  const handleApplyFavorites = () => {
-    setEquippedUpperId(favoriteUpperId ?? null)
-    setEquippedLowerId(favoriteLowerId ?? null)
-    setEquippedAccessoryIds(Array.isArray(favoriteAccessoryIds) ? favoriteAccessoryIds : [])
-  }
-
-  const handleUnequipCategory = (category) => {
-    if (category === 'upper') {
-      setEquippedUpperId(null)
-      return
-    }
-    if (category === 'lower') {
-      setEquippedLowerId(null)
-      return
-    }
-    if (category === 'accessory') {
-      setEquippedAccessoryIds([])
-    }
-  }
-
-  const handleUnequipAll = () => {
-    setEquippedUpperId(null)
-    setEquippedLowerId(null)
-    setEquippedAccessoryIds([])
-  }
-
-  const handleUpload = async () => {
-    if (!uploadName.trim()) {
-      alert('名前を入れてね')
-      return
-    }
-    if (!uploadFile) {
-      alert('画像を選んでね')
-      return
-    }
-
-    try {
-      setIsUploading(true)
-
-      const filePath = fileToSafePath(uploadFile.name)
-
-      const { error: uploadError } = await supabase.storage
-        .from(STORAGE_BUCKET)
-        .upload(filePath, uploadFile, { upsert: false })
-
-      if (uploadError) throw uploadError
-
-      const { data: publicUrlData } = supabase.storage
-        .from(STORAGE_BUCKET)
-        .getPublicUrl(filePath)
-
-      const newItem = {
-        id: `custom-${Date.now()}`,
-        name: uploadName.trim(),
-        category: uploadCategory,
-        imageUrl: publicUrlData.publicUrl,
-        source: 'custom',
-        creatorName: nickname || DEFAULT_NICKNAME,
-        creatorUrl: '',
-        qrShareable: true,
-      }
-
-      setCustomItems((prev) => [newItem, ...prev])
-      handleEquip(newItem)
-      setClosetTab(uploadCategory)
-      setSelectedQrItemId(newItem.id)
-
-      setUploadName('')
-      setUploadCategory('upper')
-      setUploadFile(null)
-
-      alert('アップロードできたよ')
-    } catch (error) {
-      alert(`アップロード失敗: ${error.message}`)
-    } finally {
-      setIsUploading(false)
-    }
-  }
-
-  const handleDeleteCustomItem = (itemId) => {
-    const target = customItems.find((item) => item.id === itemId)
-    if (!target) return
-
-    const ok = window.confirm(`「${target.name}」を削除する？`)
-    if (!ok) return
-
-    setCustomItems((prev) => prev.filter((item) => item.id !== itemId))
-
-    if (equippedUpperId === itemId) setEquippedUpperId(null)
-    if (equippedLowerId === itemId) setEquippedLowerId(null)
-    if (favoriteUpperId === itemId) setFavoriteUpperId(null)
-    if (favoriteLowerId === itemId) setFavoriteLowerId(null)
-
-    if (equippedAccessoryIds.includes(itemId)) {
-      setEquippedAccessoryIds((prev) => prev.filter((id) => id !== itemId))
-    }
-    if (favoriteAccessoryIds.includes(itemId)) {
-      setFavoriteAccessoryIds((prev) => prev.filter((id) => id !== itemId))
-    }
-    if (selectedQrItemId === itemId) {
-      setSelectedQrItemId(null)
-    }
-  }
-
-  const handleLayerDragEnd = (event) => {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-
-    const visibleIds = layeredEquippedItems.map((entry) => entry.layerKey)
-    const oldIndex = visibleIds.indexOf(String(active.id))
-    const newIndex = visibleIds.indexOf(String(over.id))
-    if (oldIndex < 0 || newIndex < 0) return
-
-    const movedVisible = arrayMove(visibleIds, oldIndex, newIndex)
-    setEquippedLayerOrder(['base', ...movedVisible])
-  }
-
-  const handleReadQrImage = async (event) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    setQrMessage('QRを読み取り中…')
-
-    const objectUrl = URL.createObjectURL(file)
-    const image = new Image()
-    image.crossOrigin = 'anonymous'
-    const reader = new BrowserMultiFormatReader()
-
-    image.onload = async () => {
-      try {
-        const result = await reader.decodeFromImageElement(image)
-        const text = result.getText()
-        const parsed = JSON.parse(text)
-
-        if (parsed?.app !== 'kisekae-web' || parsed?.kind !== 'cloth-item') {
-          throw new Error('このQRは服データじゃないよ')
-        }
-
-        const importedItem = normalizeImportedItem(parsed.item)
-        if (!importedItem) {
-          throw new Error('QRのデータ形式が正しくないよ')
-        }
-
-        setCustomItems((prev) => {
-          const exists = prev.some((item) => item.id === importedItem.id)
-          if (exists) return prev
-          return [importedItem, ...prev]
-        })
-
-        handleEquip(importedItem)
-        setClosetTab(importedItem.category)
-        setSelectedQrItemId(null)
-        setQrMessage(`「${importedItem.name}」を読み込んだよ`)
-      } catch (error) {
-        setQrMessage(error.message || 'QRが読み取れなかったよ')
-      } finally {
-        URL.revokeObjectURL(objectUrl)
-        event.target.value = ''
-      }
-    }
-
-    image.onerror = () => {
-      setQrMessage('画像が読み込めなかったよ')
-      URL.revokeObjectURL(objectUrl)
-      event.target.value = ''
-    }
-
-    image.src = objectUrl
-  }
-
-  const handleResetDress = () => {
-    setEquippedUpperId(DEFAULT_SAVE.equippedUpperId)
-    setEquippedLowerId(DEFAULT_SAVE.equippedLowerId)
-    setEquippedAccessoryIds(DEFAULT_SAVE.equippedAccessoryIds)
-    setEquippedLayerOrder(DEFAULT_LAYER_ORDER)
-  }
-
-  const handleResetSettings = () => {
-    setNickname(DEFAULT_NICKNAME)
-    setConcept('')
-  }
-
-  const handleClearCustomItems = () => {
-    const ok = window.confirm('アップロードした服を全部消す？')
-    if (!ok) return
-
-    setCustomItems([])
-    setEquippedUpperId(DEFAULT_SAVE.equippedUpperId)
-    setEquippedLowerId(DEFAULT_SAVE.equippedLowerId)
-    setEquippedAccessoryIds(DEFAULT_SAVE.equippedAccessoryIds)
-    setFavoriteUpperId(DEFAULT_SAVE.favoriteUpperId)
-    setFavoriteLowerId(DEFAULT_SAVE.favoriteLowerId)
-    setFavoriteAccessoryIds(DEFAULT_SAVE.favoriteAccessoryIds)
-    setSelectedQrItemId(null)
-    setEquippedLayerOrder(DEFAULT_LAYER_ORDER)
-  }
     const qrValue = selectedQrItem
     ? JSON.stringify({
         app: 'kisekae-web',
@@ -1507,7 +1222,7 @@ export default function App() {
             <div className="closetTabHint">自分の服を追加できるよ</div>
           </div>
 
-          <div className="uploadPanelMobile">
+          <div className="uploadPanelMobile uploadPanelSmart">
             <label className="fieldLabel">
               名前
               <input
@@ -1592,18 +1307,37 @@ export default function App() {
             <h1 className="pageTitle">ろぷのクローゼット</h1>
           </div>
 
-          <div className="tabRow">
-            <button className={`tabButton ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
-              ホーム
+          <div className="tabRow topStickyTabRow">
+            <button
+              className={`tabButton compactTabButton ${activeTab === 'home' ? 'active' : ''}`}
+              onClick={() => setActiveTab('home')}
+            >
+              <span className="tabEmoji">🏠</span>
+              <span className="tabLabelShort">ホーム</span>
             </button>
-            <button className={`tabButton ${activeTab === 'closet' ? 'active' : ''}`} onClick={() => setActiveTab('closet')}>
-              クローゼット
+
+            <button
+              className={`tabButton compactTabButton ${activeTab === 'closet' ? 'active' : ''}`}
+              onClick={() => setActiveTab('closet')}
+            >
+              <span className="tabEmoji">👗</span>
+              <span className="tabLabelShort">服</span>
             </button>
-            <button className={`tabButton ${activeTab === 'qr' ? 'active' : ''}`} onClick={() => setActiveTab('qr')}>
-              QR
+
+            <button
+              className={`tabButton compactTabButton ${activeTab === 'qr' ? 'active' : ''}`}
+              onClick={() => setActiveTab('qr')}
+            >
+              <span className="tabEmoji">🔗</span>
+              <span className="tabLabelShort">QR</span>
             </button>
-            <button className={`tabButton ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-              設定
+
+            <button
+              className={`tabButton compactTabButton ${activeTab === 'settings' ? 'active' : ''}`}
+              onClick={() => setActiveTab('settings')}
+            >
+              <span className="tabEmoji">⚙️</span>
+              <span className="tabLabelShort">設定</span>
             </button>
           </div>
         </header>
@@ -1640,44 +1374,44 @@ export default function App() {
             <div className="closetLayout closetLayoutMobileFixed">
               <section className="leftColumn closetPreviewColumn">
                 <div className="mainCard previewCard previewCardSticky previewCardOnlyAvatar">
-                  <div className="avatarOnlyWrap">
-                    {renderAvatarLayers('characterStage smallStage')}
+                  <div className="avatarOnlyWrap avatarOnlyWrapLarge">
+                    {renderAvatarLayers('characterStage smallStage closetStickyStage')}
                   </div>
 
                   <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
 
-                  <div className="miniActions miniActionsGridTwo">
-                    <button className="secondaryButton actionGridButton" onClick={handleResetDress}>
-                      デフォルトコーデに戻す
+                  <div className="miniActions miniActionsCompactGrid">
+                    <button className="secondaryButton compactActionButton" onClick={handleResetDress}>
+                      既定
                     </button>
 
-                    <button className="secondaryButton actionGridButton" onClick={handleUnequipAll}>
-                      全部脱ぐ
+                    <button className="secondaryButton compactActionButton" onClick={handleUnequipAll}>
+                      全脱ぎ
                     </button>
 
-                    <button className="primaryButton actionGridButton" onClick={handleApplyFavorites}>
-                      お気に入りを着る
+                    <button className="primaryButton compactActionButton" onClick={handleApplyFavorites}>
+                      ★着る
                     </button>
 
                     <button
-                      className="secondaryButton actionGridButton"
+                      className="secondaryButton compactActionButton"
                       onClick={handleSaveBaseImage}
                       disabled={isSavingBaseImage}
                     >
-                      {isSavingBaseImage ? '保存中…' : '素体を保存'}
+                      {isSavingBaseImage ? '保存中' : '素体'}
                     </button>
                   </div>
                 </div>
               </section>
 
               <section className="rightColumn closetContentColumn">
-                <div className="mainCard">
+                <div className="mainCard closetMainCard">
                   <div className="sectionHeader">
                     <h2 className="sectionTitle">クローゼット</h2>
 
                     {closetTab !== 'layer' && closetTab !== 'upload' && (
                       <button
-                        className="ghostButton"
+                        className="ghostButton compactGhostButton"
                         onClick={() =>
                           handleUnequipCategory(
                             closetTab === 'upper'
@@ -1688,33 +1422,50 @@ export default function App() {
                           )
                         }
                       >
-                        {closetTab === 'accessory' ? 'アクセを外す' : '脱ぐ'}
+                        {closetTab === 'accessory' ? 'はずす' : '脱ぐ'}
                       </button>
                     )}
                   </div>
 
-                  <div className="closetTabRow closetTabRowMobileFriendly">
-                    <button className={`closetTabButton ${closetTab === 'upper' ? 'active' : ''}`} onClick={() => setClosetTab('upper')}>
-                      上の服
-                      <span className="closetTabCount">{upperItems.length}</span>
+                  <div className="closetTabRow closetTabRowMobileFriendly closetInnerStickyTabs">
+                    <button
+                      className={`closetTabButton iconTabButton ${closetTab === 'upper' ? 'active' : ''}`}
+                      onClick={() => setClosetTab('upper')}
+                    >
+                      <span>👕</span>
+                      <span>上</span>
                     </button>
 
-                    <button className={`closetTabButton ${closetTab === 'lower' ? 'active' : ''}`} onClick={() => setClosetTab('lower')}>
-                      下の服
-                      <span className="closetTabCount">{lowerItems.length}</span>
+                    <button
+                      className={`closetTabButton iconTabButton ${closetTab === 'lower' ? 'active' : ''}`}
+                      onClick={() => setClosetTab('lower')}
+                    >
+                      <span>👖</span>
+                      <span>下</span>
                     </button>
 
-                    <button className={`closetTabButton ${closetTab === 'accessory' ? 'active' : ''}`} onClick={() => setClosetTab('accessory')}>
-                      アクセ
-                      <span className="closetTabCount">{accessoryItems.length}</span>
+                    <button
+                      className={`closetTabButton iconTabButton ${closetTab === 'accessory' ? 'active' : ''}`}
+                      onClick={() => setClosetTab('accessory')}
+                    >
+                      <span>🎀</span>
+                      <span>アクセ</span>
                     </button>
 
-                    <button className={`closetTabButton ${closetTab === 'layer' ? 'active' : ''}`} onClick={() => setClosetTab('layer')}>
-                      重ね順
+                    <button
+                      className={`closetTabButton iconTabButton ${closetTab === 'layer' ? 'active' : ''}`}
+                      onClick={() => setClosetTab('layer')}
+                    >
+                      <span>↕️</span>
+                      <span>順番</span>
                     </button>
 
-                    <button className={`closetTabButton ${closetTab === 'upload' ? 'active' : ''}`} onClick={() => setClosetTab('upload')}>
-                      アップロード
+                    <button
+                      className={`closetTabButton iconTabButton ${closetTab === 'upload' ? 'active' : ''}`}
+                      onClick={() => setClosetTab('upload')}
+                    >
+                      <span>⬆️</span>
+                      <span>追加</span>
                     </button>
                   </div>
 
@@ -1723,8 +1474,7 @@ export default function App() {
               </section>
             </div>
           )}
-
-          {activeTab === 'qr' && (
+                    {activeTab === 'qr' && (
             <div className="qrLayout">
               <section className="mainCard">
                 <h2 className="sectionTitle">服をQRで配る</h2>
