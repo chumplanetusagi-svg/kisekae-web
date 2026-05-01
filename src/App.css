@@ -417,16 +417,66 @@ a { color: var(--text-deep); }
    スマホだけ：画像は固定しない
    名前＋ボタンだけ固定
 ========================= */
+/* =========================
+   クローゼット：通常
+========================= */
+.closetPreviewColumn {
+  align-self: start;
+}
+
+.closetPreviewArea {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-self: start;
+}
+
+.previewImageCard {
+  padding-bottom: 16px;
+}
+
+.closetStickyUiWrap {
+  position: static;
+}
+
+.closetStickyUiCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 0 0;
+}
+
+.qrUploadPanel {
+  display: grid;
+  gap: 12px;
+}
+
+/* =========================
+   スマホだけ：キャラ画像ごと全部 sticky
+========================= */
 @media (max-width: 640px) {
-  .closetPreviewArea {
+  .closetLayout,
+  .mobileClosetLayout {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .closetPreviewColumn {
     position: sticky;
     top: 72px;
     z-index: 30;
+    align-self: start;
+  }
+
+  .closetPreviewArea {
+    position: static;
+    gap: 10px;
   }
 
   .previewImageCard {
     position: static;
-    padding-bottom: 12px;
+    padding-bottom: 10px;
+    margin-bottom: 0;
   }
 
   .closetStickyUiWrap {
@@ -440,7 +490,7 @@ a { color: var(--text-deep); }
     background: linear-gradient(
       180deg,
       rgba(239, 245, 255, 0.96) 0%,
-      rgba(239, 245, 255, 0.9) 100%
+      rgba(239, 245, 255, 0.90) 100%
     );
     backdrop-filter: blur(10px);
     border-radius: 18px;
