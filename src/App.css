@@ -251,7 +251,6 @@ a {
   object-fit: contain;
   pointer-events: none;
 }
-
 .closetLayout {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
@@ -272,10 +271,45 @@ a {
   gap: 16px;
 }
 
+.previewCardOnlyAvatar {
+  position: sticky;
+  top: 16px;
+}
+
+.avatarOnlyWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.previewCardOnlyAvatar .smallStage {
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+}
+
 .miniActions {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.miniActionsGridTwo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.actionGridButton {
+  width: 100%;
+  min-height: 52px;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.4;
+  border-radius: 16px;
 }
 
 .formGrid {
@@ -317,7 +351,7 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .closetTabButton {
@@ -358,30 +392,6 @@ a {
   background: rgba(255, 255, 255, 0.95);
 }
 
-.closetInnerModeRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.closetInnerModeButton {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.86);
-  color: var(--text-deep);
-  padding: 10px 16px;
-  border-radius: 999px;
-  font-weight: 800;
-  transition: 0.2s ease;
-}
-
-.closetInnerModeButton.active {
-  background: var(--blue-btn);
-  color: white;
-  border-color: transparent;
-  box-shadow: var(--shadow);
-}
-
 .closetTabPanel {
   display: flex;
   flex-direction: column;
@@ -411,8 +421,8 @@ a {
 
 .itemGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
   min-width: 0;
 }
 
@@ -438,6 +448,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid #c7d6ff;
 }
 
 .itemPreview img {
@@ -448,21 +459,15 @@ a {
 
 .previewCreatorBadge {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
-  max-width: calc(100% - 20px);
-  padding: 4px 8px;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #6a78c9;
+  border: 1px solid #d6defd;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--text-deep);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.2;
-  text-align: right;
-  box-shadow: 0 4px 10px rgba(120, 140, 220, 0.14);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .itemInfo {
@@ -551,7 +556,6 @@ a {
 .dangerButton:hover,
 .ghostButton:hover,
 .closetTabButton:hover,
-.closetInnerModeButton:hover,
 .tabButton:hover,
 .settingsTabButton:hover {
   transform: translateY(-1px);
@@ -586,7 +590,6 @@ a {
   border-radius: 14px;
   font-size: 14px;
 }
-
 .primaryButton:disabled,
 .secondaryButton:disabled,
 .dangerButton:disabled,
@@ -862,6 +865,33 @@ a {
   font-weight: 700;
 }
 
+.uploadPanelMobile {
+  display: grid;
+  gap: 16px;
+}
+
+.uploadSubmitButton {
+  width: 100%;
+}
+
+.closetLayoutMobileFixed {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.closetPreviewColumn,
+.closetContentColumn {
+  min-width: 0;
+}
+
+.closetTabRowMobileFriendly {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 @media (max-width: 1080px) {
   .closetLayout,
   .qrLayout {
@@ -869,7 +899,46 @@ a {
   }
 }
 
-@media (max-width: 820px) {
+@media (max-width: 900px) {
+  .closetLayoutMobileFixed {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .previewCardOnlyAvatar {
+    position: sticky;
+    top: 10px;
+    z-index: 5;
+  }
+
+  .previewCardOnlyAvatar .smallStage {
+    max-width: 220px;
+  }
+
+  .itemGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .itemActions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .closetTabRowMobileFriendly {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .closetTabButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
   .appShell {
     padding: 16px;
   }
@@ -883,30 +952,8 @@ a {
   }
 
   .mainCard {
-    padding: 18px;
-    border-radius: 24px;
-  }
-
-  .itemGrid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  }
-
-  .qrCardMain {
-    grid-template-columns: 1fr;
-  }
-
-  .qrCodePane {
-    align-items: flex-start;
-  }
-
-  .topHeader {
-    align-items: flex-start;
-  }
-}
-
-@media (max-width: 640px) {
-  .homeCaptureCard {
-    padding: 18px;
+    padding: 16px;
+    border-radius: 20px;
   }
 
   .tabRow {
@@ -917,20 +964,51 @@ a {
     flex: 1 1 calc(50% - 12px);
   }
 
-  .closetInnerModeRow,
-  .closetTabRow,
+  .previewCardOnlyAvatar .smallStage {
+    max-width: 200px;
+  }
+
+  .miniActionsGridTwo {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .actionGridButton {
+    min-height: 48px;
+    font-size: 14px;
+    padding: 10px 8px;
+  }
+
+  .itemGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .itemCard {
+    border-radius: 18px;
+    padding: 10px;
+  }
+
+  .itemName {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .previewCreatorBadge {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  .closetTabRowMobileFriendly {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .settingsTabRow {
     display: grid;
     grid-template-columns: 1fr;
   }
 
-  .itemGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .itemActions,
-  .settingsButtons,
-  .miniActions {
+  .settingsButtons {
     flex-direction: column;
   }
 
@@ -938,13 +1016,7 @@ a {
   .secondaryButton,
   .dangerButton,
   .ghostButton,
-  .closetTabButton,
-  .closetInnerModeButton,
   .settingsTabButton {
     width: 100%;
-  }
-
-  .layerRowDrag {
-    padding: 12px;
   }
 }

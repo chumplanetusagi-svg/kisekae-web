@@ -370,15 +370,14 @@ const DEFAULT_SAVE = {
   customItems: [],
   equippedBaseId: 'default-base-1',
   equippedUpperId: 'default-upper-1',
-  equippedLowerId: null,
+  equippedLowerId: 'default-lower-1',
   equippedAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
   favoriteUpperId: 'default-upper-1',
-  favoriteLowerId: null,
+  favoriteLowerId: 'default-lower-1',
   favoriteAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
   selectedQrItemId: null,
   equippedLayerOrder: DEFAULT_LAYER_ORDER,
 }
-
 function loadSaveData() {
   try {
     const raw = localStorage.getItem(LS_KEY)
@@ -518,7 +517,7 @@ async function drawAvatarCanvas({
 }) {
   const canvas = document.createElement('canvas')
   canvas.width = size
-    canvas.height = size
+  canvas.height = size
   const ctx = canvas.getContext('2d')
 
   const grad = ctx.createLinearGradient(0, 0, 0, size)
@@ -739,7 +738,6 @@ function SortableLayerRow({ entry, index }) {
     </div>
   )
 }
-
 export default function App() {
   const initialSaveRef = useRef(null)
   if (!initialSaveRef.current) {
@@ -1002,8 +1000,7 @@ export default function App() {
       setIsSavingBaseImage(false)
     }
   }
-
-  const handleSaveQrImage = async () => {
+    const handleSaveQrImage = async () => {
     if (!selectedQrItem) return
 
     try {
@@ -1038,7 +1035,7 @@ export default function App() {
       alert(`QR画像の保存に失敗したよ: ${error.message}`)
       console.error(error)
     } finally {
-            setIsSavingQrImage(false)
+      setIsSavingQrImage(false)
     }
   }
 
@@ -1288,8 +1285,7 @@ export default function App() {
     setSelectedQrItemId(null)
     setEquippedLayerOrder(DEFAULT_LAYER_ORDER)
   }
-
-  const qrValue = selectedQrItem
+    const qrValue = selectedQrItem
     ? JSON.stringify({
         app: 'kisekae-web',
         kind: 'cloth-item',
@@ -1503,6 +1499,59 @@ export default function App() {
       )
     }
 
+    if (closetTab === 'upload') {
+      return (
+        <div className="closetTabPanel">
+          <div className="closetTabHeaderLine">
+            <div className="closetTabTitle">服をアップロード</div>
+            <div className="closetTabHint">自分の服を追加できるよ</div>
+          </div>
+
+          <div className="uploadPanelMobile">
+            <label className="fieldLabel">
+              名前
+              <input
+                className="textInput"
+                type="text"
+                value={uploadName}
+                onChange={(e) => setUploadName(e.target.value)}
+                placeholder="例：アイドル衣装"
+              />
+            </label>
+
+            <label className="fieldLabel">
+              カテゴリ
+              <select
+                className="textInput"
+                value={uploadCategory}
+                onChange={(e) => setUploadCategory(e.target.value)}
+              >
+                <option value="upper">上の服</option>
+                <option value="lower">下の服</option>
+                <option value="accessory">アクセサリー</option>
+              </select>
+            </label>
+
+            <label className="fieldLabel">
+              画像
+              <input
+                className="fileInput"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+              />
+            </label>
+
+            <button className="primaryButton uploadSubmitButton" onClick={handleUpload} disabled={isUploading}>
+              {isUploading ? 'アップロード中…' : 'アップロードする'}
+            </button>
+
+            <p className="infoText">個人でアップした服は、作った人が自動でニックネーム表記になるよ。</p>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="layerManagerDrag">
         <p className="infoText">
@@ -1534,8 +1583,7 @@ export default function App() {
       </div>
     )
   }
-
-  return (
+    return (
     <div className="appShell">
       <div className="appFrame">
         <header className="topHeader">
@@ -1559,7 +1607,8 @@ export default function App() {
             </button>
           </div>
         </header>
-                <main className="contentArea">
+
+        <main className="contentArea">
           {activeTab === 'home' && (
             <div className="homeSingleWrap">
               <section className="mainCard homeOnlyCard">
@@ -1588,24 +1637,30 @@ export default function App() {
           )}
 
           {activeTab === 'closet' && (
-            <div className="closetLayout">
-              <section className="leftColumn">
-                <div className="mainCard previewCard">
-                  {renderAvatarLayers('characterStage smallStage')}
+            <div className="closetLayout closetLayoutMobileFixed">
+              <section className="leftColumn closetPreviewColumn">
+                <div className="mainCard previewCard previewCardSticky previewCardOnlyAvatar">
+                  <div className="avatarOnlyWrap">
+                    {renderAvatarLayers('characterStage smallStage')}
+                  </div>
+
                   <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
 
-                  <div className="miniActions">
-                    <button className="secondaryButton" onClick={handleResetDress}>
+                  <div className="miniActions miniActionsGridTwo">
+                    <button className="secondaryButton actionGridButton" onClick={handleResetDress}>
                       デフォルトコーデに戻す
                     </button>
-                    <button className="secondaryButton" onClick={handleUnequipAll}>
+
+                    <button className="secondaryButton actionGridButton" onClick={handleUnequipAll}>
                       全部脱ぐ
                     </button>
-                    <button className="primaryButton" onClick={handleApplyFavorites}>
+
+                    <button className="primaryButton actionGridButton" onClick={handleApplyFavorites}>
                       お気に入りを着る
                     </button>
+
                     <button
-                      className="secondaryButton"
+                      className="secondaryButton actionGridButton"
                       onClick={handleSaveBaseImage}
                       disabled={isSavingBaseImage}
                     >
@@ -1613,59 +1668,14 @@ export default function App() {
                     </button>
                   </div>
                 </div>
-
-                <div className="mainCard">
-                  <h2 className="sectionTitle">服をアップロード</h2>
-
-                  <div className="formGrid">
-                    <label className="fieldLabel">
-                      名前
-                      <input
-                        className="textInput"
-                        type="text"
-                        value={uploadName}
-                        onChange={(e) => setUploadName(e.target.value)}
-                        placeholder="例：アイドル衣装"
-                      />
-                    </label>
-
-                    <label className="fieldLabel">
-                      カテゴリ
-                      <select
-                        className="textInput"
-                        value={uploadCategory}
-                        onChange={(e) => setUploadCategory(e.target.value)}
-                      >
-                        <option value="upper">上の服</option>
-                        <option value="lower">下の服</option>
-                        <option value="accessory">アクセサリー</option>
-                      </select>
-                    </label>
-
-                    <label className="fieldLabel">
-                      画像
-                      <input
-                        className="fileInput"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                      />
-                    </label>
-
-                    <button className="primaryButton" onClick={handleUpload} disabled={isUploading}>
-                      {isUploading ? 'アップロード中…' : 'アップロードする'}
-                    </button>
-                  </div>
-
-                  <p className="infoText">個人でアップした服は、作った人が自動でニックネーム表記になるよ。</p>
-                </div>
               </section>
 
-              <section className="rightColumn">
+              <section className="rightColumn closetContentColumn">
                 <div className="mainCard">
                   <div className="sectionHeader">
                     <h2 className="sectionTitle">クローゼット</h2>
-                    {closetTab !== 'layer' && (
+
+                    {closetTab !== 'layer' && closetTab !== 'upload' && (
                       <button
                         className="ghostButton"
                         onClick={() =>
@@ -1683,7 +1693,7 @@ export default function App() {
                     )}
                   </div>
 
-                  <div className="closetTabRow">
+                  <div className="closetTabRow closetTabRowMobileFriendly">
                     <button className={`closetTabButton ${closetTab === 'upper' ? 'active' : ''}`} onClick={() => setClosetTab('upper')}>
                       上の服
                       <span className="closetTabCount">{upperItems.length}</span>
@@ -1701,6 +1711,10 @@ export default function App() {
 
                     <button className={`closetTabButton ${closetTab === 'layer' ? 'active' : ''}`} onClick={() => setClosetTab('layer')}>
                       重ね順
+                    </button>
+
+                    <button className={`closetTabButton ${closetTab === 'upload' ? 'active' : ''}`} onClick={() => setClosetTab('upload')}>
+                      アップロード
                     </button>
                   </div>
 
