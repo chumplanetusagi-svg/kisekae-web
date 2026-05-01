@@ -197,3 +197,73 @@ a { color: var(--text-deep); }
     margin: 0 auto;
   }
 }
+.closetPreviewArea {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.closetImageSticky {
+  position: static;
+}
+
+.closetUiNormal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.twoColumnActions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 640px) {
+  .closetLayout {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .closetPreviewColumn {
+    align-self: stretch;
+    min-height: 100%;
+  }
+
+  .closetPreviewArea {
+    min-height: 100%;
+  }
+
+  .closetImageSticky {
+    position: sticky;
+    top: 72px;
+    z-index: 30;
+  }
+
+  .previewImageCard {
+    padding: 12px;
+    margin-bottom: 0;
+  }
+
+  .smallStage,
+  .characterStage {
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .twoColumnActions,
+  .miniActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .twoColumnActions .primaryButton,
+  .twoColumnActions .secondaryButton,
+  .miniActions .primaryButton,
+  .miniActions .secondaryButton {
+    min-height: 38px;
+    padding: 8px 6px;
+    font-size: 12px;
+    border-radius: 14px;
+  }
+}
