@@ -418,32 +418,56 @@ a { color: var(--text-deep); }
    名前＋ボタンだけ固定
 ========================= */
 @media (max-width: 640px) {
-  .closetStickyPreviewWrap {
-    position: static;
-    top: auto;
+  .closetPreviewArea {
+    position: sticky;
+    top: 72px;
+    z-index: 30;
   }
 
   .previewImageCard {
     position: static;
+    padding-bottom: 12px;
   }
 
   .closetStickyUiWrap {
-    position: sticky;
-    top: 72px;
-    z-index: 30;
-    padding-top: 2px;
+    position: static;
+    top: auto;
+    z-index: auto;
+    padding-top: 0;
   }
 
   .closetStickyUiCard {
     background: linear-gradient(
       180deg,
       rgba(239, 245, 255, 0.96) 0%,
-      rgba(239, 245, 255, 0.90) 100%
+      rgba(239, 245, 255, 0.9) 100%
     );
     backdrop-filter: blur(10px);
     border-radius: 18px;
     padding: 10px 0 0;
   }
+
+  .closetStickyUiCard .namePlate.compact {
+    margin: 0 auto 2px;
+  }
+
+  .twoColumnActions,
+  .miniActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .twoColumnActions .primaryButton,
+  .twoColumnActions .secondaryButton,
+  .miniActions .primaryButton,
+  .miniActions .secondaryButton {
+    min-height: 38px;
+    padding: 8px 6px;
+    font-size: 12px;
+    border-radius: 14px;
+  }
+}
 
   .closetStickyUiCard .namePlate.compact {
     margin: 0 auto 2px;
