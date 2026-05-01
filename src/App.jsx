@@ -370,10 +370,10 @@ const DEFAULT_SAVE = {
   customItems: [],
   equippedBaseId: 'default-base-1',
   equippedUpperId: 'default-upper-1',
-  equippedLowerId: null,
+  equippedLowerId: 'default-lower-1',
   equippedAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
   favoriteUpperId: 'default-upper-1',
-  favoriteLowerId: null,
+  favoriteLowerId: 'default-lower-1',
   favoriteAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
   selectedQrItemId: null,
   equippedLayerOrder: DEFAULT_LAYER_ORDER,
@@ -449,6 +449,7 @@ function findSpecialVoiceRule({ upperId, lowerId, accessoryIds }) {
     }) || null
   )
 }
+
 function roundedRect(ctx, x, y, width, height, radius) {
   ctx.beginPath()
   ctx.moveTo(x + radius, y)
@@ -754,6 +755,7 @@ export default function App() {
   const [settingsTab, setSettingsTab] = useState(initialSave.settingsTab)
   const [nickname, setNickname] = useState(initialSave.nickname)
   const [concept, setConcept] = useState(initialSave.concept)
+
   const [customItems, setCustomItems] = useState(initialSave.customItems)
 
   const [equippedBaseId] = useState(initialSave.equippedBaseId)
@@ -777,18 +779,37 @@ export default function App() {
   const [isSavingHomeImage, setIsSavingHomeImage] = useState(false)
   const [isSavingQrImage, setIsSavingQrImage] = useState(false)
   const [isSavingBaseImage, setIsSavingBaseImage] = useState(false)
+
   const [qrMessage, setQrMessage] = useState('')
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 4 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   )
 
   const allItems = useMemo(() => [...DEFAULT_ITEMS, ...customItems], [customItems])
-  const upperItems = useMemo(() => allItems.filter((item) => item.category === 'upper'), [allItems])
-  const lowerItems = useMemo(() => allItems.filter((item) => item.category === 'lower'), [allItems])
-  const accessoryItems = useMemo(() => allItems.filter((item) => item.category === 'accessory'), [allItems])
-  const qrShareableItems = useMemo(() => allItems.filter((item) => item.qrShareable), [allItems])
+
+  const upperItems = useMemo(
+    () => allItems.filter((item) => item.category === 'upper'),
+    [allItems]
+  )
+  const lowerItems = useMemo(
+    () => allItems.filter((item) => item.category === 'lower'),
+    [allItems]
+  )
+  const accessoryItems = useMemo(
+    () => allItems.filter((item) => item.category === 'accessory'),
+    [allItems]
+  )
+
+  const qrShareableItems = useMemo(
+    () => allItems.filter((item) => item.qrShareable),
+    [allItems]
+  )
 
   const equippedBase = useMemo(
     () => allItems.find((item) => item.id === equippedBaseId) || DEFAULT_BASE_ITEMS[0],
@@ -806,6 +827,7 @@ export default function App() {
     () => allItems.filter((item) => equippedAccessoryIds.includes(item.id)),
     [allItems, equippedAccessoryIds]
   )
+
   const selectedQrItem = useMemo(
     () => qrShareableItems.find((item) => item.id === selectedQrItemId) || null,
     [qrShareableItems, selectedQrItemId]
@@ -824,7 +846,10 @@ export default function App() {
 
     return ensureLayerOrder(equippedLayerOrder)
       .filter((layerKey) => layerKey !== 'base')
-      .map((layerKey) => ({ layerKey, item: layers[layerKey] || null }))
+      .map((layerKey) => ({
+        layerKey,
+        item: layers[layerKey] || null,
+      }))
       .filter((entry) => entry.item)
   }, [equippedLower, equippedUpper, equippedAccessories, equippedLayerOrder])
 
@@ -874,6 +899,7 @@ export default function App() {
       setSelectedQrItemId(qrShareableItems[0].id)
       return
     }
+
     if (selectedQrItemId && !qrShareableItems.some((item) => item.id === selectedQrItemId)) {
       setSelectedQrItemId(qrShareableItems[0]?.id ?? null)
     }
@@ -905,7 +931,8 @@ export default function App() {
     if (item.source === 'custom') return nickname || DEFAULT_NICKNAME
     return item.creatorName || '不明'
   }
-    const handleCharacterClick = async () => {
+
+  const handleCharacterClick = async () => {
     try {
       const matchedRule = findSpecialVoiceRule({
         upperId: equippedUpperId,
@@ -938,10 +965,8 @@ export default function App() {
         .filter((entry) => entry.layerKey.startsWith('accessory-'))
         .map((entry) => entry.item.imageUrl)
 
-      const lowerUrl =
-        layeredEquippedItems.find((entry) => entry.layerKey === 'lower')?.item?.imageUrl || ''
-      const upperUrl =
-        layeredEquippedItems.find((entry) => entry.layerKey === 'upper')?.item?.imageUrl || ''
+      const lowerUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'lower')?.item?.imageUrl || ''
+      const upperUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'upper')?.item?.imageUrl || ''
 
       const canvas = await createHomeCanvas({
         nickname,
@@ -964,9 +989,11 @@ export default function App() {
   const handleSaveBaseImage = async () => {
     try {
       setIsSavingBaseImage(true)
+
       const canvas = await createBaseOnlyCanvas({
         baseImageUrl: equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl,
       })
+
       downloadCanvas(canvas, `${nickname || DEFAULT_NICKNAME}-base-only.png`)
     } catch (error) {
       alert(`素体画像の保存に失敗したよ: ${error.message}`)
@@ -983,7 +1010,9 @@ export default function App() {
       setIsSavingQrImage(true)
 
       const qrCanvas = qrCanvasWrapRef.current?.querySelector('canvas')
-      if (!qrCanvas) throw new Error('QRコードが見つからないよ')
+      if (!qrCanvas) {
+        throw new Error('QRコードが見つからないよ')
+      }
 
       const itemCategoryLabel =
         selectedQrItem.category === 'upper'
@@ -1018,13 +1047,17 @@ export default function App() {
       setEquippedUpperId(item.id)
       return
     }
+
     if (item.category === 'lower') {
       setEquippedLowerId(item.id)
       return
     }
+
     if (item.category === 'accessory') {
       setEquippedAccessoryIds((prev) => {
-        if (prev.includes(item.id)) return prev.filter((id) => id !== item.id)
+        if (prev.includes(item.id)) {
+          return prev.filter((id) => id !== item.id)
+        }
         if (prev.length >= MAX_ACCESSORIES) {
           alert(`アクセサリーは最大${MAX_ACCESSORIES}個までだよ`)
           return prev
@@ -1039,13 +1072,17 @@ export default function App() {
       setFavoriteUpperId((prev) => (prev === item.id ? null : item.id))
       return
     }
+
     if (item.category === 'lower') {
       setFavoriteLowerId((prev) => (prev === item.id ? null : item.id))
       return
     }
+
     if (item.category === 'accessory') {
       setFavoriteAccessoryIds((prev) => {
-        if (prev.includes(item.id)) return prev.filter((id) => id !== item.id)
+        if (prev.includes(item.id)) {
+          return prev.filter((id) => id !== item.id)
+        }
         if (prev.length >= MAX_ACCESSORIES) {
           alert(`お気に入りアクセは最大${MAX_ACCESSORIES}個までだよ`)
           return prev
@@ -1428,7 +1465,8 @@ export default function App() {
       </div>
     )
   }
-    const renderClosetBody = () => {
+
+  const renderClosetBody = () => {
     if (closetTab === 'upper') {
       return (
         <div className="closetTabPanel">
@@ -1552,36 +1590,75 @@ export default function App() {
 
           {activeTab === 'closet' && (
             <div className="closetLayout">
-              <section className="leftColumn closetPreviewColumn">
-                <div className="closetPreviewArea">
-                  <div className="closetImageSticky">
-                    <div className="mainCard previewCard previewImageCard">
-                      {renderAvatarLayers('characterStage smallStage')}
-                    </div>
+              <section className="leftColumn">
+                <div className="mainCard previewCard">
+                  {renderAvatarLayers('characterStage smallStage')}
+                  <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
+
+                  <div className="miniActions">
+                    <button className="secondaryButton" onClick={handleResetDress}>
+                      デフォルトコーデに戻す
+                    </button>
+                    <button className="secondaryButton" onClick={handleUnequipAll}>
+                      全部脱ぐ
+                    </button>
+                    <button className="primaryButton" onClick={handleApplyFavorites}>
+                      お気に入りを着る
+                    </button>
+                    <button
+                      className="secondaryButton"
+                      onClick={handleSaveBaseImage}
+                      disabled={isSavingBaseImage}
+                    >
+                      {isSavingBaseImage ? '保存中…' : '素体を保存'}
+                    </button>
                   </div>
+                </div>
 
-                  <div className="closetUiNormal">
-                    <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
+                <div className="mainCard">
+                  <h2 className="sectionTitle">服をアップロード</h2>
 
-                    <div className="miniActions twoColumnActions">
-                      <button className="secondaryButton" onClick={handleResetDress}>
-                        デフォルトコーデに戻す
-                      </button>
-                      <button className="secondaryButton" onClick={handleUnequipAll}>
-                        全部脱ぐ
-                      </button>
-                      <button className="primaryButton" onClick={handleApplyFavorites}>
-                        お気に入りを着る
-                      </button>
-                      <button
-                        className="secondaryButton"
-                        onClick={handleSaveBaseImage}
-                        disabled={isSavingBaseImage}
+                  <div className="formGrid">
+                    <label className="fieldLabel">
+                      名前
+                      <input
+                        className="textInput"
+                        type="text"
+                        value={uploadName}
+                        onChange={(e) => setUploadName(e.target.value)}
+                        placeholder="例：アイドル衣装"
+                      />
+                    </label>
+
+                    <label className="fieldLabel">
+                      カテゴリ
+                      <select
+                        className="textInput"
+                        value={uploadCategory}
+                        onChange={(e) => setUploadCategory(e.target.value)}
                       >
-                        {isSavingBaseImage ? '保存中…' : '素体を保存'}
-                      </button>
-                    </div>
+                        <option value="upper">上の服</option>
+                        <option value="lower">下の服</option>
+                        <option value="accessory">アクセサリー</option>
+                      </select>
+                    </label>
+
+                    <label className="fieldLabel">
+                      画像
+                      <input
+                        className="fileInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                      />
+                    </label>
+
+                    <button className="primaryButton" onClick={handleUpload} disabled={isUploading}>
+                      {isUploading ? 'アップロード中…' : 'アップロードする'}
+                    </button>
                   </div>
+
+                  <p className="infoText">個人でアップした服は、作った人が自動でニックネーム表記になるよ。</p>
                 </div>
               </section>
 
@@ -1640,7 +1717,7 @@ export default function App() {
                 <h2 className="sectionTitle">服をQRで配る</h2>
 
                 {qrShareableItems.length === 0 ? (
-                  <p className="emptyText">アップロード服がまだないよ。先にQRタブの下から追加してね。</p>
+                  <p className="emptyText">アップロード服がまだないよ。先にクローゼットから追加してね。</p>
                 ) : (
                   <>
                     <label className="fieldLabel">
@@ -1713,54 +1790,6 @@ export default function App() {
                 </label>
 
                 <p className="infoText">{qrMessage || 'ここからQR画像を読み込めるよ'}</p>
-              </section>
-
-              <section className="mainCard">
-                <h2 className="sectionTitle">服をアップロード</h2>
-
-                <div className="uploadPanelMobile qrUploadPanel">
-                  <label className="fieldLabel">
-                    名前
-                    <input
-                      className="textInput"
-                      type="text"
-                      value={uploadName}
-                      onChange={(e) => setUploadName(e.target.value)}
-                      placeholder="例：アイドル衣装"
-                    />
-                  </label>
-
-                  <label className="fieldLabel">
-                    カテゴリ
-                    <select
-                      className="textInput"
-                      value={uploadCategory}
-                      onChange={(e) => setUploadCategory(e.target.value)}
-                    >
-                      <option value="upper">上の服</option>
-                      <option value="lower">下の服</option>
-                      <option value="accessory">アクセサリー</option>
-                    </select>
-                  </label>
-
-                  <label className="fieldLabel">
-                    画像
-                    <input
-                      className="fileInput"
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                    />
-                  </label>
-
-                  <button className="primaryButton uploadSubmitButton" onClick={handleUpload} disabled={isUploading}>
-                    {isUploading ? 'アップロード中…' : 'アップロードする'}
-                  </button>
-
-                  <p className="infoText">
-                    個人でアップした服は、作った人が自動でニックネーム表記になるよ。
-                  </p>
-                </div>
               </section>
             </div>
           )}
