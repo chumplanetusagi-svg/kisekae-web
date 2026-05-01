@@ -26,8 +26,7 @@ const LS_KEY = 'kisekae-app-save'
 const DEFAULT_NICKNAME = 'ふれろっぷ'
 const MAX_ACCESSORIES = 5
 
-const assetUrl = (path) =>
-  `${import.meta.env.BASE_URL}${String(path).replace(/^\/+/, '')}`
+const assetUrl = (path) => `${import.meta.env.BASE_URL}${String(path).replace(/^\/+/, '')}`
 
 const DEFAULT_BASE_CREATOR = 'はむまよろーる様'
 const DEFAULT_BASE_CREATOR_URL = 'https://x.com/hamumayo_roll'
@@ -361,6 +360,7 @@ const DEFAULT_LAYER_ORDER = [
   'accessory-4',
   'accessory-5',
 ]
+
 const DEFAULT_SAVE = {
   activeTab: 'home',
   closetTab: 'upper',
@@ -379,6 +379,76 @@ const DEFAULT_SAVE = {
   equippedLayerOrder: DEFAULT_LAYER_ORDER,
 }
 
+function loadSaveData() {
+  try {
+    const raw = localStorage.getItem(LS_KEY)
+    if (!raw) return DEFAULT_SAVE
+    const parsed = JSON.parse(raw)
+
+    return {
+      ...DEFAULT_SAVE,
+      ...parsed,
+      customItems: Array.isArray(parsed?.customItems) ? parsed.customItems : [],
+      equippedAccessoryIds: Array.isArray(parsed?.equippedAccessoryIds)
+        ? parsed.equippedAccessoryIds
+        : DEFAULT_SAVE.equippedAccessoryIds,
+      favoriteAccessoryIds: Array.isArray(parsed?.favoriteAccessoryIds)
+        ? parsed.favoriteAccessoryIds
+        : DEFAULT_SAVE.favoriteAccessoryIds,
+      equippedLayerOrder: Array.isArray(parsed?.equippedLayerOrder)
+        ? parsed.equippedLayerOrder
+        : DEFAULT_LAYER_ORDER,
+    }
+  } catch {
+    return DEFAULT_SAVE
+  }
+}
+
+function fileToSafePath(fileName) {
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}-${fileName.replace(/[^\w.\-]/g, '_')}`
+}
+
+function normalizeImportedItem(item) {
+  if (!item || typeof item !== 'object') return null
+  if (!item.id || !item.name || !item.category || !item.imageUrl) return null
+  if (!['upper', 'lower', 'accessory'].includes(item.category)) return null
+
+  return {
+    id: String(item.id),
+    name: String(item.name),
+    category: String(item.category),
+    imageUrl: String(item.imageUrl),
+    source: 'imported',
+    creatorName: item.creatorName ? String(item.creatorName) : 'だれか',
+    creatorUrl: item.creatorUrl ? String(item.creatorUrl) : '',
+    qrShareable: false,
+  }
+}
+
+function getRandomVoiceUrl() {
+  if (!HOME_VOICE_URLS.length) return null
+  const index = Math.floor(Math.random() * HOME_VOICE_URLS.length)
+  return HOME_VOICE_URLS[index]
+}
+
+function normalizeIds(ids) {
+  return [...(Array.isArray(ids) ? ids : [])].sort()
+}
+
+function findSpecialVoiceRule({ upperId, lowerId, accessoryIds }) {
+  const currentAccessories = normalizeIds(accessoryIds)
+
+  return (
+    SPECIAL_VOICE_RULES.find((rule) => {
+      const ruleAccessories = normalizeIds(rule.accessoryIds || [])
+      return (
+        (rule.upperId ?? null) === (upperId ?? null) &&
+        (rule.lowerId ?? null) === (lowerId ?? null) &&
+        JSON.stringify(ruleAccessories) === JSON.stringify(currentAccessories)
+      )
+    }) || null
+  )
+}
 function roundedRect(ctx, x, y, width, height, radius) {
   ctx.beginPath()
   ctx.moveTo(x + radius, y)
@@ -668,6 +738,7 @@ function SortableLayerRow({ entry, index }) {
     </div>
   )
 }
+
 export default function App() {
   const initialSaveRef = useRef(null)
   if (!initialSaveRef.current) {
@@ -834,8 +905,7 @@ export default function App() {
     if (item.source === 'custom') return nickname || DEFAULT_NICKNAME
     return item.creatorName || '不明'
   }
-
-  const handleCharacterClick = async () => {
+    const handleCharacterClick = async () => {
     try {
       const matchedRule = findSpecialVoiceRule({
         upperId: equippedUpperId,
@@ -868,8 +938,10 @@ export default function App() {
         .filter((entry) => entry.layerKey.startsWith('accessory-'))
         .map((entry) => entry.item.imageUrl)
 
-      const lowerUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'lower')?.item?.imageUrl || ''
-      const upperUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'upper')?.item?.imageUrl || ''
+      const lowerUrl =
+        layeredEquippedItems.find((entry) => entry.layerKey === 'lower')?.item?.imageUrl || ''
+      const upperUrl =
+        layeredEquippedItems.find((entry) => entry.layerKey === 'upper')?.item?.imageUrl || ''
 
       const canvas = await createHomeCanvas({
         nickname,
@@ -1086,7 +1158,8 @@ export default function App() {
       setSelectedQrItemId(null)
     }
   }
-    const handleLayerDragEnd = (event) => {
+
+  const handleLayerDragEnd = (event) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
 
@@ -1355,8 +1428,7 @@ export default function App() {
       </div>
     )
   }
-
-  const renderClosetBody = () => {
+    const renderClosetBody = () => {
     if (closetTab === 'upper') {
       return (
         <div className="closetTabPanel">
