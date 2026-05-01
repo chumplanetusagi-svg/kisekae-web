@@ -72,8 +72,8 @@ const SPECIAL_VOICE_RULES = [
     accessoryIds: ['default-accessory-11', 'default-accessory-12'],
     voiceUrl: assetUrl('voices/地雷ちゃん.mp3'),
   },
-    {
-    id: 'special-pajama',
+  {
+    id: 'special-detective-2',
     upperId: 'default-upper-7',
     lowerId: 'default-lower-6',
     accessoryIds: ['default-accessory-2', 'default-accessory-9'],
@@ -1597,75 +1597,36 @@ export default function App() {
 
           {activeTab === 'closet' && (
             <div className="closetLayout">
-              <section className="leftColumn">
-                <div className="mainCard previewCard">
-                  {renderAvatarLayers('characterStage smallStage')}
-                  <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
-
-                  <div className="miniActions">
-                    <button className="secondaryButton" onClick={handleResetDress}>
-                      デフォルトコーデに戻す
-                    </button>
-                    <button className="secondaryButton" onClick={handleUnequipAll}>
-                      全部脱ぐ
-                    </button>
-                    <button className="primaryButton" onClick={handleApplyFavorites}>
-                      お気に入りを着る
-                    </button>
-                    <button
-                      className="secondaryButton"
-                      onClick={handleSaveBaseImage}
-                      disabled={isSavingBaseImage}
-                    >
-                      {isSavingBaseImage ? '保存中…' : '素体を保存'}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mainCard">
-                  <h2 className="sectionTitle">服をアップロード</h2>
-
-                  <div className="formGrid">
-                    <label className="fieldLabel">
-                      名前
-                      <input
-                        className="textInput"
-                        type="text"
-                        value={uploadName}
-                        onChange={(e) => setUploadName(e.target.value)}
-                        placeholder="例：アイドル衣装"
-                      />
-                    </label>
-
-                    <label className="fieldLabel">
-                      カテゴリ
-                      <select
-                        className="textInput"
-                        value={uploadCategory}
-                        onChange={(e) => setUploadCategory(e.target.value)}
-                      >
-                        <option value="upper">上の服</option>
-                        <option value="lower">下の服</option>
-                        <option value="accessory">アクセサリー</option>
-                      </select>
-                    </label>
-
-                    <label className="fieldLabel">
-                      画像
-                      <input
-                        className="fileInput"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                      />
-                    </label>
-
-                    <button className="primaryButton" onClick={handleUpload} disabled={isUploading}>
-                      {isUploading ? 'アップロード中…' : 'アップロードする'}
-                    </button>
+              <section className="leftColumn closetPreviewColumn">
+                <div className="closetPreviewArea">
+                  <div className="mainCard previewCard previewImageCard">
+                    {renderAvatarLayers('characterStage smallStage')}
                   </div>
 
-                  <p className="infoText">個人でアップした服は、作った人が自動でニックネーム表記になるよ。</p>
+                  <div className="closetStickyUiWrap">
+                    <div className="closetStickyUiCard">
+                      <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
+
+                      <div className="miniActions twoColumnActions">
+                        <button className="secondaryButton" onClick={handleResetDress}>
+                          デフォルトコーデに戻す
+                        </button>
+                        <button className="secondaryButton" onClick={handleUnequipAll}>
+                          全部脱ぐ
+                        </button>
+                        <button className="primaryButton" onClick={handleApplyFavorites}>
+                          お気に入りを着る
+                        </button>
+                        <button
+                          className="secondaryButton"
+                          onClick={handleSaveBaseImage}
+                          disabled={isSavingBaseImage}
+                        >
+                          {isSavingBaseImage ? '保存中…' : '素体を保存'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </section>
 
@@ -1724,7 +1685,7 @@ export default function App() {
                 <h2 className="sectionTitle">服をQRで配る</h2>
 
                 {qrShareableItems.length === 0 ? (
-                  <p className="emptyText">アップロード服がまだないよ。先にクローゼットから追加してね。</p>
+                  <p className="emptyText">アップロード服がまだないよ。先にQRタブの下から追加してね。</p>
                 ) : (
                   <>
                     <label className="fieldLabel">
@@ -1797,6 +1758,54 @@ export default function App() {
                 </label>
 
                 <p className="infoText">{qrMessage || 'ここからQR画像を読み込めるよ'}</p>
+              </section>
+
+              <section className="mainCard">
+                <h2 className="sectionTitle">服をアップロード</h2>
+
+                <div className="uploadPanelMobile qrUploadPanel">
+                  <label className="fieldLabel">
+                    名前
+                    <input
+                      className="textInput"
+                      type="text"
+                      value={uploadName}
+                      onChange={(e) => setUploadName(e.target.value)}
+                      placeholder="例：アイドル衣装"
+                    />
+                  </label>
+
+                  <label className="fieldLabel">
+                    カテゴリ
+                    <select
+                      className="textInput"
+                      value={uploadCategory}
+                      onChange={(e) => setUploadCategory(e.target.value)}
+                    >
+                      <option value="upper">上の服</option>
+                      <option value="lower">下の服</option>
+                      <option value="accessory">アクセサリー</option>
+                    </select>
+                  </label>
+
+                  <label className="fieldLabel">
+                    画像
+                    <input
+                      className="fileInput"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                    />
+                  </label>
+
+                  <button className="primaryButton uploadSubmitButton" onClick={handleUpload} disabled={isUploading}>
+                    {isUploading ? 'アップロード中…' : 'アップロードする'}
+                  </button>
+
+                  <p className="infoText">
+                    個人でアップした服は、作った人が自動でニックネーム表記になるよ。
+                  </p>
+                </div>
               </section>
             </div>
           )}

@@ -380,3 +380,97 @@ a { color: var(--text-deep); }
     width: 100%;
   }
 }
+/* =========================
+   クローゼット：画像とUIを分離
+========================= */
+.closetPreviewArea {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.previewImageCard {
+  padding-bottom: 16px;
+}
+
+.closetStickyUiWrap {
+  position: sticky;
+  top: 72px;
+  z-index: 25;
+}
+
+.closetStickyUiCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 0 0;
+}
+
+/* PCでは今まで通りでOK */
+@media (min-width: 641px) {
+  .closetStickyUiWrap {
+    position: static;
+  }
+}
+
+/* =========================
+   スマホだけ：画像は固定しない
+   名前＋ボタンだけ固定
+========================= */
+@media (max-width: 640px) {
+  .closetStickyPreviewWrap {
+    position: static;
+    top: auto;
+  }
+
+  .previewImageCard {
+    position: static;
+  }
+
+  .closetStickyUiWrap {
+    position: sticky;
+    top: 72px;
+    z-index: 30;
+    padding-top: 2px;
+  }
+
+  .closetStickyUiCard {
+    background: linear-gradient(
+      180deg,
+      rgba(239, 245, 255, 0.96) 0%,
+      rgba(239, 245, 255, 0.90) 100%
+    );
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 10px 0 0;
+  }
+
+  .closetStickyUiCard .namePlate.compact {
+    margin: 0 auto 2px;
+  }
+
+  .twoColumnActions,
+  .miniActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .twoColumnActions .primaryButton,
+  .twoColumnActions .secondaryButton,
+  .miniActions .primaryButton,
+  .miniActions .secondaryButton {
+    min-height: 38px;
+    padding: 8px 6px;
+    font-size: 12px;
+    border-radius: 14px;
+  }
+}
+
+/* =========================
+   QR側アップロードを少しすっきり
+========================= */
+.qrUploadPanel {
+  display: grid;
+  gap: 12px;
+}
