@@ -160,7 +160,12 @@ a { color: var(--text-deep); }
   .uploadPanelCard .uploadSubmitButton { grid-column: 1 / -1; }
 }
 
-/* sticky support for closet preview */
+
+/* ===== sticky closet preview for moved upload version ===== */
+.closetPreviewColumn {
+  align-self: start;
+}
+
 .closetPreviewArea {
   display: flex;
   flex-direction: column;
@@ -171,204 +176,66 @@ a { color: var(--text-deep); }
   position: static;
 }
 
+.previewImageCard {
+  padding-bottom: 16px;
+}
+
 .closetUiNormal {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.previewImageCard {
-  padding-bottom: 16px;
+.twoColumnActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 @media (max-width: 640px) {
   .closetLayout {
-    display: grid;
-    grid-template-columns: 1fr;
-    align-items: stretch;
-    gap: 14px;
-  }
-
-  .closetPreviewColumn {
-    align-self: stretch;
-    min-height: 100%;
-  }
-
-  .closetPreviewArea {
-    min-height: 100%;
-  }
-
-  .closetImageSticky {
-    position: sticky;
-    top: 72px;
-    z-index: 30;
-  }
-
-  .previewImageCard {
-    padding: 12px;
-    margin-bottom: 0;
-  }
-
-  .smallStage,
-  .characterStage {
-    max-width: 220px;
-    margin: 0 auto;
-  }
-
-  .namePlate.compact {
-    margin: 8px auto 4px;
-    font-size: 13px;
-    padding: 9px 16px;
-  }
-
-  .twoColumnActions,
-  .miniActions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .twoColumnActions .primaryButton,
-  .twoColumnActions .secondaryButton,
-  .miniActions .primaryButton,
-  .miniActions .secondaryButton {
-    min-height: 38px;
-    padding: 8px 6px;
-    font-size: 12px;
-    border-radius: 14px;
-  }
-}
-/* =========================
-   スマホ：クローゼットのキャラをずっと上に残す
-========================= */
-@media (max-width: 640px) {
-  .closetLayout {
-    display: block !important;
+    display: block;
     position: relative;
   }
 
-  /* 左カラムをレイアウト高さから外す */
   .closetPreviewColumn {
-    position: relative;
+    position: fixed;
+    top: 92px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(240px, calc(100vw - 32px));
     z-index: 40;
-    height: 0;
-    min-height: 0 !important;
-    pointer-events: none;
+    margin: 0;
   }
 
-  /* sticky 本体 */
   .closetPreviewArea {
-    position: sticky;
-    top: 72px;
-    z-index: 40;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: fit-content;
-    margin: 0 auto;
-    min-height: 0 !important;
-    pointer-events: none;
-  }
-
-  .closetImageSticky {
-    position: static !important;
-    top: auto !important;
-  }
-
-  /* キャラ画像カードだけ見せる */
-  .previewImageCard {
-    padding: 10px !important;
-    margin: 0 !important;
-    border-radius: 22px;
-    pointer-events: none;
-  }
-
-  .smallStage,
-  .characterStage {
-    max-width: 220px;
-    margin: 0 auto;
-  }
-
-  /* 名前とボタンはスマホでは隠す */
-  .closetUiNormal {
-    display: none !important;
-  }
-
-  /* 右側の服一覧をキャラの下から始める */
-.rightColumn {
-  position: relative;
-  z-index: 1;
-  padding-top: 120px;
-  margin-top: -40px;
-}
-
-  /* タブ周り */
-  .closetTabRow,
-  .closetTabRowMobileFriendly {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-
-  .closetTabButton {
     width: 100%;
-    min-height: 42px;
-    justify-content: center;
-    padding: 8px;
-    font-size: 12px;
-    border-radius: 14px;
-    gap: 6px;
+    gap: 8px;
   }
 
-  .closetTabCount {
-    min-width: 22px;
-    height: 22px;
-    padding: 0 6px;
-    font-size: 10px;
+  .closetImageSticky {
+    position: static;
   }
 
-  /* 服一覧 */
-  .itemGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .itemCard {
+  .previewImageCard {
     padding: 10px;
-    border-radius: 18px;
-    gap: 10px;
+    margin: 0;
+    border-radius: 22px;
   }
 
-  .itemPreview {
-    border-radius: 16px;
+  .smallStage,
+  .characterStage {
+    max-width: 220px;
+    margin: 0 auto;
   }
 
-  .itemName {
-    font-size: 13px;
-    line-height: 1.35;
+  .closetUiNormal {
+    display: none;
   }
 
-  .previewCreatorBadge {
-    right: 6px;
-    bottom: 6px;
-    padding: 3px 7px;
-    font-size: 10px;
-  }
-
-  .itemActions {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-
-  .primaryButton.small,
-  .secondaryButton.small,
-  .dangerButton.small {
-    width: 100%;
-    min-height: 36px;
-    padding: 8px;
-    font-size: 11px;
-    border-radius: 12px;
+  .rightColumn {
+    position: relative;
+    z-index: 1;
+    padding-top: 220px;
   }
 }
