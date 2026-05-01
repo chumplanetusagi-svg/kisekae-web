@@ -449,7 +449,6 @@ function findSpecialVoiceRule({ upperId, lowerId, accessoryIds }) {
     }) || null
   )
 }
-
 function roundedRect(ctx, x, y, width, height, radius) {
   ctx.beginPath()
   ctx.moveTo(x + radius, y)
@@ -688,6 +687,7 @@ async function createQrCardCanvas({
 
   return canvas
 }
+
 function ensureLayerOrder(order) {
   const safe = Array.isArray(order) ? [...order] : []
   DEFAULT_LAYER_ORDER.forEach((key) => {
@@ -754,7 +754,6 @@ export default function App() {
   const [settingsTab, setSettingsTab] = useState(initialSave.settingsTab)
   const [nickname, setNickname] = useState(initialSave.nickname)
   const [concept, setConcept] = useState(initialSave.concept)
-
   const [customItems, setCustomItems] = useState(initialSave.customItems)
 
   const [equippedBaseId] = useState(initialSave.equippedBaseId)
@@ -906,8 +905,7 @@ export default function App() {
     if (item.source === 'custom') return nickname || DEFAULT_NICKNAME
     return item.creatorName || '不明'
   }
-
-  const handleCharacterClick = async () => {
+    const handleCharacterClick = async () => {
     try {
       const matchedRule = findSpecialVoiceRule({
         upperId: equippedUpperId,
@@ -1430,8 +1428,7 @@ export default function App() {
       </div>
     )
   }
-
-  const renderClosetBody = () => {
+    const renderClosetBody = () => {
     if (closetTab === 'upper') {
       return (
         <div className="closetTabPanel">
