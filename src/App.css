@@ -293,3 +293,76 @@ a { color: var(--text-deep); }
     margin-top: -50px;
   }
 }
+
+
+/* ===== v3: sticky top header + one-row tabs + larger closet character ===== */
+@media (max-width: 640px) {
+  .topHeader {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    margin-bottom: 14px;
+    padding: 8px 0 10px;
+    background: linear-gradient(180deg, rgba(223, 241, 255, 0.96) 0%, rgba(238, 245, 255, 0.93) 70%, rgba(238, 245, 255, 0) 100%);
+    backdrop-filter: blur(10px);
+  }
+
+  .subTitle {
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+
+  .pageTitle {
+    font-size: 24px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .tabRow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    flex-wrap: nowrap;
+  }
+
+  .tabButton {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 4px;
+    font-size: 11px;
+    border-radius: 14px;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .closetPreviewColumn {
+    position: fixed;
+    top: 108px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(320px, calc(100vw - 20px));
+    z-index: 55;
+    margin: 0;
+    align-self: auto;
+  }
+
+  .previewImageCard {
+    padding: 10px;
+    margin: 0;
+    border-radius: 22px;
+  }
+
+  .smallStage,
+  .characterStage {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .rightColumn {
+    position: relative;
+    z-index: 1;
+    padding-top: 150px;
+    margin-top: -50px;
+  }
+}
