@@ -161,67 +161,30 @@ a { color: var(--text-deep); }
 }
 
 
-/* === mobile sticky fix: header + character visible and sticky === */
-.closetPreviewArea {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.closetImageSticky {
-  position: static;
-}
-
-.closetUiNormal {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.twoColumnActions {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
+/* ===== mobile fixed closet overlay ===== */
+.closetMobileFixedWrap { display: contents; }
+.closetScrollableColumn { min-width: 0; }
+.closetMainCard { position: relative; }
+.closetTabsSticky { position: static; }
 
 @media (max-width: 640px) {
-  .topHeader {
-    position: sticky;
-    top: 0;
-    z-index: 60;
-    align-items: stretch;
-    gap: 10px;
-    margin-bottom: 12px;
-    padding: 8px 0 10px;
-    background: linear-gradient(180deg, rgba(223,241,255,.97) 0%, rgba(238,245,255,.94) 74%, rgba(238,245,255,0) 100%);
-    backdrop-filter: blur(10px);
-  }
-
-  .subTitle {
-    font-size: 11px;
-    margin-bottom: 2px;
-  }
-
-  .pageTitle {
-    font-size: 24px;
-    line-height: 1.1;
-    margin-bottom: 6px;
-  }
-
+  .appShell { padding: 14px; }
+  .topHeader { margin-bottom: 14px; }
+  .pageTitle { font-size: 28px; }
   .tabRow {
-    width: 100%;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
-    flex-wrap: nowrap;
+    gap: 8px;
+    width: 100%;
   }
-
   .tabButton {
+    flex: initial;
     width: 100%;
     min-width: 0;
-    padding: 10px 4px;
-    font-size: 10px;
-    line-height: 1.15;
+    padding: 10px 6px;
+    font-size: 11px;
+    line-height: 1.2;
     text-align: center;
-    border-radius: 14px;
   }
 
   .closetLayout {
@@ -230,77 +193,97 @@ a { color: var(--text-deep); }
   }
 
   .closetPreviewColumn {
-    position: relative;
-    z-index: 45;
+    position: static;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    z-index: 40;
+  }
+
+  .closetMobileFixedWrap {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 96px;
+    z-index: 40;
+    width: min(92vw, 340px);
+    display: block;
+    pointer-events: none;
   }
 
   .closetPreviewArea {
-    position: sticky;
-    top: 98px;
-    z-index: 45;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 8px;
-    width: 100%;
   }
 
   .closetImageSticky {
     position: static;
-    width: 100%;
-    display: flex;
-    justify-content: center;
   }
 
   .previewImageCard {
-    padding: 10px !important;
-    margin: 0 !important;
+    padding: 10px 10px 8px;
+    margin: 0;
     border-radius: 24px;
-    background: rgba(255,255,255,.92);
-    width: fit-content;
-    display: flex;
-    justify-content: center;
   }
 
   .smallStage,
   .characterStage {
-    max-width: 280px;
-    width: 280px;
+    max-width: 300px;
     margin: 0 auto;
   }
 
   .closetUiNormal {
-    display: none !important;
+    pointer-events: auto;
+    padding: 12px;
+    border-radius: 20px;
+    gap: 8px;
   }
 
-  .rightColumn {
+  .namePlate.compact {
+    margin: 0 auto 2px;
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+
+  .twoColumnActions,
+  .miniActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .twoColumnActions .primaryButton,
+  .twoColumnActions .secondaryButton,
+  .miniActions .primaryButton,
+  .miniActions .secondaryButton {
+    min-height: 36px;
+    padding: 8px 6px;
+    font-size: 11px;
+    border-radius: 13px;
+  }
+
+  .closetScrollableColumn {
     position: relative;
     z-index: 1;
-    margin-top: -70px;
-    padding-top: 220px;
   }
 
-  .rightColumn > .mainCard {
-    position: relative;
-    z-index: 1;
-    overflow: visible;
+  .closetMainCard {
+    padding-top: 330px;
+    margin-top: -60px;
   }
 
-  .sectionHeader {
-    margin-bottom: 12px;
-  }
-
-  .closetTabRow {
+  .closetTabsSticky {
     position: sticky;
-    top: 322px;
-    z-index: 20;
+    top: 330px;
+    z-index: 35;
+    background: rgba(239, 245, 255, 0.92);
+    backdrop-filter: blur(10px);
+    padding: 8px 0 10px;
+    margin: 0 0 14px;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
-    margin: 0 -4px 12px;
-    padding: 6px 4px 10px;
-    background: linear-gradient(180deg, rgba(238,245,255,.98) 0%, rgba(238,245,255,.94) 75%, rgba(238,245,255,0) 100%);
-    backdrop-filter: blur(8px);
   }
 
   .closetTabButton {
@@ -309,17 +292,85 @@ a { color: var(--text-deep); }
     min-height: 40px;
     justify-content: center;
     padding: 8px 4px;
-    font-size: 10px;
-    line-height: 1.15;
+    font-size: 11px;
+    line-height: 1.1;
     border-radius: 14px;
     gap: 4px;
-    white-space: nowrap;
+    text-align: center;
   }
 
   .closetTabCount {
-    min-width: 18px;
-    height: 18px;
+    min-width: 20px;
+    height: 20px;
     padding: 0 4px;
-    font-size: 9px;
+    font-size: 10px;
+  }
+
+  .closetTabHeaderLine {
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .closetTabTitle {
+    font-size: 18px;
+  }
+
+  .closetTabHint {
+    font-size: 12px;
+  }
+
+  .itemGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .itemCard {
+    padding: 10px;
+    border-radius: 18px;
+    gap: 10px;
+  }
+
+  .itemPreview {
+    border-radius: 16px;
+  }
+
+  .itemName {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .previewCreatorBadge {
+    right: 6px;
+    bottom: 6px;
+    padding: 3px 7px;
+    font-size: 10px;
+  }
+
+  .itemActions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .primaryButton.small,
+  .secondaryButton.small,
+  .dangerButton.small {
+    width: 100%;
+    min-height: 36px;
+    padding: 8px;
+    font-size: 11px;
+    border-radius: 12px;
+  }
+
+  .settingsTabRow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .settingsButtons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 }
