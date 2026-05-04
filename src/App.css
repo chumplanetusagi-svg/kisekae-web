@@ -250,3 +250,132 @@ a { color: var(--text-deep); }
     font-size: 10px;
   }
 }
+
+
+/* 追記: スマホで上タブ4列・クローゼット内タブ4列・服2列・素体追従を強める */
+@media (max-width: 640px) {
+  .tabRow {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .tabButton {
+    width: 100%;
+    min-width: 0;
+    flex: none !important;
+    padding: 10px 4px;
+    font-size: 11px;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .closetLayout {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  .closetDesktopPreview {
+    display: none !important;
+  }
+
+  .mobileClosetFollowCard {
+    display: block !important;
+    position: sticky !important;
+    top: 8px !important;
+    z-index: 35 !important;
+    margin: -2px 0 12px;
+    pointer-events: none;
+  }
+
+  .mobileClosetFollowInner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px 6px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(223, 241, 255, 0.92) 0%, rgba(238, 245, 255, 0.88) 100%);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 24px rgba(151, 177, 255, 0.16);
+  }
+
+  .mobileFollowStage,
+  .mobileClosetFollowCard .characterStage,
+  .mobileClosetFollowCard .smallStage {
+    max-width: 270px;
+    margin: 0 auto;
+  }
+
+  .mobileClosetFollowCard .namePlate.compact {
+    margin: 0 auto;
+  }
+
+  .closetTabRow {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .closetTabButton {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+    padding: 9px 4px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .closetTabCount {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    font-size: 10px;
+  }
+
+  .itemGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px;
+  }
+
+  .itemCard {
+    padding: 10px;
+    border-radius: 18px;
+    gap: 10px;
+  }
+
+  .itemPreview {
+    border-radius: 16px;
+  }
+
+  .itemName {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .previewCreatorBadge {
+    right: 6px;
+    bottom: 6px;
+    padding: 3px 7px;
+    font-size: 10px;
+  }
+
+  .itemActions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .primaryButton.small,
+  .secondaryButton.small,
+  .dangerButton.small {
+    width: 100%;
+    min-height: 36px;
+    padding: 8px;
+    font-size: 11px;
+    border-radius: 12px;
+  }
+}
