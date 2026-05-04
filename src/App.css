@@ -627,9 +627,20 @@ a { color: var(--text-deep); }
   }
 
   .topHeader {
+    position: sticky;
+    top: 0;
+    z-index: 60;
     align-items: stretch;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+    padding: 8px 0 10px;
+    background: linear-gradient(
+      180deg,
+      rgba(223, 241, 255, 0.97) 0%,
+      rgba(238, 245, 255, 0.94) 72%,
+      rgba(238, 245, 255, 0) 100%
+    );
+    backdrop-filter: blur(10px);
   }
 
   .subTitle {
@@ -642,7 +653,7 @@ a { color: var(--text-deep); }
     line-height: 1.1;
   }
 
-  /* 上のタブは固定しない、表記そのまま、1列 */
+  /* 上のタブは表記そのままで1列 */
   .tabRow {
     width: 100%;
     display: grid;
@@ -666,39 +677,36 @@ a { color: var(--text-deep); }
     position: relative;
   }
 
-  /* キャラを浮かせる */
+  /* キャラ表示エリア自体は見えるまま sticky */
   .closetPreviewColumn {
     position: relative;
-    z-index: 35;
-    height: 0;
-    min-height: 0;
+    z-index: 40;
   }
 
   .closetPreviewArea {
     position: sticky;
-    top: 16px;
-    z-index: 35;
+    top: 96px;
+    z-index: 40;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
     width: 100%;
-    min-height: 0;
-    pointer-events: none;
   }
 
   .closetImageSticky {
     position: static;
-    width: fit-content;
-    pointer-events: none;
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
   .previewImageCard {
     padding: 10px !important;
     margin: 0 !important;
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.88);
-    pointer-events: none;
+    background: rgba(255, 255, 255, 0.9);
+    width: fit-content;
   }
 
   .smallStage,
@@ -716,8 +724,8 @@ a { color: var(--text-deep); }
   .rightColumn {
     position: relative;
     z-index: 1;
-    margin-top: -70px;
-    padding-top: 210px;
+    margin-top: -74px;
+    padding-top: 218px;
   }
 
   .rightColumn > .mainCard {
@@ -733,7 +741,7 @@ a { color: var(--text-deep); }
   /* クローゼット内タブは1列で、キャラの下に残す */
   .closetTabRow {
     position: sticky;
-    top: 240px;
+    top: 318px;
     z-index: 20;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -818,24 +826,5 @@ a { color: var(--text-deep); }
     padding: 8px;
     font-size: 11px;
     border-radius: 12px;
-  }
-
-  .homeCaptureCard { padding: 16px; }
-  .homeAvatarStage { width: min(100%, 280px); border-radius: 22px; }
-  .homeConceptOnly { padding: 14px; font-size: 13px; line-height: 1.75; border-radius: 18px; }
-
-  .settingsButtons,
-  .settingsTabRow {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .settingsTabButton,
-  .ghostButton,
-  .primaryButton,
-  .secondaryButton,
-  .dangerButton {
-    width: 100%;
   }
 }
