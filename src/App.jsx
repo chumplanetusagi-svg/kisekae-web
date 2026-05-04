@@ -1590,41 +1590,42 @@ export default function App() {
 
           {activeTab === 'closet' && (
             <div className="closetLayout">
-              <section className="leftColumn closetPreviewColumn">
-                <div className="closetPreviewArea">
-                  <div className="closetImageSticky">
-                    <div className="mainCard previewCard previewImageCard">
-                      {renderAvatarLayers('characterStage smallStage')}
-                    </div>
-                  </div>
+              <section className="leftColumn closetDesktopPreview">
+                <div className="mainCard previewCard">
+                  {renderAvatarLayers('characterStage smallStage')}
+                  <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
 
-                  <div className="mainCard closetUiNormal">
-                    <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
-
-                    <div className="miniActions twoColumnActions">
-                      <button className="secondaryButton" onClick={handleResetDress}>
-                        デフォルトコーデに戻す
-                      </button>
-                      <button className="secondaryButton" onClick={handleUnequipAll}>
-                        全部脱ぐ
-                      </button>
-                      <button className="primaryButton" onClick={handleApplyFavorites}>
-                        お気に入りを着る
-                      </button>
-                      <button
-                        className="secondaryButton"
-                        onClick={handleSaveBaseImage}
-                        disabled={isSavingBaseImage}
-                      >
-                        {isSavingBaseImage ? '保存中…' : '素体を保存'}
-                      </button>
-                    </div>
+                  <div className="miniActions">
+                    <button className="secondaryButton" onClick={handleResetDress}>
+                      デフォルトコーデに戻す
+                    </button>
+                    <button className="secondaryButton" onClick={handleUnequipAll}>
+                      全部脱ぐ
+                    </button>
+                    <button className="primaryButton" onClick={handleApplyFavorites}>
+                      お気に入りを着る
+                    </button>
+                    <button
+                      className="secondaryButton"
+                      onClick={handleSaveBaseImage}
+                      disabled={isSavingBaseImage}
+                    >
+                      {isSavingBaseImage ? '保存中…' : '素体を保存'}
+                    </button>
                   </div>
                 </div>
+
               </section>
 
               <section className="rightColumn">
                 <div className="mainCard">
+                  <div className="mobileClosetFollowCard">
+                    <div className="mobileClosetFollowInner">
+                      {renderAvatarLayers('characterStage smallStage mobileFollowStage')}
+                      <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
+                    </div>
+                  </div>
+
                   <div className="sectionHeader">
                     <h2 className="sectionTitle">クローゼット</h2>
                     {closetTab !== 'layer' && (
