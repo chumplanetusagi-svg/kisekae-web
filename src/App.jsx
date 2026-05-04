@@ -1621,9 +1621,28 @@ export default function App() {
                 <div className="mainCard">
                   <div className="mobileClosetFollowCard">
                     <div className="mobileClosetFollowInner">
-                      {renderAvatarLayers('characterStage smallStage mobileFollowStage')}
+                      <div className="mobileFollowAvatarWrap">
+                        {renderAvatarLayers('characterStage smallStage mobileFollowStage')}
 
-                      <div className="mobileFollowQuickTabs">
+                        {closetTab !== 'layer' && (
+                          <button
+                            className="mobileFollowUnequipButton"
+                            onClick={() =>
+                              handleUnequipCategory(
+                                closetTab === 'upper'
+                                  ? 'upper'
+                                  : closetTab === 'lower'
+                                  ? 'lower'
+                                  : 'accessory'
+                              )
+                            }
+                          >
+                            {closetTab === 'accessory' ? 'アクセを外す' : '脱ぐ'}
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="mobileFollowQuickTabs fullTabs">
                         <button
                           className={`mobileFollowQuickTab ${closetTab === 'upper' ? 'active' : ''}`}
                           onClick={() => setClosetTab('upper')}
@@ -1635,6 +1654,18 @@ export default function App() {
                           onClick={() => setClosetTab('lower')}
                         >
                           下の服
+                        </button>
+                        <button
+                          className={`mobileFollowQuickTab ${closetTab === 'accessory' ? 'active' : ''}`}
+                          onClick={() => setClosetTab('accessory')}
+                        >
+                          アクセ
+                        </button>
+                        <button
+                          className={`mobileFollowQuickTab ${closetTab === 'layer' ? 'active' : ''}`}
+                          onClick={() => setClosetTab('layer')}
+                        >
+                          重ね順
                         </button>
                       </div>
                     </div>
