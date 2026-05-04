@@ -1622,7 +1622,21 @@ export default function App() {
                   <div className="mobileClosetFollowCard">
                     <div className="mobileClosetFollowInner">
                       {renderAvatarLayers('characterStage smallStage mobileFollowStage')}
-                      <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
+
+                      <div className="mobileFollowQuickTabs">
+                        <button
+                          className={`mobileFollowQuickTab ${closetTab === 'upper' ? 'active' : ''}`}
+                          onClick={() => setClosetTab('upper')}
+                        >
+                          上の服
+                        </button>
+                        <button
+                          className={`mobileFollowQuickTab ${closetTab === 'lower' ? 'active' : ''}`}
+                          onClick={() => setClosetTab('lower')}
+                        >
+                          下の服
+                        </button>
+                      </div>
                     </div>
                   </div>
 
