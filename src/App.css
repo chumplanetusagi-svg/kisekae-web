@@ -374,3 +374,19 @@ a { color: var(--text-deep); }
     gap: 8px;
   }
 }
+
+
+/* stronger mobile fixed follow override */
+@media (max-width: 900px) {
+  .closetLayout { display:block !important; position:relative; }
+  .closetPreviewColumn { position: static !important; height: 0 !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; z-index: 60; }
+  .closetMobileFixedWrap { position: fixed !important; left: 50% !important; transform: translateX(-50%) !important; top: 12px !important; z-index: 60 !important; width: min(92vw, 340px) !important; display: block !important; pointer-events: none !important; }
+  .closetPreviewArea { display:flex !important; flex-direction:column !important; gap:8px !important; }
+  .closetImageSticky { position: static !important; top: auto !important; }
+  .previewImageCard { padding: 10px !important; margin: 0 !important; border-radius: 24px !important; }
+  .smallStage, .characterStage { max-width: 300px !important; margin: 0 auto !important; }
+  .closetUiNormal { pointer-events: auto !important; }
+  .closetScrollableColumn { position: relative !important; z-index: 1 !important; }
+  .closetMainCard { padding-top: 330px !important; margin-top: -40px !important; }
+  .closetTabsSticky { position: sticky !important; top: 330px !important; z-index: 55 !important; }
+}
