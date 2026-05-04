@@ -1619,6 +1619,47 @@ export default function App() {
 
               <section className="rightColumn">
                 <div className="mainCard">
+                  <div className="sectionHeader closetSectionHeaderSimple">
+                    <h2 className="sectionTitle">クローゼット</h2>
+                    {closetTab !== 'layer' && (
+                      <button
+                        className="ghostButton"
+                        onClick={() =>
+                          handleUnequipCategory(
+                            closetTab === 'upper'
+                              ? 'upper'
+                              : closetTab === 'lower'
+                              ? 'lower'
+                              : 'accessory'
+                          )
+                        }
+                      >
+                        {closetTab === 'accessory' ? 'アクセを外す' : '脱ぐ'}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="closetTabRow desktopOnlyClosetTabs">
+                    <button className={`closetTabButton ${closetTab === 'upper' ? 'active' : ''}`} onClick={() => setClosetTab('upper')}>
+                      上の服
+                      <span className="closetTabCount">{upperItems.length}</span>
+                    </button>
+
+                    <button className={`closetTabButton ${closetTab === 'lower' ? 'active' : ''}`} onClick={() => setClosetTab('lower')}>
+                      下の服
+                      <span className="closetTabCount">{lowerItems.length}</span>
+                    </button>
+
+                    <button className={`closetTabButton ${closetTab === 'accessory' ? 'active' : ''}`} onClick={() => setClosetTab('accessory')}>
+                      アクセ
+                      <span className="closetTabCount">{accessoryItems.length}</span>
+                    </button>
+
+                    <button className={`closetTabButton ${closetTab === 'layer' ? 'active' : ''}`} onClick={() => setClosetTab('layer')}>
+                      重ね順
+                    </button>
+                  </div>
+
                   <div className="mobileClosetFollowCard">
                     <div className="mobileClosetFollowInner">
                       <div className="mobileFollowAvatarWrap">
