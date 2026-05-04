@@ -477,3 +477,15 @@ a { color: var(--text-deep); }
     display: none;
   }
 }
+
+
+/* overlay tabs only below avatar */
+.closetSectionHeaderSimple{margin-bottom:14px;}
+.mobileFollowQuickTabs.fullTabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%;}
+.mobileFollowQuickTab{border:1px solid var(--line);background:rgba(255,255,255,0.9);color:var(--text-deep);padding:10px 6px;border-radius:14px;font-weight:800;font-size:12px;line-height:1.1;text-align:center;}
+.mobileFollowQuickTab.active{background:var(--blue-btn);color:white;border-color:transparent;box-shadow:var(--shadow);}
+.mobileFollowAvatarWrap{position:relative;width:100%;display:flex;justify-content:center;}
+.mobileFollowUnequipButton{position:absolute;top:8px;right:8px;z-index:3;border:none;border-radius:999px;padding:8px 12px;background:rgba(255,255,255,0.95);color:var(--text-deep);font-weight:800;box-shadow:0 8px 18px rgba(181,196,255,0.18);}
+@media (min-width:821px){.mobileClosetFollowCard{display:none !important;}.closetSectionHeaderSimple{display:block;}}
+@media (max-width:820px){.closetSectionHeaderSimple{display:none;} .mobileClosetFollowCard{display:block;position:sticky;top:8px;z-index:25;margin:-6px 0 14px;pointer-events:none;} .mobileClosetFollowInner{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 10px 6px;border-radius:24px;background:linear-gradient(180deg, rgba(223, 241, 255, 0.9) 0%, rgba(238, 245, 255, 0.84) 100%);backdrop-filter:blur(10px);} .mobileFollowAvatarWrap,.mobileFollowQuickTabs,.mobileFollowUnequipButton{pointer-events:auto;} .mobileFollowStage{max-width:250px;margin:0 auto;} .closetDesktopPreview{display:none;} .closetLayout{grid-template-columns:1fr;}}
+@media (max-width:640px){.tabRow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%;}.tabButton{width:100%;min-width:0;padding:10px 4px;font-size:11px;} .mobileClosetFollowCard{top:6px;margin-bottom:12px;} .mobileFollowStage,.mobileClosetFollowCard .characterStage,.mobileClosetFollowCard .smallStage{max-width:270px;} .mobileFollowQuickTabs.fullTabs{gap:6px;} .mobileFollowQuickTab{padding:9px 4px;font-size:11px;border-radius:13px;} .mobileFollowUnequipButton{top:6px;right:6px;padding:7px 10px;font-size:11px;} .itemGrid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}}
