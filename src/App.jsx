@@ -1671,10 +1671,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="sectionHeader closetSectionHeaderSimple">
-                    <h2 className="sectionTitle">クローゼット</h2>
-                  </div>
-
                   {renderClosetBody()}
                 </div>
               </section>
