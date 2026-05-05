@@ -25,6 +25,7 @@ const STORAGE_BUCKET = 'clothes'
 const LS_KEY = 'kisekae-app-save'
 const DEFAULT_NICKNAME = 'ふれろっぷ'
 const MAX_ACCESSORIES = 5
+const BACK_ACCESSORY_IDS = ['default-accessory-22']
 
 const assetUrl = (path) => `${import.meta.env.BASE_URL}${String(path).replace(/^\/+/, '')}`
 
@@ -48,6 +49,8 @@ const HOME_VOICE_URLS = [
   assetUrl('voices/home-1.mp3'),
   assetUrl('voices/home-2.mp3'),
   assetUrl('voices/home-3.mp3'),
+  assetUrl('voices/home-4.mp3'),
+  assetUrl('voices/home-5.mp3'),
 ]
 
 const SPECIAL_VOICE_RULES = [
@@ -55,23 +58,38 @@ const SPECIAL_VOICE_RULES = [
     id: 'special-default-look',
     upperId: 'default-upper-1',
     lowerId: null,
-    accessoryIds: ['default-accessory-2', 'default-accessory-1'],
+    accessoryIds: ['default-accessory-2', 'default-accessory-1','default-accessory-22','default-accessory-25'],
     voiceUrl: assetUrl('voices/いつものふく.mp3'),
   },
   {
     id: 'special-detective',
     upperId: 'default-upper-3',
     lowerId: 'default-lower-2',
-    accessoryIds: ['default-accessory-2'],
+    accessoryIds: ['default-accessory-2','default-accessory-15'],
     voiceUrl: assetUrl('voices/執事ボイス.mp3'),
   },
   {
     id: 'special-pajama',
     upperId: 'default-upper-2',
     lowerId: 'default-lower-1',
-    accessoryIds: ['default-accessory-11', 'default-accessory-12'],
+    accessoryIds: ['default-accessory-11', 'default-accessory-12','default-accessory-21','default-accessory-18'],
     voiceUrl: assetUrl('voices/地雷ちゃん.mp3'),
   },
+  {
+    id: 'special-pajama',
+    upperId: 'default-upper-7',
+    lowerId: 'default-lower-6',
+    accessoryIds: ['default-accessory-2', 'default-accessory-9', 'default-accessory-15'],
+    voiceUrl: assetUrl('voices/名探偵.mp3'),
+  },
+  {
+    id: 'special-pajama',
+    upperId: 'default-upper-8',
+    lowerId: 'default-lower-7',
+    accessoryIds: [],
+    voiceUrl: assetUrl('voices/パジャマ.mp3'),
+  },
+    
 ]
 
 const DEFAULT_UPPER_ITEMS = [
@@ -79,7 +97,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-1',
     name: 'いつものふく',
     category: 'upper',
-    imageUrl: assetUrl('images/tops/top-default-1.png'),
+    imageUrl: assetUrl('images/tops/デフォルト服_上半身.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -89,7 +107,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-2',
     name: 'ピンクブラウス',
     category: 'upper',
-    imageUrl: assetUrl('images/tops/top-default-2.png'),
+    imageUrl: assetUrl('images/tops/地雷_上半身.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -99,7 +117,7 @@ const DEFAULT_UPPER_ITEMS = [
     id: 'default-upper-3',
     name: '燕尾服上',
     category: 'upper',
-    imageUrl: assetUrl('images/tops/top-default-3.png'),
+    imageUrl: assetUrl('images/tops/スーツ_上半身.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -162,7 +180,7 @@ const DEFAULT_LOWER_ITEMS = [
     id: 'default-lower-1',
     name: 'ふりるスカート黒',
     category: 'lower',
-    imageUrl: assetUrl('images/bottoms/bottom-default-1.png'),
+    imageUrl: assetUrl('images/bottoms/地雷_下半身.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -225,7 +243,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-1',
     name: 'いつもの帽子',
     category: 'accessory',
-    imageUrl: assetUrl('images/accessories/accessory-default-1.png'),
+    imageUrl: assetUrl('images/accessories/デフォルト服_帽子.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -235,7 +253,77 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-2',
     name: 'モノクル',
     category: 'accessory',
-    imageUrl: assetUrl('images/accessories/accessory-default-2.png'),
+    imageUrl: assetUrl('images/accessories/モノクル.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-22',
+    name: 'まきもの',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/デフォルト服_背中巻物.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-23',
+    name: '付箋左',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/デフォルト服_付箋←.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-24',
+    name: '付箋右',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/デフォルト服_付箋→.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-25',
+    name: '付箋左右',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/付箋左右.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-13',
+    name: 'スーツ靴左',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/スーツ_靴←.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-14',
+    name: 'スーツ靴右',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/スーツ_靴→.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-15',
+    name: 'スーツ靴左右',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/スーツ_靴左右.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -245,7 +333,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-3',
     name: 'リボン右',
     category: 'accessory',
-    imageUrl: assetUrl('images/accessories/accessory-default-3.png'),
+    imageUrl: assetUrl('images/accessories/リボン→.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -255,7 +343,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-4',
     name: 'リボン左',
     category: 'accessory',
-    imageUrl: assetUrl('images/accessories/accessory-default-4.png'),
+    imageUrl: assetUrl('images/accessories/リボン←.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -265,7 +353,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-11',
     name: 'リボン左右',
     category: 'accessory',
-    imageUrl: assetUrl('images/accessories/accessory-default-11.png'),
+    imageUrl: assetUrl('images/accessories/リボン左右.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -275,7 +363,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-5',
     name: '編み上げリボン右',
     category: 'accessory',
-    imageUrl: assetUrl('images/accessories/accessory-default-5.png'),
+    imageUrl: assetUrl('images/accessories/リボンピアス→.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -285,7 +373,7 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-6',
     name: '編み上げリボン左',
     category: 'accessory',
-    imageUrl: assetUrl('images/accessories/accessory-default-6.png'),
+    imageUrl: assetUrl('images/accessories/リボンピアス←.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -295,7 +383,67 @@ const DEFAULT_ACCESSORY_ITEMS = [
     id: 'default-accessory-12',
     name: '編み上げリボン左右',
     category: 'accessory',
-    imageUrl: assetUrl('images/accessories/accessory-default-12.png'),
+    imageUrl: assetUrl('images/accessories/編み上げリボン左右.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-19',
+    name: 'にんじん左',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/にんじん←.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-20',
+    name: 'にんじん右',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/にんじん→.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-21',
+    name: 'にんじん左右',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/にんじん左右.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+  },
+  {
+    id: 'default-accessory-16',
+    name: '地雷靴左',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/地雷_靴←.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+   },
+   {
+    id: 'default-accessory-17',
+    name: '地雷靴右',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/地雷_靴→.png'),
+    source: 'default',
+    creatorName: 'はむまよろーる様',
+    creatorUrl: 'https://x.com/hamumayo_roll',
+    qrShareable: false,
+   },
+   {
+    id: 'default-accessory-18',
+    name: '地雷靴左右',
+    category: 'accessory',
+    imageUrl: assetUrl('images/accessories/地雷靴左右.png'),
     source: 'default',
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
@@ -370,11 +518,11 @@ const DEFAULT_SAVE = {
   customItems: [],
   equippedBaseId: 'default-base-1',
   equippedUpperId: 'default-upper-1',
-  equippedLowerId: 'default-lower-1',
-  equippedAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
+  equippedLowerId: null,
+  equippedAccessoryIds: ['default-accessory-2', 'default-accessory-1','default-accessory-22', 'default-accessory-25'],
   favoriteUpperId: 'default-upper-1',
-  favoriteLowerId: 'default-lower-1',
-  favoriteAccessoryIds: ['default-accessory-2', 'default-accessory-1'],
+  favoriteLowerId: null,
+  favoriteAccessoryIds: ['default-accessory-2','default-accessory-1','default-accessory-22', 'default-accessory-25'],
   selectedQrItemId: null,
   equippedLayerOrder: DEFAULT_LAYER_ORDER,
 }
@@ -448,6 +596,32 @@ function findSpecialVoiceRule({ upperId, lowerId, accessoryIds }) {
       )
     }) || null
   )
+}
+
+function isBackAccessory(item) {
+  return !!item && BACK_ACCESSORY_IDS.includes(item.id)
+}
+
+function splitAccessoryImageUrls(accessoryImageUrls = []) {
+  const back = []
+  const front = []
+
+  accessoryImageUrls.forEach((entry) => {
+    if (!entry) return
+
+    if (typeof entry === 'string') {
+      front.push(entry)
+      return
+    }
+
+    if (isBackAccessory(entry)) {
+      back.push(entry.imageUrl)
+    } else {
+      front.push(entry.imageUrl)
+    }
+  })
+
+  return { back, front }
 }
 
 function roundedRect(ctx, x, y, width, height, radius) {
@@ -527,7 +701,8 @@ async function drawAvatarCanvas({
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, size, size)
 
-  const urls = [baseImageUrl, lowerImageUrl, upperImageUrl, ...accessoryImageUrls].filter(Boolean)
+  const { back, front } = splitAccessoryImageUrls(accessoryImageUrls)
+  const urls = [...back, baseImageUrl, lowerImageUrl, upperImageUrl, ...front].filter(Boolean)
 
   for (const url of urls) {
     const img = await loadImage(url)
@@ -961,9 +1136,9 @@ export default function App() {
     try {
       setIsSavingHomeImage(true)
 
-      const accessoryUrlsInLayerOrder = layeredEquippedItems
+      const accessoryItemsInLayerOrder = layeredEquippedItems
         .filter((entry) => entry.layerKey.startsWith('accessory-'))
-        .map((entry) => entry.item.imageUrl)
+        .map((entry) => entry.item)
 
       const lowerUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'lower')?.item?.imageUrl || ''
       const upperUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'upper')?.item?.imageUrl || ''
@@ -974,7 +1149,7 @@ export default function App() {
         baseImageUrl: equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl,
         lowerImageUrl: lowerUrl,
         upperImageUrl: upperUrl,
-        accessoryImageUrls: accessoryUrlsInLayerOrder,
+        accessoryImageUrls: accessoryItemsInLayerOrder,
       })
 
       downloadCanvas(canvas, `${nickname || DEFAULT_NICKNAME}-home-card.png`)
@@ -1029,7 +1204,7 @@ export default function App() {
         baseImageUrl: equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl,
         qrItemUpperImageUrl: qrPreviewUpper?.imageUrl || '',
         qrItemLowerImageUrl: qrPreviewLower?.imageUrl || '',
-        qrItemAccessoryImageUrls: qrPreviewAccessories.map((item) => item.imageUrl),
+        qrItemAccessoryImageUrls: qrPreviewAccessories,
         qrCanvas,
       })
 
@@ -1305,71 +1480,109 @@ export default function App() {
     : ''
 
   const renderAvatarLayers = (stageClassName = 'characterStage') => {
-    const layerMap = {
-      base: equippedBase,
+    const backAccessories = equippedAccessories.filter((item) => isBackAccessory(item))
+    const frontAccessories = equippedAccessories.filter((item) => !isBackAccessory(item))
+
+    const frontLayerMap = {
       lower: equippedLower,
       upper: equippedUpper,
-      'accessory-1': equippedAccessories[0] || null,
-      'accessory-2': equippedAccessories[1] || null,
-      'accessory-3': equippedAccessories[2] || null,
-      'accessory-4': equippedAccessories[3] || null,
-      'accessory-5': equippedAccessories[4] || null,
+      'accessory-1': frontAccessories[0] || null,
+      'accessory-2': frontAccessories[1] || null,
+      'accessory-3': frontAccessories[2] || null,
+      'accessory-4': frontAccessories[3] || null,
+      'accessory-5': frontAccessories[4] || null,
     }
 
     return (
       <div className={stageClassName}>
-        {ensureLayerOrder(equippedLayerOrder).map((layerKey) => {
-          const item = layerMap[layerKey]
-          if (!item) return null
-          return (
-            <img
-              key={`${layerKey}-${item.id}`}
-              className="layerImage"
-              src={item.imageUrl}
-              alt={item.name}
-              crossOrigin="anonymous"
-            />
-          )
-        })}
+        {backAccessories.map((item) => (
+          <img
+            key={`back-${item.id}`}
+            className="layerImage"
+            src={item.imageUrl}
+            alt={item.name}
+            crossOrigin="anonymous"
+          />
+        ))}
+
+        {equippedBase && (
+          <img
+            key={`base-${equippedBase.id}`}
+            className="layerImage"
+            src={equippedBase.imageUrl}
+            alt={equippedBase.name}
+            crossOrigin="anonymous"
+          />
+        )}
+
+        {ensureLayerOrder(equippedLayerOrder)
+          .filter((layerKey) => layerKey !== 'base')
+          .map((layerKey) => {
+            const item = frontLayerMap[layerKey]
+            if (!item) return null
+            return (
+              <img
+                key={`${layerKey}-${item.id}`}
+                className="layerImage"
+                src={item.imageUrl}
+                alt={item.name}
+                crossOrigin="anonymous"
+              />
+            )
+          })}
       </div>
     )
   }
 
-  const renderQrPreviewLayers = (stageClassName = 'qrAvatarStage') => (
-    <div className={stageClassName}>
-      <img
-        className="layerImage"
-        src={equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl}
-        alt={equippedBase?.name || '素体'}
-        crossOrigin="anonymous"
-      />
-      {qrPreviewLower && (
+  const renderQrPreviewLayers = (stageClassName = 'qrAvatarStage') => {
+    const backQrAccessories = qrPreviewAccessories.filter((item) => isBackAccessory(item))
+    const frontQrAccessories = qrPreviewAccessories.filter((item) => !isBackAccessory(item))
+
+    return (
+      <div className={stageClassName}>
+        {backQrAccessories.map((item) => (
+          <img
+            key={`qr-back-${item.id}`}
+            className="layerImage"
+            src={item.imageUrl}
+            alt={item.name}
+            crossOrigin="anonymous"
+          />
+        ))}
         <img
           className="layerImage"
-          src={qrPreviewLower.imageUrl}
-          alt={qrPreviewLower.name}
+          src={equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl}
+          alt={equippedBase?.name || '素体'}
           crossOrigin="anonymous"
         />
-      )}
-      {qrPreviewUpper && (
-        <img
-          className="layerImage"
-          src={qrPreviewUpper.imageUrl}
-          alt={qrPreviewUpper.name}
-          crossOrigin="anonymous"
-        />
-      )}
-      {qrPreviewAccessories.map((item) => (
-        <img
-          key={item.id}
-          className="layerImage"
-          src={item.imageUrl}
-          alt={item.name}
-          crossOrigin="anonymous"
-        />
-      ))}
-    </div>
-  )
+        {qrPreviewLower && (
+          <img
+            className="layerImage"
+            src={qrPreviewLower.imageUrl}
+            alt={qrPreviewLower.name}
+            crossOrigin="anonymous"
+          />
+        )}
+        {qrPreviewUpper && (
+          <img
+            className="layerImage"
+            src={qrPreviewUpper.imageUrl}
+            alt={qrPreviewUpper.name}
+            crossOrigin="anonymous"
+          />
+        )}
+        {frontQrAccessories.map((item) => (
+          <img
+            key={item.id}
+            className="layerImage"
+            src={item.imageUrl}
+            alt={item.name}
+            crossOrigin="anonymous"
+          />
+        ))}
+      </div>
+    )
+  }
 
   const renderItemCard = (item) => {
     const equipped = isEquipped(item)

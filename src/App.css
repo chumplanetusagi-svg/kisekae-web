@@ -508,3 +508,23 @@ a { color: var(--text-deep); }
     display: none !important;
   }
 }
+
+
+/* Desktop: keep character preview following while scrolling */
+@media (min-width: 821px) {
+  .closetLayout {
+    align-items: start;
+  }
+
+  .closetDesktopPreview {
+    display: block !important;
+    position: sticky;
+    top: 16px;
+    align-self: start;
+    z-index: 20;
+  }
+
+  .closetDesktopPreview .mainCard.previewCard {
+    position: relative;
+  }
+}
