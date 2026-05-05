@@ -929,6 +929,8 @@ export default function App() {
 
   const audioRef = useRef(null)
   const qrCanvasWrapRef = useRef(null)
+  const mobileClosetFollowRef = useRef(null)
+  const desktopClosetPreviewRef = useRef(null)
 
   const [activeTab, setActiveTab] = useState(initialSave.activeTab)
   const [closetTab, setClosetTab] = useState(initialSave.closetTab)
@@ -1376,6 +1378,49 @@ export default function App() {
     }
   }
 
+
+  const getFollowingPreviewBottom = () => {
+    if (typeof window === 'undefined') return 0
+
+    const mobileVisible = window.innerWidth <= 820 && mobileClosetFollowRef.current
+    if (mobileVisible) {
+      const rect = mobileClosetFollowRef.current.getBoundingClientRect()
+      return rect.bottom
+    }
+
+    const desktopVisible = window.innerWidth > 820 && desktopClosetPreviewRef.current
+    if (desktopVisible) {
+      const rect = desktopClosetPreviewRef.current.getBoundingClientRect()
+      return rect.bottom
+    }
+
+    return 0
+  }
+
+  const handleLayerDragMove = (event) => {
+    if (activeTab !== 'closet' || closetTab !== 'layer') return
+
+    const translated = event?.active?.rect?.current?.translated
+    if (!translated || typeof window === 'undefined') return
+
+    const stickyBottom = getFollowingPreviewBottom()
+    const upperSafeLine = Math.max(stickyBottom + 20, 120)
+    const lowerSafeLine = window.innerHeight - 90
+
+    if (translated.top < upperSafeLine) {
+      const distance = upperSafeLine - translated.top
+      const amount = Math.max(10, Math.min(28, distance * 0.35))
+      window.scrollBy({ top: -amount, left: 0, behavior: 'auto' })
+      return
+    }
+
+    if (translated.bottom > lowerSafeLine) {
+      const distance = translated.bottom - lowerSafeLine
+      const amount = Math.max(10, Math.min(28, distance * 0.35))
+      window.scrollBy({ top: amount, left: 0, behavior: 'auto' })
+    }
+  }
+
   const handleLayerDragEnd = (event) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
@@ -1735,6 +1780,7 @@ export default function App() {
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            onDragMove={handleLayerDragMove}
             onDragEnd={handleLayerDragEnd}
           >
             <SortableContext
@@ -1808,7 +1854,7 @@ export default function App() {
 
           {activeTab === 'closet' && (
             <div className="closetLayout">
-              <section className="leftColumn closetDesktopPreview">
+              <section ref={desktopClosetPreviewRef} className="leftColumn closetDesktopPreview">
                 <div className="mainCard previewCard">
                   {renderAvatarLayers('characterStage smallStage')}
                   <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
@@ -1878,7 +1924,7 @@ export default function App() {
                     </button>
                   </div>
 
-                  <div className="mobileClosetFollowCard">
+                  <div ref={mobileClosetFollowRef} className="mobileClosetFollowCard">
                     <div className="mobileClosetFollowInner">
                       <div className="mobileFollowAvatarWrap">
                         {renderAvatarLayers('characterStage smallStage mobileFollowStage')}
