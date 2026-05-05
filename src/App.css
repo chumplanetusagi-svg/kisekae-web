@@ -534,3 +534,13 @@ a { color: var(--text-deep); }
   display: grid;
   gap: 12px;
 }
+
+
+.hiddenQrSaveCanvas {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
