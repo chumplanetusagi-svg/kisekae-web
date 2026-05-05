@@ -528,3 +528,9 @@ a { color: var(--text-deep); }
     position: relative;
   }
 }
+
+
+.qrSaveBaseCard {
+  display: grid;
+  gap: 12px;
+}

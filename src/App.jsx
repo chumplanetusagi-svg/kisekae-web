@@ -713,13 +713,18 @@ async function drawAvatarCanvas({
 }
 
 async function createBaseOnlyCanvas({ baseImageUrl }) {
-  return drawAvatarCanvas({
-    baseImageUrl,
-    lowerImageUrl: '',
-    upperImageUrl: '',
-    accessoryImageUrls: [],
-    size: 1200,
-  })
+  const img = await loadImage(baseImageUrl)
+  const width = img.naturalWidth || img.width
+  const height = img.naturalHeight || img.height
+
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, width, height)
+  ctx.drawImage(img, 0, 0, width, height)
+
+  return canvas
 }
 
 async function createHomeCanvas({
@@ -2012,6 +2017,18 @@ export default function App() {
                 <p className="infoText">{qrMessage || 'ここからQR画像を読み込めるよ'}</p>
               </section>
 
+              <section className="mainCard qrSaveBaseCard">
+                <h2 className="sectionTitle">素体を保存</h2>
+
+                <button className="primaryButton" onClick={handleSaveBaseImage} disabled={isSavingBaseImage}>
+                  {isSavingBaseImage ? '保存中…' : '素体を保存'}
+                </button>
+
+                <p className="infoText">
+                  服を作るとき用の素体画像を、元の大きさのまま保存できるよ。
+                </p>
+              </section>
+
               <section className="mainCard">
                 <h2 className="sectionTitle">服をアップロード</h2>
 
@@ -2122,11 +2139,12 @@ export default function App() {
                       <p className="rulesText">・既存の服や、ほかの人が作った服を自分で作ったことにしないでね。</p>
                       <p className="rulesText">・QRで受け取った服は、作った人の名前を消したり、自分の作品として再配布しないでね。</p>
                       <p className="rulesText">・配布するときは、相手や制作者さんが嫌がる使い方をしないでね。</p>
+                      <p className="rulesText">・素体や服に対する加筆修正はしないでね。</p>
                       <p className="rulesText">・ここで保存したものはAIなどに取り込まないでね。</p>
                       <p className="rulesText">・著作権や利用条件がある素材は、それぞれのルールを守って使ってね。</p>
-                      <p className="rulesText">・公序良俗に反するものは公開しないでください。</p>
+                      <p className="rulesText">・公序良俗に反するものは公開しないでね。</p>
                       <p className="rulesText">・こちらはふれろっぷ個ちゃむで制作してるよ。調査員等に問い合わせはしないでね。</p>
-                      <p className="rulesText">・こちらのサイトでの個人間でのトラブルにおきましては当方は一切の責任等は取れないよ。</p>
+                      <p className="rulesText">・こちらのサイトでの個人間でのトラブルにおきましては当方は一切の責任等は取れないです。</p>
                     </div>
                   </div>
                 )}
