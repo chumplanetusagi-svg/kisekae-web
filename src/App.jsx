@@ -2149,7 +2149,7 @@ export default function App() {
                     </div>
 
                     <div className="creditCard">
-                      <div className="summaryLabel">サイト制作</div>
+                      <div className="summaryLabel">サイト制作・その他</div>
                       <div className="summaryValue">ふれろっぷ</div>
                       <div className="creditLinkWrap">
                         <a
