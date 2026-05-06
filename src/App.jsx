@@ -855,10 +855,12 @@ async function createQrCardCanvas({
   ctx.fillText(nickname || DEFAULT_NICKNAME, 430, 1071)
 
   ctx.fillStyle = '#ffffff'
-  roundedRect(ctx, 980, 430, 420, 420, 30)
+  roundedRect(ctx, 950, 400, 480, 480, 30)
   ctx.fill()
 
-  ctx.drawImage(qrCanvas, 1040, 490, 300, 300)
+  ctx.imageSmoothingEnabled = false
+  ctx.drawImage(qrCanvas, 1010, 460, 360, 360)
+  ctx.imageSmoothingEnabled = true
 
   ctx.fillStyle = '#98a7de'
   ctx.font = 'bold 24px sans-serif'
@@ -929,6 +931,9 @@ export default function App() {
 
   const audioRef = useRef(null)
   const qrCanvasWrapRef = useRef(null)
+  const qrSaveCanvasWrapRef = useRef(null)
+  const qrReadInputRef = useRef(null)
+  const uploadFileInputRef = useRef(null)
   const mobileClosetFollowRef = useRef(null)
   const desktopClosetPreviewRef = useRef(null)
 
@@ -1191,7 +1196,7 @@ export default function App() {
     try {
       setIsSavingQrImage(true)
 
-      const qrCanvas = qrCanvasWrapRef.current?.querySelector('canvas')
+      const qrCanvas = qrSaveCanvasWrapRef.current?.querySelector('canvas') || qrCanvasWrapRef.current?.querySelector('canvas')
       if (!qrCanvas) {
         throw new Error('QRコードが見つからないよ')
       }
@@ -1344,6 +1349,7 @@ export default function App() {
       setUploadName('')
       setUploadCategory('upper')
       setUploadFile(null)
+      if (uploadFileInputRef.current) uploadFileInputRef.current.value = ''
 
       alert('アップロードできたよ')
     } catch (error) {
@@ -1379,45 +1385,23 @@ export default function App() {
   }
 
 
-  const getFollowingPreviewBottom = () => {
-    if (typeof window === 'undefined') return 0
-
-    const mobileVisible = window.innerWidth <= 820 && mobileClosetFollowRef.current
-    if (mobileVisible) {
-      const rect = mobileClosetFollowRef.current.getBoundingClientRect()
-      return rect.bottom
-    }
-
-    const desktopVisible = window.innerWidth > 820 && desktopClosetPreviewRef.current
-    if (desktopVisible) {
-      const rect = desktopClosetPreviewRef.current.getBoundingClientRect()
-      return rect.bottom
-    }
-
-    return 0
-  }
-
-  const handleLayerDragMove = (event) => {
-    if (activeTab !== 'closet' || closetTab !== 'layer') return
-
+  const handleDragAutoScroll = (event) => {
     const translated = event?.active?.rect?.current?.translated
-    if (!translated || typeof window === 'undefined') return
+    if (!translated) return
 
-    const stickyBottom = getFollowingPreviewBottom()
-    const upperSafeLine = Math.max(stickyBottom + 20, 120)
-    const lowerSafeLine = window.innerHeight - 90
+    const mobileBottom = mobileClosetFollowRef.current?.getBoundingClientRect?.().bottom ?? 0
+    const desktopBottom = desktopClosetPreviewRef.current?.getBoundingClientRect?.().bottom ?? 0
+    const stickyBottom = Math.max(mobileBottom, desktopBottom)
+    const upperSafeLine = stickyBottom > 0 ? stickyBottom + 12 : 96
+    const lowerSafeLine = window.innerHeight - 72
 
     if (translated.top < upperSafeLine) {
-      const distance = upperSafeLine - translated.top
-      const amount = Math.max(10, Math.min(28, distance * 0.35))
-      window.scrollBy({ top: -amount, left: 0, behavior: 'auto' })
+      window.scrollBy({ top: -24, behavior: 'auto' })
       return
     }
 
     if (translated.bottom > lowerSafeLine) {
-      const distance = translated.bottom - lowerSafeLine
-      const amount = Math.max(10, Math.min(28, distance * 0.35))
-      window.scrollBy({ top: amount, left: 0, behavior: 'auto' })
+      window.scrollBy({ top: 24, behavior: 'auto' })
     }
   }
 
@@ -1475,6 +1459,7 @@ export default function App() {
       } finally {
         URL.revokeObjectURL(objectUrl)
         event.target.value = ''
+        if (qrReadInputRef.current) qrReadInputRef.current.value = ''
       }
     }
 
@@ -1482,6 +1467,7 @@ export default function App() {
       setQrMessage('画像が読み込めなかったよ')
       URL.revokeObjectURL(objectUrl)
       event.target.value = ''
+      if (qrReadInputRef.current) qrReadInputRef.current.value = ''
     }
 
     image.src = objectUrl
@@ -1780,7 +1766,7 @@ export default function App() {
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
-            onDragMove={handleLayerDragMove}
+            onDragMove={handleDragAutoScroll}
             onDragEnd={handleLayerDragEnd}
           >
             <SortableContext
@@ -1929,22 +1915,31 @@ export default function App() {
                       <div className="mobileFollowAvatarWrap">
                         {renderAvatarLayers('characterStage smallStage mobileFollowStage')}
 
-                        {closetTab !== 'layer' && (
+                        <button
+                          className="mobileFollowAllOffButton"
+                          onClick={handleUnequipAll}
+                        >
+                          全部脱ぐ
+                        </button>
+
+                        <div className="mobileFollowCornerActions">
                           <button
-                            className="mobileFollowUnequipButton"
-                            onClick={() =>
-                              handleUnequipCategory(
-                                closetTab === 'upper'
-                                  ? 'upper'
-                                  : closetTab === 'lower'
-                                  ? 'lower'
-                                  : 'accessory'
-                              )
-                            }
+                            className="mobileFollowMiniAction"
+                            onClick={handleResetDress}
+                            aria-label="デフォルト衣装に戻す"
+                            title="デフォルト衣装"
                           >
-                            {closetTab === 'accessory' ? 'アクセを外す' : '脱ぐ'}
+                            ⚙️
                           </button>
-                        )}
+                          <button
+                            className="mobileFollowMiniAction"
+                            onClick={handleApplyFavorites}
+                            aria-label="お気に入りコーデを着る"
+                            title="お気に入りコーデ"
+                          >
+                            💖
+                          </button>
+                        </div>
                       </div>
 
                       <div className="mobileFollowQuickTabs fullTabs">
@@ -2036,6 +2031,9 @@ export default function App() {
                               <div ref={qrCanvasWrapRef} className="qrCanvasWrap">
                                 <QRCodeCanvas value={qrValue} size={220} includeMargin />
                               </div>
+                              <div ref={qrSaveCanvasWrapRef} className="hiddenQrSaveCanvas" aria-hidden="true">
+                                <QRCodeCanvas value={qrValue} size={1024} includeMargin />
+                              </div>
                               <p className="qrHelpText">読み込むとこの服を追加できるよ</p>
                             </div>
                           </div>
@@ -2057,7 +2055,7 @@ export default function App() {
 
                 <label className="fieldLabel">
                   QR画像
-                  <input className="fileInput" type="file" accept="image/*" onChange={handleReadQrImage} />
+                  <input ref={qrReadInputRef} className="fileInput" type="file" accept="image/*" onClick={(e) => { e.currentTarget.value = '' }} onChange={handleReadQrImage} />
                 </label>
 
                 <p className="infoText">{qrMessage || 'ここからQR画像を読み込めるよ'}</p>
@@ -2106,9 +2104,11 @@ export default function App() {
                   <label className="fieldLabel">
                     画像
                     <input
+                      ref={uploadFileInputRef}
                       className="fileInput"
                       type="file"
                       accept="image/*"
+                      onClick={(e) => { e.currentTarget.value = '' }}
                       onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
                     />
                   </label>
