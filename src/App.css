@@ -701,3 +701,17 @@ a { color: var(--text-deep); }
     bottom: 6px;
   }
 }
+
+
+.mobileFollowMiniAction svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .mobileFollowMiniAction svg {
+    width: 18px;
+    height: 18px;
+  }
+}

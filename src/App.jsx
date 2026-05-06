@@ -20,6 +20,8 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { IoSettingsSharp } from 'react-icons/io5'
+import { FaHeart } from 'react-icons/fa'
 
 const STORAGE_BUCKET = 'clothes'
 const LS_KEY = 'kisekae-app-save'
@@ -1945,7 +1947,7 @@ export default function App() {
                           aria-label="デフォルト衣装に戻す"
                           title="デフォルト衣装"
                         >
-                          ⚙️
+                          <IoSettingsSharp aria-hidden="true" />
                         </button>
 
                         <button
@@ -1954,7 +1956,7 @@ export default function App() {
                           aria-label="お気に入りコーデを着る"
                           title="お気に入りコーデ"
                         >
-                          💖
+                          <FaHeart aria-hidden="true" />
                         </button>
                       </div>
 
