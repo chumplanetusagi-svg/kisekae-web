@@ -629,3 +629,75 @@ a { color: var(--text-deep); }
     font-size: 18px;
   }
 }
+
+
+/* mobile avatar action positions v2 */
+.mobileFollowUnequipTopButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text-deep);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(181, 196, 255, 0.18);
+  pointer-events: auto;
+}
+
+.mobileFollowGearButton {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 3;
+}
+
+.mobileFollowHeartButton {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 3;
+}
+
+@media (min-width: 821px) {
+  .mobileFollowUnequipTopButton,
+  .mobileFollowGearButton,
+  .mobileFollowHeartButton {
+    display: none !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .mobileFollowUnequipButton,
+  .mobileFollowCornerActions {
+    display: none !important;
+  }
+
+  .mobileFollowUnequipTopButton,
+  .mobileFollowGearButton,
+  .mobileFollowHeartButton {
+    pointer-events: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .mobileFollowUnequipTopButton {
+    top: 6px;
+    right: 6px;
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .mobileFollowGearButton {
+    left: 6px;
+    bottom: 6px;
+  }
+
+  .mobileFollowHeartButton {
+    right: 6px;
+    bottom: 6px;
+  }
+}

@@ -1922,24 +1922,40 @@ export default function App() {
                           全部脱ぐ
                         </button>
 
-                        <div className="mobileFollowCornerActions">
+                        {closetTab !== 'layer' && (
                           <button
-                            className="mobileFollowMiniAction"
-                            onClick={handleResetDress}
-                            aria-label="デフォルト衣装に戻す"
-                            title="デフォルト衣装"
+                            className="mobileFollowUnequipTopButton"
+                            onClick={() =>
+                              handleUnequipCategory(
+                                closetTab === 'upper'
+                                  ? 'upper'
+                                  : closetTab === 'lower'
+                                  ? 'lower'
+                                  : 'accessory'
+                              )
+                            }
                           >
-                            ⚙️
+                            {closetTab === 'accessory' ? 'アクセを外す' : '脱ぐ'}
                           </button>
-                          <button
-                            className="mobileFollowMiniAction"
-                            onClick={handleApplyFavorites}
-                            aria-label="お気に入りコーデを着る"
-                            title="お気に入りコーデ"
-                          >
-                            💖
-                          </button>
-                        </div>
+                        )}
+
+                        <button
+                          className="mobileFollowMiniAction mobileFollowGearButton"
+                          onClick={handleResetDress}
+                          aria-label="デフォルト衣装に戻す"
+                          title="デフォルト衣装"
+                        >
+                          ⚙️
+                        </button>
+
+                        <button
+                          className="mobileFollowMiniAction mobileFollowHeartButton"
+                          onClick={handleApplyFavorites}
+                          aria-label="お気に入りコーデを着る"
+                          title="お気に入りコーデ"
+                        >
+                          💖
+                        </button>
                       </div>
 
                       <div className="mobileFollowQuickTabs fullTabs">
