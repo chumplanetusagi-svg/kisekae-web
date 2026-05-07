@@ -703,21 +703,24 @@ async function drawAvatarCanvas({
   // Clear or subtle dark background (optional)
   ctx.clearRect(0, 0, size, size)
 
+  // 1. Draw Monocle Frame first (Background)
+  try {
+    const monocleImg = await loadImage(assetUrl('images/monocle.png'))
+    ctx.drawImage(monocleImg, -size * 0.1, -size * 0.1, size * 1.2, size * 1.2)
+  } catch (e) {
+    console.warn('Failed to load monocle for canvas', e)
+  }
+
+  // 2. Draw Character Layers on top
   const { back, front } = splitAccessoryImageUrls(accessoryImageUrls)
   const urls = [...back, baseImageUrl, lowerImageUrl, upperImageUrl, ...front].filter(Boolean)
 
+  const yOffset = -size * 0.12 // Shift up
+  const scale = 1.3
+
   for (const url of urls) {
     const img = await loadImage(url)
-    ctx.drawImage(img, 0, 0, size, size)
-  }
-
-  // Draw Monocle Frame on top
-  try {
-    const monocleImg = await loadImage(assetUrl('images/monocle.png'))
-    // Draw it slightly larger to match the UI feel
-    ctx.drawImage(monocleImg, -size * 0.15, -size * 0.15, size * 1.3, size * 1.3)
-  } catch (e) {
-    console.warn('Failed to load monocle for canvas', e)
+    ctx.drawImage(img, size * (1 - scale) / 2, yOffset, size * scale, size * scale)
   }
 
   return canvas
@@ -911,7 +914,7 @@ async function createQrCardCanvas({
     accessoryImageUrls: qrItemAccessoryImageUrls,
     size: 620,
   })
-  ctx.drawImage(avatarCanvas, 120, 390, 620, 620)
+  ctx.drawImage(avatarCanvas, 120, 350, 620, 620)
 
   // Name Plate
   ctx.fillStyle = '#3a2a22'
