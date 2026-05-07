@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import { supabase } from './supabase'
@@ -2020,7 +2020,7 @@ export default function App() {
 
                     <div className="homeRightCol">
                       <div className="notebookCard">
-                        <img src="/images/monocle.png" alt="" style={{ position: 'absolute', top: '-15px', right: '-15px', width: '50px', transform: 'rotate(15deg)', zIndex: 10 }} />
+                        
                         <div className="notebookTitle">なまえ</div>
                         <div className="notebookContent">{nickname || DEFAULT_NICKNAME}</div>
                       </div>
