@@ -970,6 +970,59 @@ export default function App() {
   const [isSavingBaseImage, setIsSavingBaseImage] = useState(false)
 
   const [qrMessage, setQrMessage] = useState('')
+  const [equipAnimClass, setEquipAnimClass] = useState('')
+  const [showTutorial, setShowTutorial] = useState(false)
+  const [isDragOver, setIsDragOver] = useState(false)
+
+  const PRESET_COORDS = [
+    { base: 'default-base-1', upper: 'default-upper-7', lower: 'default-lower-6', accessories: ['default-accessory-9', 'default-accessory-10'] },
+    { base: 'default-base-1', upper: 'default-upper-3', lower: 'default-lower-2', accessories: ['default-accessory-2'] },
+    { base: 'default-base-1', upper: 'default-upper-5', lower: 'default-lower-1', accessories: ['default-accessory-8', 'default-accessory-22'] }
+  ];
+
+  const renderPresetAvatar = (preset) => {
+    const baseItem = DEFAULT_BASE_ITEMS.find(i => i.id === preset.base)
+    const upperItem = DEFAULT_UPPER_ITEMS.find(i => i.id === preset.upper)
+    const lowerItem = DEFAULT_LOWER_ITEMS.find(i => i.id === preset.lower)
+    const accessoryItems = preset.accessories.map(id => DEFAULT_ACCESSORY_ITEMS.find(i => i.id === id)).filter(Boolean)
+
+    const backAccessories = accessoryItems.filter(i => isBackAccessory(i))
+    const frontAccessories = accessoryItems.filter(i => !isBackAccessory(i))
+
+    const layeredItems = []
+    if (baseItem) layeredItems.push({ layerKey: 'base', item: baseItem })
+    
+    const sorted = [upperItem, lowerItem].filter(Boolean).sort((a, b) => {
+      return DEFAULT_LAYER_ORDER.indexOf(a.category) - DEFAULT_LAYER_ORDER.indexOf(b.category)
+    })
+    sorted.forEach(item => layeredItems.push({ layerKey: item.category, item }))
+
+    return (
+      <>
+        {backAccessories.map(item => <img key={`back-${item.id}`} src={item.imageUrl} className="layerImage" crossOrigin="anonymous" alt="" />)}
+        {layeredItems.map(entry => <img key={`layer-${entry.layerKey}`} src={entry.item.imageUrl} className="layerImage" crossOrigin="anonymous" alt="" />)}
+        {frontAccessories.map(item => <img key={`front-${item.id}`} src={item.imageUrl} className="layerImage" crossOrigin="anonymous" alt="" />)}
+      </>
+    )
+  }
+
+  useEffect(() => {
+    const done = localStorage.getItem('tutorialDone')
+    if (!done) {
+      setShowTutorial(true)
+    }
+  }, [])
+
+  const handleTutorialClose = () => {
+    setShowTutorial(false)
+    localStorage.setItem('tutorialDone', 'true')
+  }
+
+  useEffect(() => {
+    setEquipAnimClass('anim-pop')
+    const timer = setTimeout(() => setEquipAnimClass(''), 400)
+    return () => clearTimeout(timer)
+  }, [equippedUpperId, equippedLowerId, equippedAccessoryIds, equippedBaseId, equippedLayerOrder])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -1517,7 +1570,7 @@ export default function App() {
       })
     : ''
 
-  const renderAvatarLayers = (stageClassName = 'characterStage') => {
+  const renderAvatarLayers = (stageClassName = 'characterStage', enableDrop = false) => {
     const backAccessories = equippedAccessories.filter((item) => isBackAccessory(item))
     const frontAccessories = equippedAccessories.filter((item) => !isBackAccessory(item))
 
@@ -1532,7 +1585,37 @@ export default function App() {
     }
 
     return (
-      <div className={stageClassName}>
+      <div 
+        className={`${stageClassName} ${equipAnimClass} ${enableDrop && isDragOver ? 'drag-over' : ''}`}
+        onDragOver={(e) => {
+          if (!enableDrop) return
+          e.preventDefault()
+          e.dataTransfer.dropEffect = 'copy'
+          if (!isDragOver) setIsDragOver(true)
+        }}
+        onDragLeave={(e) => {
+          if (!enableDrop) return
+          setIsDragOver(false)
+        }}
+        onDrop={(e) => {
+          if (!enableDrop) return
+          e.preventDefault()
+          setIsDragOver(false)
+          try {
+            const data = e.dataTransfer.getData('application/json')
+            if (data) {
+              const item = JSON.parse(data)
+              if (item && item.category) {
+                if (item.category === 'upper') setEquippedUpperId(item.id)
+                else if (item.category === 'lower') setEquippedLowerId(item.id)
+                else handleEquip(item)
+              }
+            }
+          } catch(err) {
+            console.error('Drop error', err)
+          }
+        }}
+      >
         {backAccessories.map((item) => (
           <img
             key={`back-${item.id}`}
@@ -1626,7 +1709,35 @@ export default function App() {
     const equipped = isEquipped(item)
 
     return (
-      <div key={item.id} className="itemCard">
+      <div 
+        key={item.id} 
+        className="itemCard"
+        draggable={true}
+        onDragStart={(e) => {
+          e.dataTransfer.setData('application/json', JSON.stringify(item))
+          e.dataTransfer.effectAllowed = 'copy'
+          
+          const imgEl = e.currentTarget.querySelector('.itemPreview img')
+          if (imgEl) {
+            const clone = imgEl.cloneNode(true)
+            clone.style.position = 'absolute'
+            clone.style.top = '-9999px'
+            clone.style.width = '150px'
+            clone.style.height = '150px'
+            clone.style.objectFit = 'contain'
+            document.body.appendChild(clone)
+            
+            // Set the clone as drag image, centered on cursor
+            e.dataTransfer.setDragImage(clone, 75, 75)
+            
+            setTimeout(() => {
+              if (document.body.contains(clone)) {
+                document.body.removeChild(clone)
+              }
+            }, 10)
+          }
+        }}
+      >
         <div className="itemPreview">
           <img src={item.imageUrl} alt={item.name} crossOrigin="anonymous" />
           <div className="previewCreatorBadge">{getDisplayCreatorName(item)}</div>
@@ -1789,6 +1900,27 @@ export default function App() {
 
   return (
     <div className="appShell">
+      <div className="floatingAvatarContainer">
+        <img src="/images/gear_bronze.png" className="deco-gear gear-1" alt="" />
+        <img src="/images/gear_silver.png" className="deco-gear gear-2" alt="" />
+        <img src="/images/gear_gold.png" className="deco-gear gear-3" alt="" />
+        <img src="/images/feather.png" className="deco-feather float-feather-1" alt="" />
+        <img src="/images/feather.png" className="deco-feather float-feather-2" alt="" />
+
+        {activeTab === 'home' && <img src="/images/mic.png" className="deco-mic" alt="" />}
+        {activeTab === 'closet' && <img src="/images/penlight.png" className="deco-penlight" alt="" />}
+
+        <div className="floating-avatar float-1">
+          {renderPresetAvatar(PRESET_COORDS[0])}
+        </div>
+        <div className="floating-avatar float-2">
+          {renderPresetAvatar(PRESET_COORDS[1])}
+        </div>
+        <div className="floating-avatar float-3">
+          {renderPresetAvatar(PRESET_COORDS[2])}
+        </div>
+      </div>
+      
       <div className="appFrame">
         <header className="topHeader">
           <div>
@@ -1800,8 +1932,11 @@ export default function App() {
             <button className={`tabButton ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
               ホーム
             </button>
-            <button className={`tabButton ${activeTab === 'closet' ? 'active' : ''}`} onClick={() => setActiveTab('closet')}>
+            <button className={`tabButton ${activeTab === 'closet' ? 'active' : ''}`} onClick={() => { setActiveTab('closet'); handleTutorialClose(); }}>
               クローゼット
+              {showTutorial && activeTab === 'home' && (
+                <div className="tutorialTooltip">ここから着せ替え！</div>
+              )}
             </button>
             <button className={`tabButton ${activeTab === 'qr' ? 'active' : ''}`} onClick={() => setActiveTab('qr')}>
               QR
@@ -1818,14 +1953,38 @@ export default function App() {
               <section className="mainCard homeOnlyCard">
                 <div className="homeCaptureCard">
                   <div className="homeCaptureInner">
-                    <button className="homeAvatarButton" onClick={handleCharacterClick}>
-                      {renderAvatarLayers('homeAvatarStage')}
-                    </button>
+                    <div className="homeLeftCol">
+                      <button className="homeAvatarButton" onClick={handleCharacterClick}>
+                        {renderAvatarLayers('homeAvatarStage')}
+                      </button>
+                    </div>
 
-                    <div className="homeNamePlate">{nickname || DEFAULT_NICKNAME}</div>
+                    <div className="homeRightCol">
+                      <div className="notebookCard">
+                        <img src="/images/monocle.png" alt="" style={{ position: 'absolute', top: '-15px', right: '-15px', width: '50px', transform: 'rotate(15deg)', zIndex: 10 }} />
+                        <div className="notebookTitle">なまえ</div>
+                        <div className="notebookContent">{nickname || DEFAULT_NICKNAME}</div>
+                      </div>
 
-                    <div className="homeConceptOnly">
-                      {concept?.trim() ? concept : 'コンセプトはまだ未設定だよ'}
+                      <div className="notebookCard">
+                        <div className="notebookTitle">コンセプト</div>
+                        <div className="notebookContent">
+                          {concept?.trim() ? concept : 'コンセプトはまだ未設定だよ'}
+                        </div>
+                      </div>
+
+                      <div className="notebookCard">
+                        <div className="notebookTitle">今日のコーデ</div>
+                        <div className="equippedItemsRow">
+                          {layeredEquippedItems.map(entry => (
+                            entry.item && (
+                              <div key={entry.item.id} className="equippedMiniIcon" title={entry.item.name}>
+                                <img src={entry.item.imageUrl} alt={entry.item.name} crossOrigin="anonymous" />
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1844,7 +2003,7 @@ export default function App() {
             <div className="closetLayout">
               <section ref={desktopClosetPreviewRef} className="leftColumn closetDesktopPreview">
                 <div className="mainCard previewCard">
-                  {renderAvatarLayers('characterStage smallStage')}
+                  {renderAvatarLayers('characterStage smallStage', true)}
                   <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
 
                   <div className="miniActions">
@@ -1915,7 +2074,7 @@ export default function App() {
                   <div ref={mobileClosetFollowRef} className="mobileClosetFollowCard">
                     <div className="mobileClosetFollowInner">
                       <div className="mobileFollowAvatarWrap">
-                        {renderAvatarLayers('characterStage smallStage mobileFollowStage')}
+                        {renderAvatarLayers('characterStage smallStage mobileFollowStage', true)}
 
                         <button
                           className="mobileFollowAllOffButton"
