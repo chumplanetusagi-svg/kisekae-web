@@ -2541,8 +2541,9 @@ export default function App() {
                           className="textArea"
                           value={concept}
                           onChange={(e) => setConcept(e.target.value)}
-                          placeholder="例：いつものふれろっぷ / ちょっとおでかけ風 / お嬢様風"
-                          rows={5}
+                          placeholder="40文字以内でコーデのポイントを教えてね。"
+                          rows={3}
+                          maxLength={40}
                         />
                       </label>
                     </div>
