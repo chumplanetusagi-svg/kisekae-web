@@ -764,8 +764,8 @@ async function createHomeCanvas({
   roundedRect(ctx, 450, 1010, 500, 90, 45)
   ctx.fill()
 
-  ctx.fillStyle = '#5f6fc3'
-  ctx.font = 'bold 42px sans-serif'
+  ctx.fillStyle = '#d4b895'
+  ctx.font = 'bold 42px "Shippori Mincho", serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(nickname || DEFAULT_NICKNAME, 700, 1055)
@@ -774,8 +774,8 @@ async function createHomeCanvas({
   roundedRect(ctx, 170, 1150, 1060, 360, 30)
   ctx.fill()
 
-  ctx.fillStyle = '#6d7fd7'
-  ctx.font = 'bold 34px sans-serif'
+  ctx.fillStyle = '#f2ce9e'
+  ctx.font = 'bold 34px "Shippori Mincho", serif'
   ctx.textAlign = 'left'
   ctx.textBaseline = 'top'
   drawWrappedText(
@@ -821,19 +821,19 @@ async function createQrCardCanvas({
   ctx.fill()
 
   ctx.fillStyle = '#ffffff'
-  ctx.font = 'bold 24px sans-serif'
+  ctx.font = 'bold 24px "Shippori Mincho", serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText('QR配布カード', 185, 118)
 
-  ctx.fillStyle = '#5f6fc3'
+  ctx.fillStyle = '#d4b895'
   ctx.textAlign = 'left'
   ctx.textBaseline = 'top'
-  ctx.font = 'bold 54px sans-serif'
+  ctx.font = 'bold 54px "Shippori Mincho", serif'
   ctx.fillText(itemName, 90, 185)
 
   ctx.fillStyle = '#98a7de'
-  ctx.font = 'bold 28px sans-serif'
+  ctx.font = 'bold 28px "Shippori Mincho", serif'
   ctx.fillText(`作った人：${creatorName}`, 90, 260)
   ctx.fillText(itemCategoryLabel, 90, 308)
 
@@ -850,8 +850,8 @@ async function createQrCardCanvas({
   roundedRect(ctx, 285, 1035, 290, 72, 36)
   ctx.fill()
 
-  ctx.fillStyle = '#5f6fc3'
-  ctx.font = 'bold 30px sans-serif'
+  ctx.fillStyle = '#d4b895'
+  ctx.font = 'bold 30px "Shippori Mincho", serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(nickname || DEFAULT_NICKNAME, 430, 1071)
@@ -865,7 +865,7 @@ async function createQrCardCanvas({
   ctx.imageSmoothingEnabled = true
 
   ctx.fillStyle = '#98a7de'
-  ctx.font = 'bold 24px sans-serif'
+  ctx.font = 'bold 24px "Shippori Mincho", serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   ctx.fillText('読み込むとこの服を追加できるよ', 1190, 885)
@@ -974,6 +974,27 @@ export default function App() {
   const [showTutorial, setShowTutorial] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
   const [time, setTime] = useState(new Date())
+  const [clickParticles, setClickParticles] = useState([])
+
+  const handleGlobalClick = (e) => {
+    if (e.target.closest('button')) {
+      const rect = e.target.getBoundingClientRect()
+      const x = rect.left + rect.width / 2
+      const y = rect.top + rect.height / 2
+      const newParticles = Array.from({length: 6}).map((_, i) => ({
+        id: Date.now() + i,
+        x,
+        y,
+        tx: (Math.random() - 0.5) * 100 + 'px',
+        ty: (Math.random() - 0.5) * 100 + 'px'
+      }))
+      setClickParticles(prev => [...prev, ...newParticles])
+      setTimeout(() => {
+        setClickParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)))
+      }, 1000)
+    }
+  }
+
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000)
@@ -1933,7 +1954,10 @@ export default function App() {
   }
 
   return (
-    <div className="appShell">
+    <div className="appShell" onClick={handleGlobalClick}>
+      {clickParticles.map(p => (
+        <div key={p.id} className="magic-particle" style={{ left: p.x, top: p.y, '--tx': p.tx, '--ty': p.ty }} />
+      ))}
       <div className="steam-container">
         {[...Array(10)].map((_, i) => (
           <div key={i} className="steam-particle" style={{

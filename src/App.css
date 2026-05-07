@@ -1,4 +1,5 @@
-﻿:root {
+﻿@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700;800&display=swap');
+:root {
   --bg: radial-gradient(circle at center, #382822 0%, #140e0c 100%);
   --card: rgba(36, 26, 22, 0.85);
   --text: #d4b895;
@@ -21,7 +22,7 @@ body,
 #root {
   margin: 0;
   min-height: 100%;
-  font-family: 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
+  font-family: 'Shippori Mincho', serif;
   background: var(--bg);
   background-attachment: fixed;
   background-color: #140e0c;
@@ -2264,7 +2265,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Times New Roman', serif;
+  font-family: 'Shippori Mincho', serif;
   font-weight: 800;
   color: #3e2723;
   font-size: 18px;
@@ -2284,3 +2285,34 @@ a {
 
 .homeAvatarStage::before, .characterStage::before, .smallStage::before, .qrAvatarStage::before { content: ''; position: absolute; top: -15%; left: -15%; width: 130%; height: 130%; background: url('/images/monocle.png') no-repeat center center; background-size: contain; pointer-events: none; z-index: 0; } 
 .layerImage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; }
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+.deco-gear, .deco-feather {
+  animation: floatBob 6s ease-in-out infinite;
+}
+
+/* Add slight delay offsets based on class to make them float differently */
+.gear-2 { animation-delay: -2s; }
+.gear-3 { animation-delay: -4s; }
+.float-feather-1 { animation-delay: -1.5s; animation-duration: 7s; }
+.float-feather-2 { animation-delay: -3.5s; animation-duration: 5s; }
+
+.magic-particle {
+  position: fixed;
+  pointer-events: none;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #ffe299 0%, #d4af37 50%, transparent 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ffe299;
+  z-index: 9999;
+  animation: particleFade 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes particleFade {
+  0% { transform: scale(0.5) translate(0, 0); opacity: 1; }
+  100% { transform: scale(1.5) translate(var(--tx), var(--ty)); opacity: 0; }
+}
