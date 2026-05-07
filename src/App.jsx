@@ -2181,7 +2181,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+                <div style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', pointerEvents: 'none' }}>
                   <div ref={homeCaptureHiddenRef} className="homeCaptureCard force-pc">
                     {/* Decorative Gears */}
                     <div className="gearDecoration gear-tr" />

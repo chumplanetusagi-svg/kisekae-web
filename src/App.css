@@ -15,17 +15,19 @@
 
 * {
   box-sizing: border-box;
-  cursor: url('/images/cursor.svg') 0 0, auto;
+  /* Steampunk Arrow Cursor (Base64) */
+  cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNMiAyIEwxNiAxNiBMOCAxNiBMOCAyNiBMMiAyNiBaIiBmaWxsPSIjY2Q3ZjMyIiBzdHJva2U9IiMzZTI3MjMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGNpcmNsZSBjeD0iNiIgY3k9IjIwIiByPSIzIiBmaWxsPSIjOGI0NTEzIiBzdHJva2U9IiMzZTI3MjMiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik02IDE2IEw2IDI0IE0yIDIwIEwxMCAyMCIgc3Ryb2tlPSIjM2UyNzIzIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=') 0 0, auto;
 }
 
 button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
-  cursor: url('/images/cursor_hover.svg') 16 16, pointer !important;
+  /* Steampunk Gear Hover (Base64) */
+  cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMCIgZmlsbD0iI2YyY2U5ZSIgc3Ryb2tlPSIjOGI0NTEzIiBzdHJva2Utd2lkdGg9IjIiLz48ZyBzdHJva2U9IiM4YjQ1MTMiIHN0cm9rZS13aWR0aD0iNCI+PHBhdGggZD0iTTE2IDIgTDE2IDMwIE0yIDE2IEwzMCAxNiBNNiA2IEwyNiAyNiBNNiAyNiBMMjYgNiIvPjwvZz48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSI0IiBmaWxsPSIjOGI0NTEzIi8+PC9zdmc+') 16 16, pointer !important;
 }
 
 html,
-body,
-#root {
+body {
   margin: 0;
+  overflow-x: hidden; /* Prevent horizontal scroll from hidden elements */
   min-height: 100%;
   font-family: 'Shippori Mincho', serif;
   background: var(--bg);
@@ -2432,5 +2434,4 @@ button, .itemCard, .dragHandle, a {
   opacity: 0.12;
   pointer-events: none;
   z-index: 0;
-  mix-blend-mode: overlay;
 }
