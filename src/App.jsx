@@ -865,6 +865,54 @@ async function createQrCardCanvas({
 
     // Central Large Gear
     drawSingleGear(gearG, width / 2, height / 2, width * 0.45, 0)
+
+    // Top Left Decorations (Clock & Date)
+    try {
+      const [watchBase, watchHour, watchMin, watchSec] = await Promise.all([
+        loadImage(assetUrl('images/watch_base.png')),
+        loadImage(assetUrl('images/watch_hour.png')),
+        loadImage(assetUrl('images/watch_minute.png')),
+        loadImage(assetUrl('images/watch_second.png'))
+      ])
+
+      const now = new Date()
+      const centerX = 160
+      const centerY = 160
+      const size = 180
+
+      ctx.save()
+      ctx.translate(centerX, centerY)
+      ctx.drawImage(watchBase, -size / 2, -size / 2, size, size)
+
+      const drawHand = (img, deg) => {
+        ctx.save()
+        ctx.rotate((deg * Math.PI) / 180)
+        ctx.drawImage(img, -size / 2, -size / 2, size, size)
+        ctx.restore()
+      }
+
+      drawHand(watchHour, now.getHours() * 30 + now.getMinutes() * 0.5)
+      drawHand(watchMin, now.getMinutes() * 6)
+      drawHand(watchSec, now.getSeconds() * 6)
+      ctx.restore()
+
+      // Date Paper
+      ctx.fillStyle = '#f2ce9e'
+      ctx.strokeStyle = '#594129'
+      ctx.lineWidth = 3
+      roundedRect(ctx, 260, 130, 140, 60, 8)
+      ctx.fill()
+      ctx.stroke()
+
+      ctx.fillStyle = '#3e2723'
+      ctx.font = 'bold 24px "Shippori Mincho", serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(`${now.getMonth() + 1}月 ${now.getDate()}日`, 330, 160)
+
+    } catch (e) {
+      console.warn('Clock assets failed for QR canvas', e)
+    }
     
   } catch (e) {
     console.warn('Gears failed to load for QR card', e)
@@ -2177,6 +2225,17 @@ export default function App() {
             <div className="homeSingleWrap">
               <section className="mainCard homeOnlyCard">
                 <div ref={homeCaptureRef} className="homeCaptureCard">
+                  <div className="homeCardTopLeftDecor">
+                    <div className="pocket-watch-large">
+                      <img src="/images/watch_base.png" className="watch-base" alt="" />
+                      <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
+                      <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
+                      <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
+                    </div>
+                    <div className="antique-date-paper">
+                      <span className="date-month">{time.getMonth() + 1}</span>月<span className="date-day">{time.getDate()}</span>日
+                    </div>
+                  </div>
                   {/* Random Decorative Gears */}
                   {homeGearConfigs.map(config => (
                     <div
@@ -2234,6 +2293,17 @@ export default function App() {
 
                 <div style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', pointerEvents: 'none' }}>
                   <div ref={homeCaptureHiddenRef} className="homeCaptureCard force-pc">
+                    <div className="homeCardTopLeftDecor">
+                      <div className="pocket-watch-large">
+                        <img src="/images/watch_base.png" className="watch-base" alt="" />
+                        <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
+                        <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
+                        <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
+                      </div>
+                      <div className="antique-date-paper">
+                        <span className="date-month">{time.getMonth() + 1}</span>月<span className="date-day">{time.getDate()}</span>日
+                      </div>
+                    </div>
                     {/* Random Decorative Gears */}
                     {homeGearConfigs.map(config => (
                       <div
@@ -2483,6 +2553,17 @@ export default function App() {
                     {selectedQrItem && (
                       <>
                         <div className="qrCard">
+                          <div className="homeCardTopLeftDecor">
+                            <div className="pocket-watch-large">
+                              <img src="/images/watch_base.png" className="watch-base" alt="" />
+                              <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
+                              <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
+                              <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
+                            </div>
+                            <div className="antique-date-paper">
+                              <span className="date-month">{time.getMonth() + 1}</span>月<span className="date-day">{time.getDate()}</span>日
+                            </div>
+                          </div>
                           {/* Random Decorative Gears */}
                           {qrGearConfigs.map(config => (
                             <div
