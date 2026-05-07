@@ -833,6 +833,10 @@ button, .itemCard, .dragHandle, a {
 .gear-tm { top: -10%; left: 45%; width: 25%; height: 25%; background-image: url('/images/gear_silver.png'); transform: rotate(45deg); }
 .gear-bm { bottom: -10%; left: 40%; width: 20%; height: 20%; background-image: url('/images/gear_bronze.png'); transform: rotate(-10deg); }
 
+.gear-gold { background-image: url('/images/gear_gold.png'); }
+.gear-silver { background-image: url('/images/gear_silver.png'); }
+.gear-bronze { background-image: url('/images/gear_bronze.png'); }
+
 .qrCardHeader {
   display: flex;
   flex-direction: column;

@@ -820,6 +820,7 @@ async function createQrCardCanvas({
   qrItemLowerImageUrl = '',
   qrItemAccessoryImageUrls = [],
   qrCanvas,
+  gearConfigs = [],
 }) {
   const width = 1600
   const height = 1180
@@ -850,19 +851,17 @@ async function createQrCardCanvas({
 
     const drawSingleGear = (img, x, y, size, rotation) => {
       ctx.save()
-      ctx.globalAlpha = 0.12 // upping transparency slightly for more gears
+      ctx.globalAlpha = 0.12
       ctx.translate(x, y)
       ctx.rotate(rotation)
-      ctx.drawImage(img, -size/2, -size/2, size, size)
+      ctx.drawImage(img, -size / 2, -size / 2, size, size)
       ctx.restore()
     }
 
-    drawSingleGear(gearS, width - 150, 150, 420, Math.PI / 8)
-    drawSingleGear(gearB, 180, height - 180, 520, Math.PI / 6)
-    drawSingleGear(gearG, width / 2 + 200, height - 100, 380, -Math.PI / 4)
-    drawSingleGear(gearS, 120, 120, 320, -Math.PI / 3)
-    drawSingleGear(gearG, width - 120, height - 120, 480, Math.PI / 5)
-    drawSingleGear(gearB, width / 2 - 100, 60, 300, Math.PI / 10)
+    gearConfigs.forEach(config => {
+      const img = config.type === 'gold' ? gearG : config.type === 'silver' ? gearS : gearB
+      drawSingleGear(img, config.x, config.y, config.size, config.rotation)
+    })
     
   } catch (e) {
     console.warn('Gears failed to load for QR card', e)
@@ -900,9 +899,9 @@ async function createQrCardCanvas({
     lowerImageUrl: qrItemLowerImageUrl,
     upperImageUrl: qrItemUpperImageUrl,
     accessoryImageUrls: qrItemAccessoryImageUrls,
-    size: 780,
+    size: 880,
   })
-  ctx.drawImage(avatarCanvas, 60, 280, 780, 780)
+  ctx.drawImage(avatarCanvas, 40, 220, 880, 880)
 
   // Name Plate
   ctx.fillStyle = '#3a2a22'
@@ -1112,6 +1111,20 @@ export default function App() {
     } while (top < 40 && left < 40); // avoid top left corner
     return { top: `${top}%`, left: `${left}%` };
   };
+
+  const generateGears = (width, height, count = 8) => {
+    return [...Array(count)].map((_, i) => ({
+      id: i,
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * (500 - 200) + 200,
+      rotation: Math.random() * Math.PI * 2,
+      type: ['gold', 'silver', 'bronze'][Math.floor(Math.random() * 3)]
+    }))
+  }
+
+  const qrGearConfigs = useMemo(() => generateGears(1600, 1180, 8), [])
+  const homeGearConfigs = useMemo(() => generateGears(1200, 680, 8), [])
 
   const randomPositions = useMemo(() => {
     return {
@@ -1424,6 +1437,7 @@ export default function App() {
         qrItemLowerImageUrl: qrPreviewLower?.imageUrl || '',
         qrItemAccessoryImageUrls: qrPreviewAccessories,
         qrCanvas,
+        gearConfigs: qrGearConfigs,
       })
 
       downloadCanvas(canvas, `${selectedQrItem.name}-qr-card.png`)
@@ -2136,13 +2150,23 @@ export default function App() {
             <div className="homeSingleWrap">
               <section className="mainCard homeOnlyCard">
                 <div ref={homeCaptureRef} className="homeCaptureCard">
-                  {/* Decorative Gears */}
-                  <div className="gearDecoration gear-tr" />
-                  <div className="gearDecoration gear-bl" />
-                  <div className="gearDecoration gear-tl" />
-                  <div className="gearDecoration gear-br" />
-                  <div className="gearDecoration gear-tm" />
-                  <div className="gearDecoration gear-bm" />
+                  {/* Random Decorative Gears */}
+                  {homeGearConfigs.map(config => (
+                    <div
+                      key={config.id}
+                      className={`gearDecoration gear-${config.type}`}
+                      style={{
+                        position: 'absolute',
+                        left: `${(config.x / 1200) * 100}%`,
+                        top: `${(config.y / 680) * 100}%`,
+                        width: `${(config.size / 1200) * 100}%`,
+                        transform: `translate(-50%, -50%) rotate(${config.rotation}rad)`,
+                        opacity: 0.08,
+                        pointerEvents: 'none',
+                        zIndex: 0
+                      }}
+                    />
+                  ))}
                   <div className="magicCircleCenter" />
                   
                   <div className="homeCaptureInner">
@@ -2183,13 +2207,24 @@ export default function App() {
 
                 <div style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden', pointerEvents: 'none' }}>
                   <div ref={homeCaptureHiddenRef} className="homeCaptureCard force-pc">
-                    {/* Decorative Gears */}
-                    <div className="gearDecoration gear-tr" />
-                    <div className="gearDecoration gear-bl" />
-                    <div className="gearDecoration gear-tl" />
-                    <div className="gearDecoration gear-br" />
-                    <div className="gearDecoration gear-tm" />
-                    <div className="gearDecoration gear-bm" />
+                    {/* Random Decorative Gears */}
+                    {homeGearConfigs.map(config => (
+                      <div
+                        key={config.id}
+                        className={`gearDecoration gear-${config.type}`}
+                        style={{
+                          position: 'absolute',
+                          left: `${config.x}px`,
+                          top: `${config.y}px`,
+                          width: `${config.size}px`,
+                          height: `${config.size}px`,
+                          transform: `translate(-50%, -50%) rotate(${config.rotation}rad)`,
+                          opacity: 0.12,
+                          pointerEvents: 'none',
+                          zIndex: 0
+                        }}
+                      />
+                    ))}
                     <div className="magicCircleCenter" />
 
                     <div className="homeCaptureInner">
@@ -2421,13 +2456,23 @@ export default function App() {
                     {selectedQrItem && (
                       <>
                         <div className="qrCard">
-                          {/* Decorative Gears */}
-                          <div className="gearDecoration gear-tr" />
-                          <div className="gearDecoration gear-bl" />
-                          <div className="gearDecoration gear-tl" />
-                          <div className="gearDecoration gear-br" />
-                          <div className="gearDecoration gear-tm" />
-                          <div className="gearDecoration gear-bm" />
+                          {/* Random Decorative Gears */}
+                          {qrGearConfigs.map(config => (
+                            <div
+                              key={config.id}
+                              className={`gearDecoration gear-${config.type}`}
+                              style={{
+                                position: 'absolute',
+                                left: `${(config.x / 1600) * 100}%`,
+                                top: `${(config.y / 1180) * 100}%`,
+                                width: `${(config.size / 1600) * 100}%`,
+                                transform: `translate(-50%, -50%) rotate(${config.rotation}rad)`,
+                                opacity: 0.08,
+                                pointerEvents: 'none',
+                                zIndex: 0
+                              }}
+                            />
+                          ))}
                           <div className="qrCardHeader">
                             <span className="qrCardBadge">QR配布カード</span>
                             <div className="qrCardTitleBlock">
