@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: radial-gradient(circle at center, #382822 0%, #140e0c 100%);
   --card: rgba(36, 26, 22, 0.85);
   --text: #d4b895;
@@ -240,11 +240,11 @@ a {
 }
 
 .notebookCard {
-  background: #291e19;
-  border-radius: 8px;
-  padding: 20px 24px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 0, 0, 0.6);
-  border: 1px solid #73543d;
+  background: linear-gradient(135deg, #3a2a22 0%, #1a120e 100%);
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(184, 138, 92, 0.15);
+  border: 1px solid #b88a5c;
   position: relative;
   width: 100%;
 }
@@ -252,12 +252,12 @@ a {
 .notebookCard::before {
   content: '';
   position: absolute;
-  top: 8px;
-  bottom: 8px;
-  left: 8px;
-  right: 8px;
-  border: 1px solid #8c6a46;
-  border-radius: 4px;
+  top: 6px;
+  bottom: 6px;
+  left: 6px;
+  right: 6px;
+  border: 1px dashed rgba(184, 138, 92, 0.4);
+  border-radius: 6px;
   pointer-events: none;
 }
 

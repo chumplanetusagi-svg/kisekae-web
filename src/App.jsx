@@ -973,7 +973,6 @@ export default function App() {
   const [equipAnimClass, setEquipAnimClass] = useState('')
   const [showTutorial, setShowTutorial] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
-  const [isSepia, setIsSepia] = useState(false)
   const [time, setTime] = useState(new Date())
 
   useEffect(() => {
@@ -981,11 +980,40 @@ export default function App() {
     return () => clearInterval(timer)
   }, [])
 
-  const PRESET_COORDS = [
-    { base: 'default-base-1', upper: 'default-upper-7', lower: 'default-lower-6', accessories: ['default-accessory-9', 'default-accessory-10'] },
-    { base: 'default-base-1', upper: 'default-upper-3', lower: 'default-lower-2', accessories: ['default-accessory-2'] },
-    { base: 'default-base-1', upper: 'default-upper-5', lower: 'default-lower-1', accessories: ['default-accessory-8', 'default-accessory-22'] }
-  ];
+  const getRandomPos = () => {
+    let top, left;
+    do {
+      top = Math.random() * 80;
+      left = Math.random() * 80;
+    } while (top < 40 && left < 40); // avoid top left corner
+    return { top: `${top}%`, left: `${left}%` };
+  };
+
+  const randomPositions = useMemo(() => {
+    return {
+      avatars: [...Array(3)].map(() => getRandomPos()),
+      gears: [...Array(3)].map(() => getRandomPos()),
+      feathers: [...Array(2)].map(() => getRandomPos()),
+    };
+  }, []);
+
+  const randomCoords = useMemo(() => {
+    return [...Array(3)].map(() => {
+      const base = DEFAULT_BASE_ITEMS[Math.floor(Math.random() * DEFAULT_BASE_ITEMS.length)]
+      const upper = DEFAULT_UPPER_ITEMS[Math.floor(Math.random() * DEFAULT_UPPER_ITEMS.length)]
+      const lower = DEFAULT_LOWER_ITEMS[Math.floor(Math.random() * DEFAULT_LOWER_ITEMS.length)]
+      const accs = []
+      const accCount = Math.floor(Math.random() * 3)
+      const accPool = [...DEFAULT_ACCESSORY_ITEMS]
+      for (let i = 0; i < accCount; i++) {
+        if (accPool.length === 0) break;
+        const idx = Math.floor(Math.random() * accPool.length)
+        accs.push(accPool[idx].id)
+        accPool.splice(idx, 1)
+      }
+      return { base: base.id, upper: upper.id, lower: lower.id, accessories: accs }
+    })
+  }, []);
 
   const renderPresetAvatar = (preset) => {
     const baseItem = DEFAULT_BASE_ITEMS.find(i => i.id === preset.base)
@@ -1905,7 +1933,7 @@ export default function App() {
   }
 
   return (
-    <div className={`appShell ${isSepia ? 'sepia-filter' : ''}`}>
+    <div className="appShell">
       <div className="steam-container">
         {[...Array(10)].map((_, i) => (
           <div key={i} className="steam-particle" style={{
@@ -1919,23 +1947,23 @@ export default function App() {
       </div>
 
       <div className="floatingAvatarContainer">
-        <img src="/images/gear_bronze.png" className="deco-gear gear-1" alt="" />
-        <img src="/images/gear_silver.png" className="deco-gear gear-2" alt="" />
-        <img src="/images/gear_gold.png" className="deco-gear gear-3" alt="" />
-        <img src="/images/feather.png" className="deco-feather float-feather-1" alt="" />
-        <img src="/images/feather.png" className="deco-feather float-feather-2" alt="" />
+        <img src="/images/gear_bronze.png" className="deco-gear gear-1" style={randomPositions.gears[0]} alt="" />
+        <img src="/images/gear_silver.png" className="deco-gear gear-2" style={randomPositions.gears[1]} alt="" />
+        <img src="/images/gear_gold.png" className="deco-gear gear-3" style={randomPositions.gears[2]} alt="" />
+        <img src="/images/feather.png" className="deco-feather float-feather-1" style={randomPositions.feathers[0]} alt="" />
+        <img src="/images/feather.png" className="deco-feather float-feather-2" style={randomPositions.feathers[1]} alt="" />
 
         {activeTab === 'home' && <img src="/images/mic.png" className="deco-mic" alt="" />}
         {activeTab === 'closet' && <img src="/images/penlight.png" className="deco-penlight" alt="" />}
 
-        <div className="floating-avatar float-1">
-          {renderPresetAvatar(PRESET_COORDS[0])}
+        <div className="floating-avatar float-1" style={randomPositions.avatars[0]}>
+          {renderPresetAvatar(randomCoords[0])}
         </div>
-        <div className="floating-avatar float-2">
-          {renderPresetAvatar(PRESET_COORDS[1])}
+        <div className="floating-avatar float-2" style={randomPositions.avatars[1]}>
+          {renderPresetAvatar(randomCoords[1])}
         </div>
-        <div className="floating-avatar float-3">
-          {renderPresetAvatar(PRESET_COORDS[2])}
+        <div className="floating-avatar float-3" style={randomPositions.avatars[2]}>
+          {renderPresetAvatar(randomCoords[2])}
         </div>
       </div>
 
