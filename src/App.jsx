@@ -694,6 +694,7 @@ async function drawAvatarCanvas({
   upperImageUrl = '',
   accessoryImageUrls = [],
   size = 900,
+  withMonocle = true,
 }) {
   const canvas = document.createElement('canvas')
   canvas.width = size
@@ -702,14 +703,16 @@ async function drawAvatarCanvas({
 
   ctx.clearRect(0, 0, size, size)
 
-  // 1. Draw Monocle Frame first (Background)
-  const monoclePadding = 0
-  const monocleSize = size
-  try {
-    const monocleImg = await loadImage(assetUrl('images/monocle.png'))
-    ctx.drawImage(monocleImg, monoclePadding, monoclePadding, monocleSize, monocleSize)
-  } catch (e) {
-    console.warn('Failed to load monocle for canvas', e)
+  // 1. Draw Monocle Frame first (Background) - IF requested
+  if (withMonocle) {
+    const monoclePadding = 0
+    const monocleSize = size
+    try {
+      const monocleImg = await loadImage(assetUrl('images/monocle.png'))
+      ctx.drawImage(monocleImg, monoclePadding, monoclePadding, monocleSize, monocleSize)
+    } catch (e) {
+      console.warn('Failed to load monocle for canvas', e)
+    }
   }
 
   // 2. Draw Character Layers on top
@@ -916,6 +919,7 @@ async function createQrCardCanvas({
     upperImageUrl: qrItemUpperImageUrl,
     accessoryImageUrls: qrItemAccessoryImageUrls,
     size: 780,
+    withMonocle: false,
   })
   ctx.drawImage(avatarCanvas, 60, 280, 780, 780)
 
