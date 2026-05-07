@@ -2136,6 +2136,14 @@ export default function App() {
             <div className="homeSingleWrap">
               <section className="mainCard homeOnlyCard">
                 <div ref={homeCaptureRef} className="homeCaptureCard">
+                  {/* Decorative Gears */}
+                  <div className="gearDecoration gear-tr" />
+                  <div className="gearDecoration gear-bl" />
+                  <div className="gearDecoration gear-tl" />
+                  <div className="gearDecoration gear-br" />
+                  <div className="gearDecoration gear-tm" />
+                  <div className="gearDecoration gear-bm" />
+                  
                   <div className="homeCaptureInner">
                     <div className="homeLeftCol">
                       <button className="homeAvatarButton" onClick={handleCharacterClick}>
@@ -2172,9 +2180,16 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Hidden element for guaranteed landscape capture */}
                 <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
                   <div ref={homeCaptureHiddenRef} className="homeCaptureCard force-pc">
+                    {/* Decorative Gears */}
+                    <div className="gearDecoration gear-tr" />
+                    <div className="gearDecoration gear-bl" />
+                    <div className="gearDecoration gear-tl" />
+                    <div className="gearDecoration gear-br" />
+                    <div className="gearDecoration gear-tm" />
+                    <div className="gearDecoration gear-bm" />
+
                     <div className="homeCaptureInner">
                       <div className="homeLeftCol">
                         <div className="homeAvatarStage">
