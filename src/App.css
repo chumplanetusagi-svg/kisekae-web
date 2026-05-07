@@ -55,12 +55,16 @@ a {
   position: relative;
   z-index: 1;
   font-family: 'Shippori Mincho', serif;
-  /* Custom Cursor - 仮の正方形 (32px x 32px) */
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="24" height="24" x="4" y="4" fill="%233498db" stroke="white" stroke-width="2"/></svg>') 16 16, auto;
+  /* Custom Cursor - Steampunk Style */
+  cursor: url('/images/cursor.png') 0 0, auto;
 }
 
 .appShell:active {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="24" height="24" x="4" y="4" fill="%23e74c3c" stroke="white" stroke-width="2"/></svg>') 16 16, auto;
+  cursor: url('/images/cursor_hover.png') 16 16, auto;
+}
+
+button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover {
+  cursor: url('/images/cursor_hover.png') 16 16, pointer !important;
 }
 
 button, .itemCard, .dragHandle, a {
