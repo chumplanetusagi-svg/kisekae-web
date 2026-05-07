@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: radial-gradient(circle at center, #382822 0%, #140e0c 100%);
   --card: rgba(36, 26, 22, 0.85);
   --text: #d4b895;
@@ -240,25 +240,47 @@ a {
 }
 
 .notebookCard {
-  background: linear-gradient(135deg, #3a2a22 0%, #1a120e 100%);
+  background: linear-gradient(145deg, #4a3424 0%, #291e19 50%, #1a120e 100%);
   border-radius: 12px;
   padding: 24px 28px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(184, 138, 92, 0.15);
-  border: 1px solid #b88a5c;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(212, 175, 55, 0.2);
+  border: 2px solid #d4af37;
   position: relative;
   width: 100%;
+  overflow: hidden;
 }
 
 .notebookCard::before {
   content: '';
   position: absolute;
-  top: 6px;
-  bottom: 6px;
-  left: 6px;
-  right: 6px;
-  border: 1px dashed rgba(184, 138, 92, 0.4);
-  border-radius: 6px;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  border: 1px double rgba(212, 175, 55, 0.6);
+  border-radius: 8px;
   pointer-events: none;
+  z-index: 0;
+}
+
+.notebookCard::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background-image: url('/images/gear_gold.png');
+  background-size: cover;
+  opacity: 0.15;
+  pointer-events: none;
+  animation: rotateGear 20s linear infinite;
+  z-index: 0;
+}
+
+@keyframes rotateGear {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .notebookTitle {
@@ -904,10 +926,20 @@ a {
 }
 
 .creditCard {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 22px;
-  padding: 16px;
+  background: rgba(40, 30, 25, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(184, 138, 92, 0.4);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.creditCard:hover {
+  background: rgba(50, 40, 35, 0.6);
+  border-color: rgba(184, 138, 92, 0.8);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), 0 6px 15px rgba(0, 0, 0, 0.7);
 }
 
 .creditLinkWrap {
