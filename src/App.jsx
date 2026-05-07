@@ -1016,6 +1016,7 @@ export default function App() {
   const qrSaveCanvasWrapRef = useRef(null)
   const qrReadInputRef = useRef(null)
   const homeCaptureRef = useRef(null)
+  const homeCaptureHiddenRef = useRef(null)
   const uploadFileInputRef = useRef(null)
   const mobileClosetFollowRef = useRef(null)
   const desktopClosetPreviewRef = useRef(null)

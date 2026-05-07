@@ -2360,3 +2360,49 @@ button, .itemCard, .dragHandle, a {
   0% { transform: scale(0.5) translate(0, 0); opacity: 1; }
   100% { transform: scale(1.5) translate(var(--tx), var(--ty)); opacity: 0; }
 }
+
+.homeCaptureCard.force-pc {
+  width: 1200px !important;
+  height: 600px !important;
+  flex-direction: row !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  padding: 40px !important;
+  box-sizing: border-box !important;
+  background: #1a120e !important;
+  border-radius: 40px !important;
+  gap: 40px !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
+
+.force-pc .homeCaptureInner {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+  height: 100% !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+}
+
+.force-pc .homeLeftCol, .force-pc .homeRightCol {
+  flex: 1 !important;
+  width: 50% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.force-pc .notebookCard {
+  width: 450px !important;
+  height: 350px !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+.force-pc .homeAvatarStage {
+  width: 450px !important;
+  height: 450px !important;
+}
