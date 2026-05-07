@@ -876,18 +876,19 @@ async function createQrCardCanvas({
       ])
 
       const now = new Date()
-      const centerX = 160
-      const centerY = 160
-      const size = 180
+      // Match UI positioning: Clock at (10, -10), size 140. Paper at (0, 110), size 160x60.
+      const clockCenterX = 80 + 20 // add offset
+      const clockCenterY = 70 + 20
+      const clockSize = 160
 
       ctx.save()
-      ctx.translate(centerX, centerY)
-      ctx.drawImage(watchBase, -size / 2, -size / 2, size, size)
+      ctx.translate(clockCenterX, clockCenterY)
+      ctx.drawImage(watchBase, -clockSize / 2, -clockSize / 2, clockSize, clockSize)
 
       const drawHand = (img, deg) => {
         ctx.save()
         ctx.rotate((deg * Math.PI) / 180)
-        ctx.drawImage(img, -size / 2, -size / 2, size, size)
+        ctx.drawImage(img, -clockSize / 2, -clockSize / 2, clockSize, clockSize)
         ctx.restore()
       }
 
@@ -896,19 +897,26 @@ async function createQrCardCanvas({
       drawHand(watchSec, now.getSeconds() * 6)
       ctx.restore()
 
-      // Date Paper
+      // Date Paper (Below Clock)
+      ctx.save()
+      ctx.translate(clockCenterX, clockCenterY + 100)
+      ctx.rotate(-5 * Math.PI / 180) // Match CSS rotation
+      
       ctx.fillStyle = '#f2ce9e'
       ctx.strokeStyle = '#594129'
       ctx.lineWidth = 3
-      roundedRect(ctx, 260, 130, 140, 60, 8)
+      roundedRect(ctx, -85, -30, 170, 65, 4)
       ctx.fill()
       ctx.stroke()
 
+      // Text inside paper
       ctx.fillStyle = '#3e2723'
-      ctx.font = 'bold 24px "Shippori Mincho", serif'
+      ctx.font = 'bold 36px "Shippori Mincho", serif'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillText(`${now.getMonth() + 1}月 ${now.getDate()}日`, 330, 160)
+      // Use slightly less space between month and day
+      ctx.fillText(`${now.getMonth() + 1}月${now.getDate()}日`, 0, 0)
+      ctx.restore()
 
     } catch (e) {
       console.warn('Clock assets failed for QR canvas', e)
