@@ -2313,7 +2313,6 @@ button, .itemCard, .dragHandle, a {
 }
 
 
-.homeAvatarStage::before, .characterStage::before, .smallStage::before { content: ''; position: absolute; top: -15%; left: -15%; width: 130%; height: 130%; background: url('/images/monocle.png') no-repeat center center; background-size: contain; pointer-events: none; z-index: 0; } 
 .layerImage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; transform: translateY(-5%) scale(1.1); }
 @keyframes floatBob {
   0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -2363,11 +2362,11 @@ button, .itemCard, .dragHandle, a {
 
 .homeCaptureCard.force-pc {
   width: 1200px !important;
-  height: 600px !important;
+  height: 640px !important;
   flex-direction: row !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: space-around !important;
+  justify-content: space-between !important;
   padding: 40px !important;
   box-sizing: border-box !important;
   background: #1a120e !important;
@@ -2381,28 +2380,37 @@ button, .itemCard, .dragHandle, a {
 .force-pc .homeCaptureInner {
   display: flex !important;
   flex-direction: row !important;
+  flex-wrap: nowrap !important;
   width: 100% !important;
   height: 100% !important;
   align-items: center !important;
   justify-content: space-around !important;
 }
 
-.force-pc .homeLeftCol, .force-pc .homeRightCol {
-  flex: 1 !important;
-  width: 50% !important;
+.force-pc .homeLeftCol, 
+.force-pc .homeRightCol {
+  flex: 0 0 auto !important;
+  width: 540px !important; /* Explicit width */
   display: flex !important;
+  flex-direction: column !important;
   justify-content: center !important;
   align-items: center !important;
 }
 
 .force-pc .notebookCard {
-  width: 450px !important;
-  height: 350px !important;
+  width: 500px !important;
+  height: 380px !important;
   transform: none !important;
   margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .force-pc .homeAvatarStage {
-  width: 450px !important;
-  height: 450px !important;
+  width: 520px !important;
+  height: 520px !important;
+}
+
+.force-pc .layerImage {
+  transform: translateY(-5%) scale(1.1) !important;
 }
