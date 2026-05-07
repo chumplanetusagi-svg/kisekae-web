@@ -2145,7 +2145,6 @@ export default function App() {
 
                     <div className="homeRightCol">
                       <div className="notebookCard">
-                        
                         <div className="notebookTitle">なまえ</div>
                         <div className="notebookContent">{nickname || DEFAULT_NICKNAME}</div>
                       </div>
@@ -2167,6 +2166,30 @@ export default function App() {
                               </div>
                             )
                           ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hidden element for guaranteed landscape capture */}
+                <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+                  <div ref={homeCaptureHiddenRef} className="homeCaptureCard force-pc">
+                    <div className="homeCaptureInner">
+                      <div className="homeLeftCol">
+                        <div className="homeAvatarStage">
+                          {renderAvatarLayers('homeAvatarStage')}
+                        </div>
+                      </div>
+                      <div className="homeRightCol">
+                        <div className="notebookCard">
+                          <div className="notebookTitle">Concept</div>
+                          <div className="notebookContent">
+                            {concept?.trim() ? concept : 'コンセプトはまだ未設定だよ'}
+                          </div>
+                          <div className="notebookFooter">
+                            <span className="notebookName">{nickname || DEFAULT_NICKNAME}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
