@@ -703,8 +703,8 @@ async function drawAvatarCanvas({
   ctx.clearRect(0, 0, size, size)
 
   // 1. Draw Monocle Frame first (Background)
-  const monoclePadding = size * 0.005
-  const monocleSize = size - monoclePadding * 2
+  const monoclePadding = 0
+  const monocleSize = size
   try {
     const monocleImg = await loadImage(assetUrl('images/monocle.png'))
     ctx.drawImage(monocleImg, monoclePadding, monoclePadding, monocleSize, monocleSize)
@@ -716,10 +716,10 @@ async function drawAvatarCanvas({
   const { back, front } = splitAccessoryImageUrls(accessoryImageUrls)
   const urls = [...back, baseImageUrl, lowerImageUrl, upperImageUrl, ...front].filter(Boolean)
 
-  const charScale = 0.92
+  const charScale = 1.0
   const charSize = size * charScale
-  const charX = (size - charSize) / 2
-  const charY = (size - charSize) / 2 - size * 0.04 // Minimal shift up
+  const charX = 0
+  const charY = -size * 0.02 // Minimal shift up
 
   for (const url of urls) {
     const img = await loadImage(url)
@@ -915,9 +915,9 @@ async function createQrCardCanvas({
     lowerImageUrl: qrItemLowerImageUrl,
     upperImageUrl: qrItemUpperImageUrl,
     accessoryImageUrls: qrItemAccessoryImageUrls,
-    size: 620,
+    size: 780,
   })
-  ctx.drawImage(avatarCanvas, 120, 350, 620, 620)
+  ctx.drawImage(avatarCanvas, 60, 280, 780, 780)
 
   // Name Plate
   ctx.fillStyle = '#3a2a22'
