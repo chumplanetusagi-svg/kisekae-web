@@ -15,6 +15,11 @@
 
 * {
   box-sizing: border-box;
+  cursor: url('/images/cursor.svg') 0 0, auto;
+}
+
+button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
+  cursor: url('/images/cursor_hover.svg') 16 16, pointer !important;
 }
 
 html,
@@ -27,6 +32,7 @@ body,
   background-attachment: fixed;
   background-color: #140e0c;
   color: var(--text);
+  cursor: inherit;
 }
 
 button,
@@ -55,16 +61,6 @@ a {
   position: relative;
   z-index: 1;
   font-family: 'Shippori Mincho', serif;
-  /* Custom Cursor - Steampunk Style */
-  cursor: url('/images/cursor.png') 0 0, auto;
-}
-
-.appShell:active {
-  cursor: url('/images/cursor_hover.png') 16 16, auto;
-}
-
-button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover {
-  cursor: url('/images/cursor_hover.png') 16 16, pointer !important;
 }
 
 button, .itemCard, .dragHandle, a {
