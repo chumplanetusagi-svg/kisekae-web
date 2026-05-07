@@ -2143,6 +2143,7 @@ export default function App() {
                   <div className="gearDecoration gear-br" />
                   <div className="gearDecoration gear-tm" />
                   <div className="gearDecoration gear-bm" />
+                  <div className="magicCircleCenter" />
                   
                   <div className="homeCaptureInner">
                     <div className="homeLeftCol">
@@ -2189,6 +2190,7 @@ export default function App() {
                     <div className="gearDecoration gear-br" />
                     <div className="gearDecoration gear-tm" />
                     <div className="gearDecoration gear-bm" />
+                    <div className="magicCircleCenter" />
 
                     <div className="homeCaptureInner">
                       <div className="homeLeftCol">
