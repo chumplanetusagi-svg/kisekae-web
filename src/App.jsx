@@ -700,13 +700,14 @@ async function drawAvatarCanvas({
   canvas.height = size
   const ctx = canvas.getContext('2d')
 
-  // Clear or subtle dark background (optional)
   ctx.clearRect(0, 0, size, size)
 
   // 1. Draw Monocle Frame first (Background)
+  const monoclePadding = size * 0.02
+  const monocleSize = size - monoclePadding * 2
   try {
     const monocleImg = await loadImage(assetUrl('images/monocle.png'))
-    ctx.drawImage(monocleImg, -size * 0.1, -size * 0.1, size * 1.2, size * 1.2)
+    ctx.drawImage(monocleImg, monoclePadding, monoclePadding, monocleSize, monocleSize)
   } catch (e) {
     console.warn('Failed to load monocle for canvas', e)
   }
@@ -715,12 +716,14 @@ async function drawAvatarCanvas({
   const { back, front } = splitAccessoryImageUrls(accessoryImageUrls)
   const urls = [...back, baseImageUrl, lowerImageUrl, upperImageUrl, ...front].filter(Boolean)
 
-  const yOffset = -size * 0.12 // Shift up
-  const scale = 1.3
+  const charScale = 0.8
+  const charSize = size * charScale
+  const charX = (size - charSize) / 2
+  const charY = (size - charSize) / 2 - size * 0.08 // Shift up
 
   for (const url of urls) {
     const img = await loadImage(url)
-    ctx.drawImage(img, size * (1 - scale) / 2, yOffset, size * scale, size * scale)
+    ctx.drawImage(img, charX, charY, charSize, charSize)
   }
 
   return canvas
