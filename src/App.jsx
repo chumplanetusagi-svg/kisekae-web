@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import { supabase } from './supabase'
@@ -2365,13 +2365,7 @@ export default function App() {
                 <div className="sectionHeader">
                   <h2 className="sectionTitle">設定</h2>
                 </div>
-                <div className="settingsGroup">
-                  <h3 className="settingsSubtitle">⚙️ 画面フィルター</h3>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '15px' }}>
-                    <input type="checkbox" checked={isSepia} onChange={(e) => setIsSepia(e.target.checked)} />
-                    古写真（セピア）モードにする
-                  </label>
-                </div>
+
                 <div className="settingsGroup">
                   <button className={`settingsTabButton ${settingsTab === 'profile' ? 'active' : ''}`} onClick={() => setSettingsTab('profile')}>
                     プロフィール
