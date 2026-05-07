@@ -833,9 +833,9 @@ async function createQrCardCanvas({
   // Decorative Gears
   try {
     const [gearG, gearS, gearB] = await Promise.all([
-      loadImage('/images/gear_gold.png'),
-      loadImage('/images/gear_silver.png'),
-      loadImage('/images/gear_bronze.png')
+      loadImage(assetUrl('images/gear_gold.png')),
+      loadImage(assetUrl('images/gear_silver.png')),
+      loadImage(assetUrl('images/gear_bronze.png'))
     ])
 
     ctx.save()
