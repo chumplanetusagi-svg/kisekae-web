@@ -830,6 +830,39 @@ async function createQrCardCanvas({
   ctx.fillStyle = '#1a120e'
   ctx.fillRect(0, 0, width, height)
 
+  // Decorative Gears
+  try {
+    const [gearG, gearS, gearB] = await Promise.all([
+      loadImage('/images/gear_gold.png'),
+      loadImage('/images/gear_silver.png'),
+      loadImage('/images/gear_bronze.png')
+    ])
+
+    ctx.save()
+    ctx.globalAlpha = 0.2
+    
+    // Top Right (Silver)
+    ctx.translate(width - 100, 150)
+    ctx.rotate(Math.PI / 8)
+    ctx.drawImage(gearS, -200, -200, 400, 400)
+    
+    // Bottom Right (Gold)
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.translate(width - 150, height - 150)
+    ctx.rotate(-Math.PI / 4)
+    ctx.drawImage(gearG, -250, -250, 500, 500)
+    
+    // Bottom Left (Bronze)
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.translate(150, height - 100)
+    ctx.rotate(Math.PI / 6)
+    ctx.drawImage(gearB, -200, -200, 400, 400)
+    
+    ctx.restore()
+  } catch (e) {
+    console.warn('Gears failed to load for QR card', e)
+  }
+
   // Inner Frame
   ctx.fillStyle = '#291e19'
   ctx.strokeStyle = '#b88a5c'
