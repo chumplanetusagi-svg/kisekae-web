@@ -1112,18 +1112,24 @@ export default function App() {
     return { top: `${top}%`, left: `${left}%` };
   };
 
-  const generateGears = (width, height, count = 5, avoidCenter = false) => {
+  const generateGears = (width, height, count = 4, avoidCenter = false) => {
     return [...Array(count)].map((_, i) => {
       let x, y;
       if (avoidCenter) {
-        // Prefer edges: Either x is in [0, 20%] or [80%, 100%], or y is in [0, 20%] or [80%, 100%]
-        const useEdgeX = Math.random() > 0.5;
-        if (useEdgeX) {
-          x = Math.random() > 0.5 ? Math.random() * (width * 0.2) : width * 0.8 + Math.random() * (width * 0.2);
-          y = Math.random() * height;
-        } else {
-          y = Math.random() > 0.5 ? Math.random() * (height * 0.2) : height * 0.8 + Math.random() * (height * 0.2);
+        const side = Math.floor(Math.random() * 4); // 0: Top, 1: Right, 2: Bottom, 3: Left
+        const margin = 0.12; // 12% margin from edges
+        if (side === 0) { // Top strip
           x = Math.random() * width;
+          y = Math.random() * (height * margin);
+        } else if (side === 1) { // Right strip
+          x = width * (1 - margin) + Math.random() * (width * margin);
+          y = Math.random() * height;
+        } else if (side === 2) { // Bottom strip
+          x = Math.random() * width;
+          y = height * (1 - margin) + Math.random() * (height * margin);
+        } else { // Left strip
+          x = Math.random() * (width * margin);
+          y = Math.random() * height;
         }
       } else {
         x = Math.random() * width;
@@ -1134,15 +1140,15 @@ export default function App() {
         id: i,
         x,
         y,
-        size: Math.random() * (350 - 150) + 150, // Slightly smaller
+        size: Math.random() * (280 - 120) + 120, // Smaller gears
         rotation: Math.random() * Math.PI * 2,
         type: ['gold', 'silver', 'bronze'][Math.floor(Math.random() * 3)]
       }
     })
   }
 
-  const qrGearConfigs = useMemo(() => generateGears(1600, 1180, 6, true), [])
-  const homeGearConfigs = useMemo(() => generateGears(1200, 680, 5, true), [])
+  const qrGearConfigs = useMemo(() => generateGears(1600, 1180, 5, true), [])
+  const homeGearConfigs = useMemo(() => generateGears(1200, 680, 4, true), [])
 
   const randomPositions = useMemo(() => {
     return {
