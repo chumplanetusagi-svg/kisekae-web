@@ -876,10 +876,10 @@ async function createQrCardCanvas({
       ])
 
       const now = new Date()
-      // Match UI positioning: Clock at (10, -10), size 140. Paper at (0, 110), size 160x60.
-      const clockCenterX = 80 + 20 // add offset
-      const clockCenterY = 70 + 20
-      const clockSize = 160
+      // Position on the RIGHT for QR card (width = 1600)
+      const clockCenterX = 1600 - 120
+      const clockCenterY = 110
+      const clockSize = 180
 
       ctx.save()
       ctx.translate(clockCenterX, clockCenterY)
@@ -2233,17 +2233,6 @@ export default function App() {
             <div className="homeSingleWrap">
               <section className="mainCard homeOnlyCard">
                 <div ref={homeCaptureRef} className="homeCaptureCard">
-                  <div className="homeCardTopLeftDecor">
-                    <div className="pocket-watch-large">
-                      <img src="/images/watch_base.png" className="watch-base" alt="" />
-                      <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
-                      <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
-                      <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
-                    </div>
-                    <div className="antique-date-paper">
-                      <span className="date-month">{time.getMonth() + 1}</span>月<span className="date-day">{time.getDate()}</span>日
-                    </div>
-                  </div>
                   {/* Random Decorative Gears */}
                   {homeGearConfigs.map(config => (
                     <div
@@ -2561,17 +2550,6 @@ export default function App() {
                     {selectedQrItem && (
                       <>
                         <div className="qrCard">
-                          <div className="homeCardTopLeftDecor">
-                            <div className="pocket-watch-large">
-                              <img src="/images/watch_base.png" className="watch-base" alt="" />
-                              <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
-                              <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
-                              <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
-                            </div>
-                            <div className="antique-date-paper">
-                              <span className="date-month">{time.getMonth() + 1}</span>月<span className="date-day">{time.getDate()}</span>日
-                            </div>
-                          </div>
                           {/* Random Decorative Gears */}
                           {qrGearConfigs.map(config => (
                             <div
