@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700;800&display=swap');
 :root {
   --bg: radial-gradient(circle at center, #382822 0%, #140e0c 100%);
   --card: rgba(36, 26, 22, 0.85);
@@ -54,6 +54,17 @@ a {
   padding: 24px;
   position: relative;
   z-index: 1;
+  font-family: 'Shippori Mincho', serif;
+  /* Custom Cursor - 仮の正方形 (32px x 32px) */
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="24" height="24" x="4" y="4" fill="%233498db" stroke="white" stroke-width="2"/></svg>') 16 16, auto;
+}
+
+.appShell:active {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="24" height="24" x="4" y="4" fill="%23e74c3c" stroke="white" stroke-width="2"/></svg>') 16 16, auto;
+}
+
+button, .itemCard, .dragHandle, a {
+  cursor: inherit;
 }
 
 .appFrame {
@@ -2284,7 +2295,7 @@ a {
 
 
 .homeAvatarStage::before, .characterStage::before, .smallStage::before, .qrAvatarStage::before { content: ''; position: absolute; top: -15%; left: -15%; width: 130%; height: 130%; background: url('/images/monocle.png') no-repeat center center; background-size: contain; pointer-events: none; z-index: 0; } 
-.layerImage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; }
+.layerImage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; transform: translateY(-18%); }
 @keyframes floatBob {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-15px) rotate(5deg); }
@@ -2292,6 +2303,20 @@ a {
 
 .deco-gear, .deco-feather {
   animation: floatBob 6s ease-in-out infinite;
+  margin-left: var(--mx, 0px);
+  margin-top: var(--my, 0px);
+  transition: margin 0.1s ease-out;
+}
+
+.itemCard.glow-favorite {
+  box-shadow: 0 0 15px 5px rgba(212, 175, 55, 0.6);
+  border-color: #d4af37 !important;
+  animation: favoritePulse 2s infinite alternate;
+}
+
+@keyframes favoritePulse {
+  from { box-shadow: 0 0 10px 2px rgba(212, 175, 55, 0.3); }
+  to { box-shadow: 0 0 20px 8px rgba(212, 175, 55, 0.7); }
 }
 
 /* Add slight delay offsets based on class to make them float differently */

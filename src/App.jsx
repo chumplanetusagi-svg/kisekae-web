@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import { supabase } from './supabase'
@@ -626,6 +626,8 @@ function splitAccessoryImageUrls(accessoryImageUrls = []) {
   return { back, front }
 }
 
+const PAGE_TURN_SOUND_URL = 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
+
 function roundedRect(ctx, x, y, width, height, radius) {
   ctx.beginPath()
   ctx.moveTo(x + radius, y)
@@ -744,16 +746,19 @@ async function createHomeCanvas({
   canvas.height = height
   const ctx = canvas.getContext('2d')
 
+  // Background
   ctx.fillStyle = '#1a120e'
-    ctx.fillRect(0, 0, width, height)
+  ctx.fillRect(0, 0, width, height)
 
+  // Inner Ornate Frame
   ctx.fillStyle = '#291e19'
-    ctx.strokeStyle = '#b88a5c'
-    ctx.lineWidth = 10
-    roundedRect(ctx, 60, 60, width - 120, height - 120, 42)
-    ctx.fill()
-    ctx.stroke()
+  ctx.strokeStyle = '#b88a5c'
+  ctx.lineWidth = 10
+  roundedRect(ctx, 60, 60, width - 120, height - 120, 42)
+  ctx.fill()
+  ctx.stroke()
 
+  // Character inside Monocle (drawAvatarCanvas handles the monocle)
   const avatarCanvas = await drawAvatarCanvas({
     baseImageUrl,
     lowerImageUrl,
@@ -763,29 +768,118 @@ async function createHomeCanvas({
   })
   ctx.drawImage(avatarCanvas, 270, 110, 860, 860)
 
-  ctx.fillStyle = '#1a120e'
-    ctx.fillRect(0, 0, width, height)
-
-  ctx.fillStyle = '#291e19'
-    ctx.strokeStyle = '#b88a5c'
-    ctx.lineWidth = 10
-    roundedRect(ctx, 40, 40, width - 80, height - 80, 40)
-    ctx.fill()
-    ctx.stroke()
-
-  ctx.fillStyle = '#594129'
-    ctx.strokeStyle = '#8c6a46'
-    ctx.lineWidth = 4
-    roundedRect(ctx, 90, 90, 190, 56, 28)
-    ctx.fill()
-    ctx.stroke()
-
+  // Name Plate
   ctx.fillStyle = '#3a2a22'
-    ctx.strokeStyle = '#8c6a46'
-    ctx.lineWidth = 4
-    roundedRect(ctx, 285, 1035, 290, 72, 36)
-    ctx.fill()
-    ctx.stroke()
+  ctx.strokeStyle = '#8c6a46'
+  ctx.lineWidth = 4
+  roundedRect(ctx, 450, 1010, 500, 90, 45)
+  ctx.fill()
+  ctx.stroke()
+
+  ctx.fillStyle = '#d4af37'
+  ctx.font = 'bold 42px "Shippori Mincho", serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(nickname || DEFAULT_NICKNAME, 700, 1055)
+
+  // Concept Plate
+  ctx.fillStyle = '#3a2a22'
+  ctx.strokeStyle = '#8c6a46'
+  ctx.lineWidth = 4
+  roundedRect(ctx, 170, 1150, 1060, 360, 30)
+  ctx.fill()
+  ctx.stroke()
+
+  ctx.fillStyle = '#f2ce9e'
+  ctx.font = 'bold 34px "Shippori Mincho", serif'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'top'
+  drawWrappedText(
+    ctx,
+    (concept && concept.trim()) || 'コンセプトはまだ未設定だよ',
+    210,
+    1195,
+    980,
+    54,
+    5
+  )
+
+  return canvas
+}
+
+async function createQrCardCanvas({
+  itemName,
+  itemCategoryLabel,
+  creatorName,
+  nickname,
+  baseImageUrl,
+  qrItemUpperImageUrl = '',
+  qrItemLowerImageUrl = '',
+  qrItemAccessoryImageUrls = [],
+  qrCanvas,
+}) {
+  const width = 1600
+  const height = 1180
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+
+  // Background
+  ctx.fillStyle = '#1a120e'
+  ctx.fillRect(0, 0, width, height)
+
+  // Inner Frame
+  ctx.fillStyle = '#291e19'
+  ctx.strokeStyle = '#b88a5c'
+  ctx.lineWidth = 10
+  roundedRect(ctx, 40, 40, width - 80, height - 80, 40)
+  ctx.fill()
+  ctx.stroke()
+
+  // Header Plate
+  ctx.fillStyle = '#594129'
+  ctx.strokeStyle = '#8c6a46'
+  ctx.lineWidth = 4
+  roundedRect(ctx, 90, 90, 190, 56, 28)
+  ctx.fill()
+  ctx.stroke()
+
+  ctx.fillStyle = '#f2ce9e'
+  ctx.font = 'bold 24px "Shippori Mincho", serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('QR配布カード', 185, 118)
+
+  // Item Info
+  ctx.fillStyle = '#d4b895'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'top'
+  ctx.font = 'bold 54px "Shippori Mincho", serif'
+  ctx.fillText(itemName, 90, 185)
+
+  ctx.fillStyle = '#b88a5c'
+  ctx.font = 'bold 28px "Shippori Mincho", serif'
+  ctx.fillText(`作った人：${creatorName}`, 90, 260)
+  ctx.fillText(itemCategoryLabel, 90, 308)
+
+  // Avatar
+  const avatarCanvas = await drawAvatarCanvas({
+    baseImageUrl,
+    lowerImageUrl: qrItemLowerImageUrl,
+    upperImageUrl: qrItemUpperImageUrl,
+    accessoryImageUrls: qrItemAccessoryImageUrls,
+    size: 620,
+  })
+  ctx.drawImage(avatarCanvas, 120, 390, 620, 620)
+
+  // Name Plate
+  ctx.fillStyle = '#3a2a22'
+  ctx.strokeStyle = '#8c6a46'
+  ctx.lineWidth = 4
+  roundedRect(ctx, 285, 1035, 290, 72, 36)
+  ctx.fill()
+  ctx.stroke()
 
   ctx.fillStyle = '#d4b895'
   ctx.font = 'bold 30px "Shippori Mincho", serif'
@@ -793,18 +887,19 @@ async function createHomeCanvas({
   ctx.textBaseline = 'middle'
   ctx.fillText(nickname || DEFAULT_NICKNAME, 430, 1071)
 
-  ctx.fillStyle = '#ffffff'
-    ctx.strokeStyle = '#8c6a46'
-    ctx.lineWidth = 6
-    roundedRect(ctx, 950, 400, 480, 480, 30)
-    ctx.fill()
-    ctx.stroke()
+  // QR Code Area
+  ctx.fillStyle = '#ffffff' // QR code needs high contrast
+  ctx.strokeStyle = '#8c6a46'
+  ctx.lineWidth = 6
+  roundedRect(ctx, 950, 400, 480, 480, 30)
+  ctx.fill()
+  ctx.stroke()
 
   ctx.imageSmoothingEnabled = false
   ctx.drawImage(qrCanvas, 1010, 460, 360, 360)
   ctx.imageSmoothingEnabled = true
 
-  ctx.fillStyle = '#98a7de'
+  ctx.fillStyle = '#b88a5c'
   ctx.font = 'bold 24px "Shippori Mincho", serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
@@ -915,6 +1010,41 @@ export default function App() {
   const [isDragOver, setIsDragOver] = useState(false)
   const [time, setTime] = useState(new Date())
   const [clickParticles, setClickParticles] = useState([])
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 20
+      const y = (e.clientY / window.innerHeight - 0.5) * 20
+      document.documentElement.style.setProperty('--mx', `${x}px`)
+      document.documentElement.style.setProperty('--my', `${y}px`)
+      setMousePos({ x: e.clientX, y: e.clientY })
+    }
+    window.addEventListener('mousemove', handleGlobalMouseMove)
+    return () => window.removeEventListener('mousemove', handleGlobalMouseMove)
+  }, [])
+
+  useEffect(() => {
+    let timer
+    const playRandomPageTurn = () => {
+      const delay = Math.random() * (180000 - 60000) + 60000 // 1-3 minutes
+      timer = setTimeout(() => {
+        const audio = new Audio(PAGE_TURN_SOUND_URL)
+        audio.volume = 0.15
+        audio.play().catch(() => {})
+        playRandomPageTurn()
+      }, delay)
+    }
+    
+    // Start after first interaction
+    const startAudio = () => {
+      playRandomPageTurn()
+      window.removeEventListener('click', startAudio)
+    }
+    window.addEventListener('click', startAudio)
+    
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleGlobalClick = (e) => {
     if (e.target.closest('button')) {
@@ -1703,11 +1833,12 @@ export default function App() {
 
   const renderItemCard = (item) => {
     const equipped = isEquipped(item)
+    const favorite = isFavorite(item.id)
 
     return (
       <div
         key={item.id}
-        className="itemCard"
+        className={`itemCard ${favorite ? 'glow-favorite' : ''}`}
         draggable={true}
         onDragStart={(e) => {
           e.dataTransfer.setData('application/json', JSON.stringify(item))
@@ -1894,7 +2025,12 @@ export default function App() {
   }
 
   return (
-    <div className="appShell" onClick={handleGlobalClick}>
+    <div
+      className="appShell"
+      onClick={handleGlobalClick}
+      onDragOver={(e) => e.preventDefault()}
+      onDragEnter={(e) => e.preventDefault()}
+    >
       {clickParticles.map(p => (
         <div key={p.id} className="magic-particle" style={{ left: p.x, top: p.y, '--tx': p.tx, '--ty': p.ty }} />
       ))}
