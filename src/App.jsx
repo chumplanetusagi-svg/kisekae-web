@@ -853,7 +853,7 @@ async function createQrCardCanvas({
   ctx.fill()
   ctx.stroke()
 
-  // Decorative Gears (Now inside the frame)
+  // Decorative Gears (Background)
   try {
     const [gearG, gearS, gearB] = await Promise.all([
       loadImage(assetUrl('images/gear_gold.png')),
@@ -861,27 +861,22 @@ async function createQrCardCanvas({
       loadImage(assetUrl('images/gear_bronze.png'))
     ])
 
-    ctx.save()
-    ctx.globalAlpha = 0.15
+    const drawSingleGear = (img, x, y, size, rotation) => {
+      ctx.save()
+      ctx.globalAlpha = 0.12 // upping transparency slightly for more gears
+      ctx.translate(x, y)
+      ctx.rotate(rotation)
+      ctx.drawImage(img, -size/2, -size/2, size, size)
+      ctx.restore()
+    }
+
+    drawSingleGear(gearS, width - 150, 150, 420, Math.PI / 8)
+    drawSingleGear(gearB, 180, height - 180, 520, Math.PI / 6)
+    drawSingleGear(gearG, width / 2 + 200, height - 100, 380, -Math.PI / 4)
+    drawSingleGear(gearS, 120, 120, 320, -Math.PI / 3)
+    drawSingleGear(gearG, width - 120, height - 120, 480, Math.PI / 5)
+    drawSingleGear(gearB, width / 2 - 100, 60, 300, Math.PI / 10)
     
-    // Top Right (Silver)
-    ctx.translate(width - 250, 200)
-    ctx.rotate(Math.PI / 8)
-    ctx.drawImage(gearS, -200, -200, 400, 400)
-    
-    // Bottom Left (Bronze)
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.translate(250, height - 200)
-    ctx.rotate(Math.PI / 6)
-    ctx.drawImage(gearB, -250, -250, 500, 500)
-    
-    // Bottom Center/Right (Gold)
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.translate(width / 2 + 100, height - 150)
-    ctx.rotate(-Math.PI / 4)
-    ctx.drawImage(gearG, -180, -180, 360, 360)
-    
-    ctx.restore()
   } catch (e) {
     console.warn('Gears failed to load for QR card', e)
   }
@@ -2383,6 +2378,13 @@ export default function App() {
                     {selectedQrItem && (
                       <>
                         <div className="qrCard">
+                          {/* Decorative Gears */}
+                          <div className="gearDecoration gear-tr" />
+                          <div className="gearDecoration gear-bl" />
+                          <div className="gearDecoration gear-tl" />
+                          <div className="gearDecoration gear-br" />
+                          <div className="gearDecoration gear-tm" />
+                          <div className="gearDecoration gear-bm" />
                           <div className="qrCardHeader">
                             <span className="qrCardBadge">QR配布カード</span>
                             <div className="qrCardTitleBlock">

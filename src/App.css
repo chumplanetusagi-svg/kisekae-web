@@ -815,29 +815,21 @@ button, .itemCard, .dragHandle, a {
   z-index: 1;
 }
 
-.qrCard::before, .qrCard::after {
-  content: '';
+.gearDecoration {
   position: absolute;
-  width: 180px;
-  height: 180px;
-  opacity: 0.1;
-  pointer-events: none;
-  z-index: -1;
   background-size: contain;
   background-repeat: no-repeat;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: -1;
 }
 
-.qrCard::before {
-  top: -40px;
-  right: -40px;
-  background-image: url('/images/gear_silver.png');
-}
-
-.qrCard::after {
-  bottom: -50px;
-  left: -50px;
-  background-image: url('/images/gear_bronze.png');
-}
+.gear-tr { top: -5%; right: -5%; width: 30%; height: 30%; background-image: url('/images/gear_silver.png'); transform: rotate(15deg); }
+.gear-bl { bottom: -8%; left: -8%; width: 40%; height: 40%; background-image: url('/images/gear_bronze.png'); transform: rotate(30deg); }
+.gear-tl { top: -2%; left: -2%; width: 22%; height: 22%; background-image: url('/images/gear_gold.png'); transform: rotate(-15deg); }
+.gear-br { bottom: -5%; right: -5%; width: 35%; height: 35%; background-image: url('/images/gear_gold.png'); transform: rotate(-20deg); }
+.gear-tm { top: -10%; left: 45%; width: 25%; height: 25%; background-image: url('/images/gear_silver.png'); transform: rotate(45deg); }
+.gear-bm { bottom: -10%; left: 40%; width: 20%; height: 20%; background-image: url('/images/gear_bronze.png'); transform: rotate(-10deg); }
 
 .qrCardHeader {
   display: flex;
