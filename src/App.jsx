@@ -700,11 +700,8 @@ async function drawAvatarCanvas({
   canvas.height = size
   const ctx = canvas.getContext('2d')
 
-  const grad = ctx.createLinearGradient(0, 0, 0, size)
-  grad.addColorStop(0, '#dff1ff')
-  grad.addColorStop(1, '#f3eefe')
-  ctx.fillStyle = grad
-  ctx.fillRect(0, 0, size, size)
+  // Clear or subtle dark background (optional)
+  ctx.clearRect(0, 0, size, size)
 
   const { back, front } = splitAccessoryImageUrls(accessoryImageUrls)
   const urls = [...back, baseImageUrl, lowerImageUrl, upperImageUrl, ...front].filter(Boolean)
@@ -712,6 +709,15 @@ async function drawAvatarCanvas({
   for (const url of urls) {
     const img = await loadImage(url)
     ctx.drawImage(img, 0, 0, size, size)
+  }
+
+  // Draw Monocle Frame on top
+  try {
+    const monocleImg = await loadImage(assetUrl('images/monocle.png'))
+    // Draw it slightly larger to match the UI feel
+    ctx.drawImage(monocleImg, -size * 0.15, -size * 0.15, size * 1.3, size * 1.3)
+  } catch (e) {
+    console.warn('Failed to load monocle for canvas', e)
   }
 
   return canvas
@@ -830,7 +836,15 @@ async function createQrCardCanvas({
   ctx.fillStyle = '#1a120e'
   ctx.fillRect(0, 0, width, height)
 
-  // Decorative Gears
+  // Inner Frame
+  ctx.fillStyle = '#291e19'
+  ctx.strokeStyle = '#b88a5c'
+  ctx.lineWidth = 10
+  roundedRect(ctx, 40, 40, width - 80, height - 80, 40)
+  ctx.fill()
+  ctx.stroke()
+
+  // Decorative Gears (Now inside the frame)
   try {
     const [gearG, gearS, gearB] = await Promise.all([
       loadImage(assetUrl('images/gear_gold.png')),
@@ -839,37 +853,29 @@ async function createQrCardCanvas({
     ])
 
     ctx.save()
-    ctx.globalAlpha = 0.2
+    ctx.globalAlpha = 0.15
     
     // Top Right (Silver)
-    ctx.translate(width - 100, 150)
+    ctx.translate(width - 250, 200)
     ctx.rotate(Math.PI / 8)
     ctx.drawImage(gearS, -200, -200, 400, 400)
     
-    // Bottom Right (Gold)
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.translate(width - 150, height - 150)
-    ctx.rotate(-Math.PI / 4)
-    ctx.drawImage(gearG, -250, -250, 500, 500)
-    
     // Bottom Left (Bronze)
     ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.translate(150, height - 100)
+    ctx.translate(250, height - 200)
     ctx.rotate(Math.PI / 6)
-    ctx.drawImage(gearB, -200, -200, 400, 400)
+    ctx.drawImage(gearB, -250, -250, 500, 500)
+    
+    // Bottom Center/Right (Gold)
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.translate(width / 2 + 100, height - 150)
+    ctx.rotate(-Math.PI / 4)
+    ctx.drawImage(gearG, -180, -180, 360, 360)
     
     ctx.restore()
   } catch (e) {
     console.warn('Gears failed to load for QR card', e)
   }
-
-  // Inner Frame
-  ctx.fillStyle = '#291e19'
-  ctx.strokeStyle = '#b88a5c'
-  ctx.lineWidth = 10
-  roundedRect(ctx, 40, 40, width - 80, height - 80, 40)
-  ctx.fill()
-  ctx.stroke()
 
   // Header Plate
   ctx.fillStyle = '#594129'
