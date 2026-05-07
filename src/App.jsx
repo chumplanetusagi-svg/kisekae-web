@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import { supabase } from './supabase'
+import html2canvas from 'html2canvas'
 import './App.css'
 
 import {
@@ -970,6 +971,7 @@ export default function App() {
   const qrCanvasWrapRef = useRef(null)
   const qrSaveCanvasWrapRef = useRef(null)
   const qrReadInputRef = useRef(null)
+  const homeCaptureRef = useRef(null)
   const uploadFileInputRef = useRef(null)
   const mobileClosetFollowRef = useRef(null)
   const desktopClosetPreviewRef = useRef(null)
@@ -1326,26 +1328,18 @@ export default function App() {
   }
 
   const handleSaveHomeImage = async () => {
+    if (!homeCaptureRef.current) return
+
     try {
       setIsSavingHomeImage(true)
 
-      const accessoryItemsInLayerOrder = layeredEquippedItems
-        .filter((entry) => entry.layerKey.startsWith('accessory-'))
-        .map((entry) => entry.item)
-
-      const lowerUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'lower')?.item?.imageUrl || ''
-      const upperUrl = layeredEquippedItems.find((entry) => entry.layerKey === 'upper')?.item?.imageUrl || ''
-
-      const canvas = await createHomeCanvas({
-        nickname,
-        concept,
-        baseImageUrl: equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl,
-        lowerImageUrl: lowerUrl,
-        upperImageUrl: upperUrl,
-        accessoryImageUrls: accessoryItemsInLayerOrder,
+      const canvas = await html2canvas(homeCaptureRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
       })
 
-      downloadCanvas(canvas, `${nickname || DEFAULT_NICKNAME}-home-card.png`)
+      downloadCanvas(canvas, `${nickname || DEFAULT_NICKNAME}-home.png`)
     } catch (error) {
       alert(`ホーム画像の保存に失敗したよ: ${error.message}`)
       console.error(error)
@@ -2110,7 +2104,7 @@ export default function App() {
           {activeTab === 'home' && (
             <div className="homeSingleWrap">
               <section className="mainCard homeOnlyCard">
-                <div className="homeCaptureCard">
+                <div ref={homeCaptureRef} className="homeCaptureCard">
                   <div className="homeCaptureInner">
                     <div className="homeLeftCol">
                       <button className="homeAvatarButton" onClick={handleCharacterClick}>
