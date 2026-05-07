@@ -2181,14 +2181,30 @@ export default function App() {
                           {renderAvatarLayers('homeAvatarStage')}
                         </div>
                       </div>
+
                       <div className="homeRightCol">
                         <div className="notebookCard">
-                          <div className="notebookTitle">Concept</div>
+                          <div className="notebookTitle">なまえ</div>
+                          <div className="notebookContent">{nickname || DEFAULT_NICKNAME}</div>
+                        </div>
+
+                        <div className="notebookCard">
+                          <div className="notebookTitle">コンセプト</div>
                           <div className="notebookContent">
                             {concept?.trim() ? concept : 'コンセプトはまだ未設定だよ'}
                           </div>
-                          <div className="notebookFooter">
-                            <span className="notebookName">{nickname || DEFAULT_NICKNAME}</span>
+                        </div>
+
+                        <div className="notebookCard">
+                          <div className="notebookTitle">今日のコーデ</div>
+                          <div className="equippedItemsRow">
+                            {layeredEquippedItems.map(entry => (
+                              entry.item && (
+                                <div key={entry.item.id} className="equippedMiniIcon" title={entry.item.name}>
+                                  <img src={entry.item.imageUrl} alt={entry.item.name} crossOrigin="anonymous" />
+                                </div>
+                              )
+                            ))}
                           </div>
                         </div>
                       </div>

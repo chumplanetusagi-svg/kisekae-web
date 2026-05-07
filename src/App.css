@@ -2362,16 +2362,18 @@ button, .itemCard, .dragHandle, a {
 
 .homeCaptureCard.force-pc {
   width: 1200px !important;
-  height: 640px !important;
+  min-height: 680px !important;
   flex-direction: row !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: space-between !important;
-  padding: 40px !important;
+  justify-content: center !important;
+  padding: 50px !important;
   box-sizing: border-box !important;
-  background: #1a120e !important;
+  background-color: #261b17 !important;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.4) 2px, transparent 2px), linear-gradient(180deg, rgba(46, 34, 28, 0.85) 0%, rgba(31, 22, 18, 0.95) 100%) !important;
+  background-size: 24px 24px, 100% 100% !important;
   border-radius: 40px !important;
-  gap: 40px !important;
+  gap: 50px !important;
   position: absolute !important;
   top: -9999px !important;
   left: -9999px !important;
@@ -2387,30 +2389,33 @@ button, .itemCard, .dragHandle, a {
   justify-content: space-around !important;
 }
 
-.force-pc .homeLeftCol, 
-.force-pc .homeRightCol {
-  flex: 0 0 auto !important;
-  width: 540px !important; /* Explicit width */
+.force-pc .homeLeftCol {
+  flex: 0 0 520px !important;
   display: flex !important;
-  flex-direction: column !important;
   justify-content: center !important;
   align-items: center !important;
 }
 
-.force-pc .notebookCard {
-  width: 500px !important;
-  height: 380px !important;
-  transform: none !important;
-  margin: 0 !important;
+.force-pc .homeRightCol {
+  flex: 1 !important;
   display: flex !important;
   flex-direction: column !important;
+  justify-content: center !important;
+  gap: 24px !important;
+  max-width: 500px !important;
+}
+
+.force-pc .notebookCard {
+  width: 100% !important;
+  transform: none !important;
+  margin: 0 !important;
 }
 
 .force-pc .homeAvatarStage {
-  width: 520px !important;
-  height: 520px !important;
+  width: 500px !important;
+  height: 500px !important;
 }
 
 .force-pc .layerImage {
-  transform: translateY(-5%) scale(1.1) !important;
+  transform: translateY(0%) scale(1.05) !important; /* Lowered and slightly smaller for safety */
 }
