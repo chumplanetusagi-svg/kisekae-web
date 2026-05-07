@@ -1747,8 +1747,8 @@ export default function App() {
       >
         <div className="itemPreview">
           <img src={item.imageUrl} alt={item.name} crossOrigin="anonymous" />
-          <div className="previewCreatorBadge">{getDisplayCreatorName(item)}</div>
         </div>
+        <div className="previewCreatorBadge">{getDisplayCreatorName(item)}</div>
 
         <div className="itemInfo">
           <div className="itemName">{item.name}</div>
@@ -1919,16 +1919,6 @@ export default function App() {
         ))}
       </div>
 
-      <div className="pocket-watch">
-        <div className="watch-center"></div>
-        <div className="watch-hand hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }}></div>
-        <div className="watch-hand minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }}></div>
-        <div className="watch-hand second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }}></div>
-        {[...Array(12)].map((_, i) => (
-          <div key={i} className="watch-tick" style={{ transform: `rotate(${i * 30}deg)` }}></div>
-        ))}
-      </div>
-
       <div className="floatingAvatarContainer">
         <img src="/images/gear_bronze.png" className="deco-gear gear-1" alt="" />
         <img src="/images/gear_silver.png" className="deco-gear gear-2" alt="" />
@@ -1952,9 +1942,17 @@ export default function App() {
       
       <div className="appFrame">
         <header className="topHeader">
-          <div>
-            <p className="subTitle">Hureroppu Closet</p>
-            <h1 className="pageTitle">ろぷのクローゼット</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div className="pocket-watch">
+              <img src="/images/watch_base.png" className="watch-base" alt="" />
+              <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
+              <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
+              <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
+            </div>
+            <div>
+              <p className="subTitle">Hureroppu Closet</p>
+              <h1 className="pageTitle">ろっぷのクローゼット</h1>
+            </div>
           </div>
 
           <div className="tabRow">
