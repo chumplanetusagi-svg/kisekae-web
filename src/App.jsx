@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import { supabase } from './supabase'
@@ -60,21 +60,21 @@ const SPECIAL_VOICE_RULES = [
     id: 'special-default-look',
     upperId: 'default-upper-1',
     lowerId: null,
-    accessoryIds: ['default-accessory-2', 'default-accessory-1','default-accessory-22','default-accessory-25'],
+    accessoryIds: ['default-accessory-2', 'default-accessory-1', 'default-accessory-22', 'default-accessory-25'],
     voiceUrl: assetUrl('voices/いつものふく.mp3'),
   },
   {
     id: 'special-detective',
     upperId: 'default-upper-3',
     lowerId: 'default-lower-2',
-    accessoryIds: ['default-accessory-2','default-accessory-15'],
+    accessoryIds: ['default-accessory-2', 'default-accessory-15'],
     voiceUrl: assetUrl('voices/執事ボイス.mp3'),
   },
   {
     id: 'special-pajama',
     upperId: 'default-upper-2',
     lowerId: 'default-lower-1',
-    accessoryIds: ['default-accessory-11', 'default-accessory-12','default-accessory-21','default-accessory-18'],
+    accessoryIds: ['default-accessory-11', 'default-accessory-12', 'default-accessory-21', 'default-accessory-18'],
     voiceUrl: assetUrl('voices/地雷ちゃん.mp3'),
   },
   {
@@ -91,7 +91,7 @@ const SPECIAL_VOICE_RULES = [
     accessoryIds: [],
     voiceUrl: assetUrl('voices/パジャマ.mp3'),
   },
-    
+
 ]
 
 const DEFAULT_UPPER_ITEMS = [
@@ -430,8 +430,8 @@ const DEFAULT_ACCESSORY_ITEMS = [
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
     qrShareable: false,
-   },
-   {
+  },
+  {
     id: 'default-accessory-17',
     name: '地雷靴右',
     category: 'accessory',
@@ -440,8 +440,8 @@ const DEFAULT_ACCESSORY_ITEMS = [
     creatorName: 'はむまよろーる様',
     creatorUrl: 'https://x.com/hamumayo_roll',
     qrShareable: false,
-   },
-   {
+  },
+  {
     id: 'default-accessory-18',
     name: '地雷靴左右',
     category: 'accessory',
@@ -521,10 +521,10 @@ const DEFAULT_SAVE = {
   equippedBaseId: 'default-base-1',
   equippedUpperId: 'default-upper-1',
   equippedLowerId: null,
-  equippedAccessoryIds: ['default-accessory-2', 'default-accessory-1','default-accessory-22', 'default-accessory-25'],
+  equippedAccessoryIds: ['default-accessory-2', 'default-accessory-1', 'default-accessory-22', 'default-accessory-25'],
   favoriteUpperId: 'default-upper-1',
   favoriteLowerId: null,
-  favoriteAccessoryIds: ['default-accessory-2','default-accessory-1','default-accessory-22', 'default-accessory-25'],
+  favoriteAccessoryIds: ['default-accessory-2', 'default-accessory-1', 'default-accessory-22', 'default-accessory-25'],
   selectedQrItemId: null,
   equippedLayerOrder: DEFAULT_LAYER_ORDER,
 }
@@ -915,8 +915,8 @@ function SortableLayerRow({ entry, index }) {
             {entry.layerKey === 'lower'
               ? '下の服'
               : entry.layerKey === 'upper'
-              ? '上の服'
-              : 'アクセサリー'}
+                ? '上の服'
+                : 'アクセサリー'}
           </div>
         </div>
       </div>
@@ -998,7 +998,7 @@ export default function App() {
 
     const layeredItems = []
     if (baseItem) layeredItems.push({ layerKey: 'base', item: baseItem })
-    
+
     const sorted = [upperItem, lowerItem].filter(Boolean).sort((a, b) => {
       return DEFAULT_LAYER_ORDER.indexOf(a.category) - DEFAULT_LAYER_ORDER.indexOf(b.category)
     })
@@ -1267,8 +1267,8 @@ export default function App() {
         selectedQrItem.category === 'upper'
           ? '上の服'
           : selectedQrItem.category === 'lower'
-          ? '下の服'
-          : 'アクセサリー'
+            ? '下の服'
+            : 'アクセサリー'
 
       const canvas = await createQrCardCanvas({
         itemName: selectedQrItem.name,
@@ -1564,17 +1564,17 @@ export default function App() {
 
   const qrValue = selectedQrItem
     ? JSON.stringify({
-        app: 'kisekae-web',
-        kind: 'cloth-item',
-        item: {
-          id: selectedQrItem.id,
-          name: selectedQrItem.name,
-          category: selectedQrItem.category,
-          imageUrl: selectedQrItem.imageUrl,
-          creatorName: getDisplayCreatorName(selectedQrItem),
-          creatorUrl: selectedQrItem.creatorUrl || '',
-        },
-      })
+      app: 'kisekae-web',
+      kind: 'cloth-item',
+      item: {
+        id: selectedQrItem.id,
+        name: selectedQrItem.name,
+        category: selectedQrItem.category,
+        imageUrl: selectedQrItem.imageUrl,
+        creatorName: getDisplayCreatorName(selectedQrItem),
+        creatorUrl: selectedQrItem.creatorUrl || '',
+      },
+    })
     : ''
 
   const renderAvatarLayers = (stageClassName = 'characterStage', enableDrop = false) => {
@@ -1592,7 +1592,7 @@ export default function App() {
     }
 
     return (
-      <div 
+      <div
         className={`${stageClassName} ${equipAnimClass} ${enableDrop && isDragOver ? 'drag-over' : ''}`}
         onDragOver={(e) => {
           if (!enableDrop) return
@@ -1618,7 +1618,7 @@ export default function App() {
                 else handleEquip(item)
               }
             }
-          } catch(err) {
+          } catch (err) {
             console.error('Drop error', err)
           }
         }}
@@ -1716,14 +1716,14 @@ export default function App() {
     const equipped = isEquipped(item)
 
     return (
-      <div 
-        key={item.id} 
+      <div
+        key={item.id}
         className="itemCard"
         draggable={true}
         onDragStart={(e) => {
           e.dataTransfer.setData('application/json', JSON.stringify(item))
           e.dataTransfer.effectAllowed = 'copy'
-          
+
           const imgEl = e.currentTarget.querySelector('.itemPreview img')
           if (imgEl) {
             const clone = imgEl.cloneNode(true)
@@ -1733,10 +1733,10 @@ export default function App() {
             clone.style.height = '150px'
             clone.style.objectFit = 'contain'
             document.body.appendChild(clone)
-            
+
             // Set the clone as drag image, centered on cursor
             e.dataTransfer.setDragImage(clone, 75, 75)
-            
+
             setTimeout(() => {
               if (document.body.contains(clone)) {
                 document.body.removeChild(clone)
@@ -1755,19 +1755,18 @@ export default function App() {
 
           <div className="itemMeta">
             <span
-              className={`miniBadge ${
-                item.source === 'default'
+              className={`miniBadge ${item.source === 'default'
                   ? 'default'
                   : item.source === 'imported'
-                  ? 'imported'
-                  : 'custom'
-              }`}
+                    ? 'imported'
+                    : 'custom'
+                }`}
             >
               {item.source === 'default'
                 ? '既存'
                 : item.source === 'imported'
-                ? '受け取り'
-                : 'アップロード'}
+                  ? '受け取り'
+                  : 'アップロード'}
             </span>
 
             {equipped && <span className="miniBadge equipped">着用中</span>}
@@ -1807,12 +1806,12 @@ export default function App() {
                 ? '脱ぐ'
                 : '着る'
               : item.category === 'lower'
-              ? equippedLowerId === item.id
-                ? '脱ぐ'
-                : '着る'
-              : equippedAccessoryIds.includes(item.id)
-              ? 'はずす'
-              : 'つける'}
+                ? equippedLowerId === item.id
+                  ? '脱ぐ'
+                  : '着る'
+                : equippedAccessoryIds.includes(item.id)
+                  ? 'はずす'
+                  : 'つける'}
           </button>
 
           <button className="secondaryButton small" onClick={() => handleToggleFavorite(item)}>
@@ -1909,8 +1908,8 @@ export default function App() {
     <div className={`appShell ${isSepia ? 'sepia-filter' : ''}`}>
       <div className="steam-container">
         {[...Array(10)].map((_, i) => (
-          <div key={i} className="steam-particle" style={{ 
-            left: `${Math.random() * 100}%`, 
+          <div key={i} className="steam-particle" style={{
+            left: `${Math.random() * 100}%`,
             width: `${50 + Math.random() * 100}px`,
             height: `${50 + Math.random() * 100}px`,
             animationDuration: `${10 + Math.random() * 5}s`,
@@ -1920,13 +1919,18 @@ export default function App() {
       </div>
 
       <div className="floatingAvatarContainer">
+        <img src="/images/gear_bronze.png" className="deco-gear gear-1" alt="" />
         <img src="/images/gear_silver.png" className="deco-gear gear-2" alt="" />
         <img src="/images/gear_gold.png" className="deco-gear gear-3" alt="" />
+        <img src="/images/feather.png" className="deco-feather float-feather-1" alt="" />
         <img src="/images/feather.png" className="deco-feather float-feather-2" alt="" />
 
         {activeTab === 'home' && <img src="/images/mic.png" className="deco-mic" alt="" />}
         {activeTab === 'closet' && <img src="/images/penlight.png" className="deco-penlight" alt="" />}
 
+        <div className="floating-avatar float-1">
+          {renderPresetAvatar(PRESET_COORDS[0])}
+        </div>
         <div className="floating-avatar float-2">
           {renderPresetAvatar(PRESET_COORDS[1])}
         </div>
@@ -1934,15 +1938,9 @@ export default function App() {
           {renderPresetAvatar(PRESET_COORDS[2])}
         </div>
       </div>
-      
+
       <div className="appFrame">
         <div className="topLeftDecorations">
-          <img src="/images/gear_bronze.png" className="deco-gear gear-1" alt="" />
-          <div className="floating-avatar float-1">
-            {renderPresetAvatar(PRESET_COORDS[0])}
-          </div>
-          <img src="/images/feather.png" className="deco-feather float-feather-1" alt="" />
-          
           <div className="pocket-watch-large">
             <img src="/images/watch_base.png" className="watch-base" alt="" />
             <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
@@ -1953,7 +1951,7 @@ export default function App() {
             <span className="date-month">{time.getMonth() + 1}</span>月<span className="date-day">{time.getDate()}</span>日
           </div>
         </div>
-        
+
         <header className="topHeader">
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <div>
@@ -2074,8 +2072,8 @@ export default function App() {
                             closetTab === 'upper'
                               ? 'upper'
                               : closetTab === 'lower'
-                              ? 'lower'
-                              : 'accessory'
+                                ? 'lower'
+                                : 'accessory'
                           )
                         }
                       >
@@ -2125,8 +2123,8 @@ export default function App() {
                                 closetTab === 'upper'
                                   ? 'upper'
                                   : closetTab === 'lower'
-                                  ? 'lower'
-                                  : 'accessory'
+                                    ? 'lower'
+                                    : 'accessory'
                               )
                             }
                           >
@@ -2224,8 +2222,8 @@ export default function App() {
                                 {selectedQrItem.category === 'upper'
                                   ? '上の服'
                                   : selectedQrItem.category === 'lower'
-                                  ? '下の服'
-                                  : 'アクセサリー'}
+                                    ? '下の服'
+                                    : 'アクセサリー'}
                               </div>
                             </div>
                           </div>
@@ -2340,14 +2338,14 @@ export default function App() {
                 <div className="sectionHeader">
                   <h2 className="sectionTitle">設定</h2>
                 </div>
-              <div className="settingsGroup">
-                <h3 className="settingsSubtitle">⚙️ 画面フィルター</h3>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '15px' }}>
-                  <input type="checkbox" checked={isSepia} onChange={(e) => setIsSepia(e.target.checked)} />
-                  古写真（セピア）モードにする
-                </label>
-              </div>
-              <div className="settingsGroup">
+                <div className="settingsGroup">
+                  <h3 className="settingsSubtitle">⚙️ 画面フィルター</h3>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '15px' }}>
+                    <input type="checkbox" checked={isSepia} onChange={(e) => setIsSepia(e.target.checked)} />
+                    古写真（セピア）モードにする
+                  </label>
+                </div>
+                <div className="settingsGroup">
                   <button className={`settingsTabButton ${settingsTab === 'profile' ? 'active' : ''}`} onClick={() => setSettingsTab('profile')}>
                     プロフィール
                   </button>
