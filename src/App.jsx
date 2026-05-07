@@ -973,6 +973,13 @@ export default function App() {
   const [equipAnimClass, setEquipAnimClass] = useState('')
   const [showTutorial, setShowTutorial] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [isSepia, setIsSepia] = useState(false)
+  const [time, setTime] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   const PRESET_COORDS = [
     { base: 'default-base-1', upper: 'default-upper-7', lower: 'default-lower-6', accessories: ['default-accessory-9', 'default-accessory-10'] },
@@ -1899,7 +1906,29 @@ export default function App() {
   }
 
   return (
-    <div className="appShell">
+    <div className={`appShell ${isSepia ? 'sepia-filter' : ''}`}>
+      <div className="steam-container">
+        {[...Array(10)].map((_, i) => (
+          <div key={i} className="steam-particle" style={{ 
+            left: `${Math.random() * 100}%`, 
+            width: `${50 + Math.random() * 100}px`,
+            height: `${50 + Math.random() * 100}px`,
+            animationDuration: `${10 + Math.random() * 5}s`,
+            animationDelay: `${Math.random() * 5}s`
+          }} />
+        ))}
+      </div>
+
+      <div className="pocket-watch">
+        <div className="watch-center"></div>
+        <div className="watch-hand hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }}></div>
+        <div className="watch-hand minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }}></div>
+        <div className="watch-hand second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }}></div>
+        {[...Array(12)].map((_, i) => (
+          <div key={i} className="watch-tick" style={{ transform: `rotate(${i * 30}deg)` }}></div>
+        ))}
+      </div>
+
       <div className="floatingAvatarContainer">
         <img src="/images/gear_bronze.png" className="deco-gear gear-1" alt="" />
         <img src="/images/gear_silver.png" className="deco-gear gear-2" alt="" />
@@ -2306,8 +2335,14 @@ export default function App() {
                 <div className="sectionHeader">
                   <h2 className="sectionTitle">設定</h2>
                 </div>
-
-                <div className="settingsTabRow">
+              <div className="settingsGroup">
+                <h3 className="settingsSubtitle">⚙️ 画面フィルター</h3>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '15px' }}>
+                  <input type="checkbox" checked={isSepia} onChange={(e) => setIsSepia(e.target.checked)} />
+                  古写真（セピア）モードにする
+                </label>
+              </div>
+              <div className="settingsGroup">
                   <button className={`settingsTabButton ${settingsTab === 'profile' ? 'active' : ''}`} onClick={() => setSettingsTab('profile')}>
                     プロフィール
                   </button>
