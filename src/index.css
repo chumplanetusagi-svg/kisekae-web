@@ -1,13 +1,5 @@
 :root {
-  font-family:
-    'Hiragino Sans',
-    'Yu Gothic UI',
-    'Yu Gothic',
-    'Meiryo',
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
+  font-family: 'Shippori Mincho', serif;
   line-height: 1.5;
   font-weight: 400;
   color: #24324f;
@@ -33,3 +25,4 @@ body,
 body {
   margin: 0;
 }
+button, input, textarea, select { font-family: inherit; }

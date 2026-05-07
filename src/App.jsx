@@ -744,12 +744,15 @@ async function createHomeCanvas({
   canvas.height = height
   const ctx = canvas.getContext('2d')
 
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, width, height)
+  ctx.fillStyle = '#1a120e'
+    ctx.fillRect(0, 0, width, height)
 
-  ctx.fillStyle = '#f7fbff'
-  roundedRect(ctx, 60, 60, width - 120, height - 120, 42)
-  ctx.fill()
+  ctx.fillStyle = '#291e19'
+    ctx.strokeStyle = '#b88a5c'
+    ctx.lineWidth = 10
+    roundedRect(ctx, 60, 60, width - 120, height - 120, 42)
+    ctx.fill()
+    ctx.stroke()
 
   const avatarCanvas = await drawAvatarCanvas({
     baseImageUrl,
@@ -760,95 +763,29 @@ async function createHomeCanvas({
   })
   ctx.drawImage(avatarCanvas, 270, 110, 860, 860)
 
-  ctx.fillStyle = '#ffffff'
-  roundedRect(ctx, 450, 1010, 500, 90, 45)
-  ctx.fill()
+  ctx.fillStyle = '#1a120e'
+    ctx.fillRect(0, 0, width, height)
 
-  ctx.fillStyle = '#d4b895'
-  ctx.font = 'bold 42px "Shippori Mincho", serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText(nickname || DEFAULT_NICKNAME, 700, 1055)
+  ctx.fillStyle = '#291e19'
+    ctx.strokeStyle = '#b88a5c'
+    ctx.lineWidth = 10
+    roundedRect(ctx, 40, 40, width - 80, height - 80, 40)
+    ctx.fill()
+    ctx.stroke()
 
-  ctx.fillStyle = '#ffffff'
-  roundedRect(ctx, 170, 1150, 1060, 360, 30)
-  ctx.fill()
+  ctx.fillStyle = '#594129'
+    ctx.strokeStyle = '#8c6a46'
+    ctx.lineWidth = 4
+    roundedRect(ctx, 90, 90, 190, 56, 28)
+    ctx.fill()
+    ctx.stroke()
 
-  ctx.fillStyle = '#f2ce9e'
-  ctx.font = 'bold 34px "Shippori Mincho", serif'
-  ctx.textAlign = 'left'
-  ctx.textBaseline = 'top'
-  drawWrappedText(
-    ctx,
-    (concept && concept.trim()) || 'コンセプトはまだ未設定だよ',
-    210,
-    1195,
-    980,
-    54,
-    5
-  )
-
-  return canvas
-}
-
-async function createQrCardCanvas({
-  itemName,
-  itemCategoryLabel,
-  creatorName,
-  nickname,
-  baseImageUrl,
-  qrItemUpperImageUrl = '',
-  qrItemLowerImageUrl = '',
-  qrItemAccessoryImageUrls = [],
-  qrCanvas,
-}) {
-  const width = 1600
-  const height = 1180
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext('2d')
-
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, width, height)
-
-  ctx.fillStyle = '#fbfdff'
-  roundedRect(ctx, 40, 40, width - 80, height - 80, 40)
-  ctx.fill()
-
-  ctx.fillStyle = '#8fbfff'
-  roundedRect(ctx, 90, 90, 190, 56, 28)
-  ctx.fill()
-
-  ctx.fillStyle = '#ffffff'
-  ctx.font = 'bold 24px "Shippori Mincho", serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText('QR配布カード', 185, 118)
-
-  ctx.fillStyle = '#d4b895'
-  ctx.textAlign = 'left'
-  ctx.textBaseline = 'top'
-  ctx.font = 'bold 54px "Shippori Mincho", serif'
-  ctx.fillText(itemName, 90, 185)
-
-  ctx.fillStyle = '#98a7de'
-  ctx.font = 'bold 28px "Shippori Mincho", serif'
-  ctx.fillText(`作った人：${creatorName}`, 90, 260)
-  ctx.fillText(itemCategoryLabel, 90, 308)
-
-  const avatarCanvas = await drawAvatarCanvas({
-    baseImageUrl,
-    lowerImageUrl: qrItemLowerImageUrl,
-    upperImageUrl: qrItemUpperImageUrl,
-    accessoryImageUrls: qrItemAccessoryImageUrls,
-    size: 620,
-  })
-  ctx.drawImage(avatarCanvas, 120, 390, 620, 620)
-
-  ctx.fillStyle = '#ffffff'
-  roundedRect(ctx, 285, 1035, 290, 72, 36)
-  ctx.fill()
+  ctx.fillStyle = '#3a2a22'
+    ctx.strokeStyle = '#8c6a46'
+    ctx.lineWidth = 4
+    roundedRect(ctx, 285, 1035, 290, 72, 36)
+    ctx.fill()
+    ctx.stroke()
 
   ctx.fillStyle = '#d4b895'
   ctx.font = 'bold 30px "Shippori Mincho", serif'
@@ -857,8 +794,11 @@ async function createQrCardCanvas({
   ctx.fillText(nickname || DEFAULT_NICKNAME, 430, 1071)
 
   ctx.fillStyle = '#ffffff'
-  roundedRect(ctx, 950, 400, 480, 480, 30)
-  ctx.fill()
+    ctx.strokeStyle = '#8c6a46'
+    ctx.lineWidth = 6
+    roundedRect(ctx, 950, 400, 480, 480, 30)
+    ctx.fill()
+    ctx.stroke()
 
   ctx.imageSmoothingEnabled = false
   ctx.drawImage(qrCanvas, 1010, 460, 360, 360)
