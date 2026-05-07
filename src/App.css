@@ -2211,25 +2211,23 @@ a {
 
 /* Top Left Decorations (Phase 5) */
 .topLeftDecorations {
-  position: absolute;
-  top: -20px;
-  left: -140px;
-  width: 200px;
-  height: 300px;
-  z-index: 25;
+  position: relative;
+  width: 160px;
+  height: 180px;
+  flex-shrink: 0;
   pointer-events: none;
 }
 .pocket-watch-large {
   position: absolute;
-  top: 0;
-  left: 20px;
+  top: -10px;
+  left: 10px;
   width: 140px;
   height: 140px;
 }
 .antique-date-paper {
   position: absolute;
-  top: 130px;
-  left: 10px;
+  top: 110px;
+  left: 0px;
   width: 160px;
   height: 60px;
   background: linear-gradient(135deg, #e8d5b5 0%, #d4b895 50%, #c19b70 100%);
@@ -2251,7 +2249,7 @@ a {
 .antique-date-paper .date-day { font-size: 24px; color: #5d4037; margin-left: 4px; }
 
 @media (max-width: 1200px) {
-  .topLeftDecorations { left: -60px; transform: scale(0.8); }
+  .topLeftDecorations { transform: scale(0.8); transform-origin: left top; width: 128px; height: 144px; margin-right: -10px; }
 }
 @media (max-width: 820px) {
   .topLeftDecorations { display: none; }

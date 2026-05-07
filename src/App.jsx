@@ -1776,7 +1776,7 @@ export default function App() {
 
         <div className="itemActions">
           <button
-            className="primaryButton small"
+            className="secondaryButton small"
             onClick={() => {
               if (item.category === 'upper') {
                 if (equippedUpperId === item.id) {
@@ -1940,20 +1940,19 @@ export default function App() {
       </div>
 
       <div className="appFrame">
-        <div className="topLeftDecorations">
-          <div className="pocket-watch-large">
-            <img src="/images/watch_base.png" className="watch-base" alt="" />
-            <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
-            <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
-            <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
-          </div>
-          <div className="antique-date-paper">
-            <span className="date-month">{time.getMonth() + 1}</span>月<span className="date-day">{time.getDate()}</span>日
-          </div>
-        </div>
-
         <header className="topHeader">
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div className="topLeftDecorations">
+              <div className="pocket-watch-large">
+                <img src="/images/watch_base.png" className="watch-base" alt="" />
+                <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
+                <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
+                <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
+              </div>
+              <div className="antique-date-paper">
+                <span className="date-month">{time.getMonth() + 1}</span>月<span className="date-day">{time.getDate()}</span>日
+              </div>
+            </div>
             <div>
               <p className="subTitle">Hureroppu Closet</p>
               <h1 className="pageTitle">ろっぷのクローゼット</h1>
@@ -2022,7 +2021,7 @@ export default function App() {
                 </div>
 
                 <div className="homeSaveArea">
-                  <button className="primaryButton" onClick={handleSaveHomeImage} disabled={isSavingHomeImage}>
+                  <button className="secondaryButton" onClick={handleSaveHomeImage} disabled={isSavingHomeImage}>
                     {isSavingHomeImage ? '保存中…' : 'ホーム画像を保存'}
                   </button>
                   <p className="infoText">今見えているホームカードを、そのまま1枚画像で保存できるよ。</p>
@@ -2249,7 +2248,7 @@ export default function App() {
                         </div>
 
                         <div className="qrSaveArea">
-                          <button className="primaryButton" onClick={handleSaveQrImage} disabled={isSavingQrImage}>
+                          <button className="secondaryButton" onClick={handleSaveQrImage} disabled={isSavingQrImage}>
                             {isSavingQrImage ? '保存中…' : 'QR画像を保存'}
                           </button>
                         </div>
@@ -2273,7 +2272,7 @@ export default function App() {
               <section className="mainCard qrSaveBaseCard">
                 <h2 className="sectionTitle">素体を保存</h2>
 
-                <button className="primaryButton" onClick={handleSaveBaseImage} disabled={isSavingBaseImage}>
+                <button className="secondaryButton" onClick={handleSaveBaseImage} disabled={isSavingBaseImage}>
                   {isSavingBaseImage ? '保存中…' : '素体を保存'}
                 </button>
 
@@ -2322,7 +2321,7 @@ export default function App() {
                     />
                   </label>
 
-                  <button className="primaryButton" onClick={handleUpload} disabled={isUploading}>
+                  <button className="secondaryButton" onClick={handleUpload} disabled={isUploading}>
                     {isUploading ? 'アップロード中…' : 'アップロードする'}
                   </button>
                 </div>
