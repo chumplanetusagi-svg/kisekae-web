@@ -703,7 +703,7 @@ async function drawAvatarCanvas({
   ctx.clearRect(0, 0, size, size)
 
   // 1. Draw Monocle Frame first (Background)
-  const monoclePadding = size * 0.02
+  const monoclePadding = size * 0.005
   const monocleSize = size - monoclePadding * 2
   try {
     const monocleImg = await loadImage(assetUrl('images/monocle.png'))
@@ -716,10 +716,10 @@ async function drawAvatarCanvas({
   const { back, front } = splitAccessoryImageUrls(accessoryImageUrls)
   const urls = [...back, baseImageUrl, lowerImageUrl, upperImageUrl, ...front].filter(Boolean)
 
-  const charScale = 0.8
+  const charScale = 0.92
   const charSize = size * charScale
   const charX = (size - charSize) / 2
-  const charY = (size - charSize) / 2 - size * 0.08 // Shift up
+  const charY = (size - charSize) / 2 - size * 0.04 // Minimal shift up
 
   for (const url of urls) {
     const img = await loadImage(url)
