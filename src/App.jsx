@@ -1747,8 +1747,8 @@ export default function App() {
       >
         <div className="itemPreview">
           <img src={item.imageUrl} alt={item.name} crossOrigin="anonymous" />
+          <div className="previewCreatorBadge">{getDisplayCreatorName(item)}</div>
         </div>
-        <div className="previewCreatorBadge">{getDisplayCreatorName(item)}</div>
 
         <div className="itemInfo">
           <div className="itemName">{item.name}</div>
@@ -1920,18 +1920,13 @@ export default function App() {
       </div>
 
       <div className="floatingAvatarContainer">
-        <img src="/images/gear_bronze.png" className="deco-gear gear-1" alt="" />
         <img src="/images/gear_silver.png" className="deco-gear gear-2" alt="" />
         <img src="/images/gear_gold.png" className="deco-gear gear-3" alt="" />
-        <img src="/images/feather.png" className="deco-feather float-feather-1" alt="" />
         <img src="/images/feather.png" className="deco-feather float-feather-2" alt="" />
 
         {activeTab === 'home' && <img src="/images/mic.png" className="deco-mic" alt="" />}
         {activeTab === 'closet' && <img src="/images/penlight.png" className="deco-penlight" alt="" />}
 
-        <div className="floating-avatar float-1">
-          {renderPresetAvatar(PRESET_COORDS[0])}
-        </div>
         <div className="floating-avatar float-2">
           {renderPresetAvatar(PRESET_COORDS[1])}
         </div>
@@ -1941,14 +1936,26 @@ export default function App() {
       </div>
       
       <div className="appFrame">
+        <div className="topLeftDecorations">
+          <img src="/images/gear_bronze.png" className="deco-gear gear-1" alt="" />
+          <div className="floating-avatar float-1">
+            {renderPresetAvatar(PRESET_COORDS[0])}
+          </div>
+          <img src="/images/feather.png" className="deco-feather float-feather-1" alt="" />
+          
+          <div className="pocket-watch-large">
+            <img src="/images/watch_base.png" className="watch-base" alt="" />
+            <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
+            <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
+            <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
+          </div>
+          <div className="antique-date-paper">
+            <span className="date-month">{time.getMonth() + 1}</span>月<span className="date-day">{time.getDate()}</span>日
+          </div>
+        </div>
+        
         <header className="topHeader">
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <div className="pocket-watch">
-              <img src="/images/watch_base.png" className="watch-base" alt="" />
-              <img src="/images/watch_hour.png" className="watch-hand custom-hour" style={{ transform: `rotate(${time.getHours() * 30 + time.getMinutes() * 0.5}deg)` }} alt="" />
-              <img src="/images/watch_minute.png" className="watch-hand custom-minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} alt="" />
-              <img src="/images/watch_second.png" className="watch-hand custom-second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} alt="" />
-            </div>
             <div>
               <p className="subTitle">Hureroppu Closet</p>
               <h1 className="pageTitle">ろっぷのクローゼット</h1>
@@ -2040,7 +2047,7 @@ export default function App() {
                     <button className="secondaryButton" onClick={handleUnequipAll}>
                       全部脱ぐ
                     </button>
-                    <button className="primaryButton" onClick={handleApplyFavorites}>
+                    <button className="secondaryButton" onClick={handleApplyFavorites}>
                       お気に入りを着る
                     </button>
                     <button
