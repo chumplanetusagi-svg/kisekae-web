@@ -862,6 +862,9 @@ async function createQrCardCanvas({
       const img = config.type === 'gold' ? gearG : config.type === 'silver' ? gearS : gearB
       drawSingleGear(img, config.x, config.y, config.size, config.rotation)
     })
+
+    // Central Large Gear
+    drawSingleGear(gearG, width / 2, height / 2, width * 0.45, 0)
     
   } catch (e) {
     console.warn('Gears failed to load for QR card', e)
@@ -2191,7 +2194,7 @@ export default function App() {
                       }}
                     />
                   ))}
-                  <div className="magicCircleCenter" />
+                  <div className="centralGearDecoration" />
                   
                   <div className="homeCaptureInner">
                     <div className="homeLeftCol">
@@ -2249,7 +2252,7 @@ export default function App() {
                         }}
                       />
                     ))}
-                    <div className="magicCircleCenter" />
+                    <div className="centralGearDecoration" />
 
                     <div className="homeCaptureInner">
                       <div className="homeLeftCol">
@@ -2497,6 +2500,7 @@ export default function App() {
                               }}
                             />
                           ))}
+                          <div className="centralGearDecoration" />
                           <div className="qrCardHeader">
                             <span className="qrCardBadge">QR配布カード</span>
                             <div className="qrCardTitleBlock">
