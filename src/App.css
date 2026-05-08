@@ -430,7 +430,8 @@ button, .itemCard, .dragHandle, a {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
-  align-items: stretch; /* Stretch columns to match the taller side */
+  align-items: stretch; /* Crucial: make both columns the same height */
+  overflow: visible !important;
 }
 
 .leftColumn {
@@ -438,7 +439,9 @@ button, .itemCard, .dragHandle, a {
   flex-direction: column;
   gap: 24px;
   min-width: 0;
-  position: relative; /* Context for sticky */
+  position: relative;
+  height: 100%; /* Stretch to parent */
+  overflow: visible !important;
 }
 
 .rightColumn {
@@ -451,9 +454,10 @@ button, .itemCard, .dragHandle, a {
 .closetDesktopPreview {
   position: -webkit-sticky !important;
   position: sticky !important;
-  top: 40px; /* Distance from top of screen */
+  top: 20px; /* Adjusted for better visibility */
   z-index: 100;
-  align-self: flex-start; /* Required for sticky inside flex/grid */
+  align-self: flex-start;
+  height: fit-content; /* Ensure it doesn't take full height if not needed */
 }
 
 .closetActionCard {
@@ -885,12 +889,14 @@ button, .itemCard, .dragHandle, a {
 .qrCardBadge {
   display: inline-flex;
   width: fit-content;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #9cd5ff 0%, #bfb6ff 100%);
-  color: white;
+  background: linear-gradient(135deg, #e2c08d 0%, #b88a44 100%); /* Antique Gold Brass */
+  color: #3d2b1f; /* Deep brown for text contrast */
   font-size: 13px;
   font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .qrCardTitleBlock {
