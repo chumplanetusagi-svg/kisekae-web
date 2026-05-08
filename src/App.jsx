@@ -1140,6 +1140,8 @@ export default function App() {
   }, [myPostIds]);
 
   const handleDeletePost = async (postId) => {
+    // カスタムカーソルの「クリック中（消去）」状態を解除するため、一瞬だけ待ってからダイアログを出す
+    await new Promise(resolve => setTimeout(resolve, 50));
     const ok = window.confirm('この投稿をギャラリーから削除してもいい？');
     if (!ok) return;
     try {

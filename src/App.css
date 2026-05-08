@@ -30,9 +30,7 @@ body.is-dragging-custom,
 body.is-dragging-custom *,
 .itemCard[draggable="true"]:active,
 .dragHandle:active,
-[draggable="true"]:active,
-body:active,
-body:active * {
+[draggable="true"]:active {
   /* Hide native cursor during drag to use the React follower (bypasses browser drag restrictions) */
   cursor: none !important;
 }
