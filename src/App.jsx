@@ -2200,33 +2200,36 @@ export default function App() {
     document.body.classList.remove('is-dragging-custom');
   };
 
-  // --- Character Preview Sticky Support via JS (for Desktop) ---
+  // --- Character Preview Sticky Support via JS (for Desktop & Mobile) ---
   const [closetPreviewTop, setClosetPreviewTop] = useState(0);
+  const [mobilePreviewTop, setMobilePreviewTop] = useState(0);
 
   useEffect(() => {
     if (activeTab !== 'closet') return;
 
     const handleScroll = () => {
-      if (window.innerWidth <= 820) return; // Only for desktop
-      
       const scrollTop = window.scrollY;
       const closetContainer = document.querySelector('.closetLayout');
       if (!closetContainer) return;
 
       const containerRect = closetContainer.getBoundingClientRect();
       const containerTop = containerRect.top + window.scrollY;
-      
-      // Calculate how much to offset the preview relative to its column
-      let offset = Math.max(0, scrollTop - containerTop + 24);
-      
-      // Don't let it scroll past the bottom of the right column
-      const rightCol = document.querySelector('.rightColumn');
-      if (rightCol) {
-        const maxOffset = rightCol.offsetHeight - 540; // Approx height of preview card
-        offset = Math.min(offset, Math.max(0, maxOffset));
-      }
 
-      setClosetPreviewTop(offset);
+      // --- Desktop Logic ---
+      if (window.innerWidth > 820) {
+        let offset = Math.max(0, scrollTop - containerTop + 24);
+        const rightCol = document.querySelector('.rightColumn');
+        if (rightCol) {
+          const maxOffset = rightCol.offsetHeight - 540; 
+          offset = Math.min(offset, Math.max(0, maxOffset));
+        }
+        setClosetPreviewTop(offset);
+      } else {
+        // --- Mobile Logic ---
+        // Stick to top with some margin
+        let mOffset = Math.max(0, scrollTop - containerTop + 8);
+        setMobilePreviewTop(mOffset);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -2569,7 +2572,14 @@ export default function App() {
                     </button>
                   </div>
 
-                  <div ref={mobileClosetFollowRef} className="mobileClosetFollowCard">
+                  <div 
+                    ref={mobileClosetFollowRef} 
+                    className="mobileClosetFollowCard"
+                    style={{ 
+                      transform: `translateY(${mobilePreviewTop}px)`,
+                      transition: 'transform 0.02s ease-out' 
+                    }}
+                  >
                     <div className="mobileClosetFollowInner">
                       <div className="mobileFollowAvatarWrap">
                         {renderAvatarLayers('characterStage smallStage mobileFollowStage', true)}
