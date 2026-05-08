@@ -66,10 +66,18 @@ body.is-dragging-custom *,
 }
 
 html,
-body {
+body,
+#root {
   margin: 0;
-  overflow-x: visible; /* Changed from hidden to avoid breaking sticky in some browsers */
+  overflow: visible !important;
   min-height: 100%;
+}
+
+html {
+  overflow-x: hidden !important; /* Allow Y to be visible but keep X tight */
+}
+
+body {
   font-family: 'Shippori Mincho', serif;
   background: var(--bg);
   background-attachment: fixed;
@@ -103,6 +111,7 @@ a {
   position: relative;
   z-index: 1;
   font-family: 'Shippori Mincho', serif;
+  overflow: visible !important;
 }
 
 button, .itemCard, .dragHandle, a {
@@ -113,6 +122,7 @@ button, .itemCard, .dragHandle, a {
   margin: 0 auto;
   position: relative;
   z-index: 2;
+  overflow: visible !important;
 }
 
 .topHeader {
