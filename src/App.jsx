@@ -2127,8 +2127,12 @@ export default function App() {
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
             onDragMove={handleDragAutoScroll}
-            onDragEnd={handleLayerDragEnd}
+            onDragEnd={(event) => {
+              handleLayerDragEnd(event);
+              handleDragEndGlobal();
+            }}
           >
             <SortableContext
               items={layeredEquippedItems.map((entry) => entry.layerKey)}
@@ -2148,7 +2152,7 @@ export default function App() {
 
   return (
     <div
-      className="appShell"
+      className={`appShell ${activeTab === 'closet' ? 'closet-open' : ''}`}
       onClick={handleGlobalClick}
       onDragOver={(e) => e.preventDefault()}
       onDragEnter={(e) => e.preventDefault()}
