@@ -63,6 +63,9 @@ body,
   margin: 0;
   overflow: visible !important;
   min-height: 100%;
+  background: var(--bg);
+  background-attachment: fixed;
+  background-color: #140e0c;
   color: var(--text);
 }
 /* Ensure the body itself also hides the cursor if needed */
