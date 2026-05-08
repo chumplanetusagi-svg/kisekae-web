@@ -58,14 +58,11 @@ body:active * {
 }
 
 html,
-body {
+body,
+#root {
   margin: 0;
-  overflow-x: hidden; /* Prevent horizontal scroll from hidden elements */
+  overflow: visible !important;
   min-height: 100%;
-  font-family: 'Shippori Mincho', serif;
-  background: var(--bg);
-  background-attachment: fixed;
-  background-color: #140e0c;
   color: var(--text);
 }
 /* Ensure the body itself also hides the cursor if needed */
@@ -420,7 +417,7 @@ button, .itemCard, .dragHandle, a {
 
 .closetContainer {
   position: relative;
-  width: 100%;
+  overflow: visible !important;
 }
 
 .closetLayout {
@@ -428,11 +425,14 @@ button, .itemCard, .dragHandle, a {
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
   align-items: start;
+  overflow: visible !important;
 }
 
 .leftColumn {
   position: relative;
   width: 340px;
+  overflow: visible !important;
+  min-height: 100%;
 }
 
 .rightColumn {
@@ -440,36 +440,6 @@ button, .itemCard, .dragHandle, a {
   flex-direction: column;
   gap: 24px;
   min-width: 0;
-}
-
-/* PC: Keep character preview following while scrolling */
-@media (min-width: 821px) {
-  .closetContainer {
-    height: calc(100vh - 100px); /* Height of the scrollable area */
-    overflow: hidden !important;
-  }
-
-  .closetLayout {
-    height: 100%;
-  }
-
-  .leftColumn {
-    height: 100%;
-  }
-
-  .rightColumn {
-    height: 100%;
-    overflow-y: auto !important;
-    padding-right: 12px;
-  }
-
-  .closetDesktopPreview {
-    position: absolute !important;
-    top: 0;
-    left: 0;
-    width: 340px;
-    z-index: 100;
-  }
 }
 
 .previewCard {
@@ -1353,13 +1323,10 @@ button, .itemCard, .dragHandle, a {
 
   .mobileClosetFollowCard {
     display: block !important;
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 8px !important;
-    z-index: 2000 !important;
+    position: relative !important;
+    z-index: 10 !important;
     margin: 0 0 16px;
-    pointer-events: none;
-    overflow: visible !important;
+    pointer-events: auto;
   }
 
   .mobileClosetFollowInner {
