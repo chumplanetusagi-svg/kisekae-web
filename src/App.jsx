@@ -2220,25 +2220,23 @@ export default function App() {
       const closetContainer = document.querySelector('.closetLayout');
       if (!closetContainer) return;
 
-      // Use pageYOffset + getBoundingClientRect().top for a more stable absolute top
       const containerRect = closetContainer.getBoundingClientRect();
       const containerTop = containerRect.top + scrollTop;
 
       // --- Desktop Logic (Wider screens) ---
       if (window.innerWidth > 800) {
-        // We will now use CSS sticky for better reliability on PC
-        // so we don't need to manually calculate closetPreviewTop here.
-        setClosetPreviewTop(0); 
+        // PCでもJavaScriptで位置を計算して追従させる
+        const offset = Math.max(0, scrollTop - containerTop + 20);
+        setClosetPreviewTop(offset);
       } else {
         // --- Mobile Logic ---
-        // Stick to top with some margin
         let mOffset = Math.max(0, scrollTop - containerTop + 8);
         setMobilePreviewTop(mOffset);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeTab, closetTab]);
 
@@ -2265,23 +2263,14 @@ export default function App() {
       onDragOver={(e) => e.preventDefault()}
       onDragEnter={(e) => e.preventDefault()}
     >
-      {/* --- 更新確認用バナー (確認後に削除可能) --- */}
-      <div style={{ 
-        background: '#ff0000', 
-        color: '#ffffff', 
-        padding: '12px', 
-        textAlign: 'center', 
-        fontWeight: 'bold',
-        fontSize: '16px',
-        position: 'fixed', 
-        top: 0, 
-        left: 0, 
-        width: '100%', 
-        zIndex: 2000000,
-        boxShadow: '0 4px 20px rgba(0,0,0,0.8)'
-      }}>
-        【更新確認用】PC追従・羊皮紙通知 修正版 (14:05)
-      </div>
+      {notification && (
+        <div className="customToast">
+          <div className="customToastInner">
+            <span className="toastIcon">📜</span>
+            <span>{notification}</span>
+          </div>
+        </div>
+      )}
       {clickParticles.map(p => (
         <div key={p.id} className="magic-particle" style={{ left: p.x, top: p.y, '--tx': p.tx, '--ty': p.ty }} />
       ))}

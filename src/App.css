@@ -48,11 +48,11 @@ body:active * {
   transition: all 0.3s ease;
 }
 
-/* Ensure character stage stays in view while scrolling through clothes */
+/* Ensure character stage stays in view while scrolling through clothes (Using JS Transform) */
 .closetDesktopPreview,
 .mobileClosetFollowCard {
-  position: sticky !important;
-  top: 24px;
+  position: relative !important;
+  top: 0;
   z-index: 100;
 }
 
