@@ -2400,9 +2400,10 @@ export default function App() {
     setIsDraggingCustom(true);
     document.documentElement.classList.add('is-dragging-custom');
     document.body.classList.add('is-dragging-custom');
-    // 強制的にネイティブカーソルを消す (インラインスタイルが最強)
-    document.body.style.setProperty('cursor', 'none', 'important');
-    document.documentElement.style.setProperty('cursor', 'none', 'important');
+    // 強制的にネイティブカーソルを消す (透明画像で上書き)
+    const transparentCursor = "url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') 0 0, none";
+    document.body.style.setProperty('cursor', transparentCursor, 'important');
+    document.documentElement.style.setProperty('cursor', transparentCursor, 'important');
 
     // Hide native browser drag image (ghost) to only show our custom follower
     if (e.dataTransfer) {

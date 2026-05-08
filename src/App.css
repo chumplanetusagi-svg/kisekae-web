@@ -17,8 +17,8 @@ html,
 body, 
 #root,
 * {
-  /* Use the absolute nuclear option for hiding the native cursor */
-  cursor: none !important;
+  /* Use a transparent 1x1 image as the cursor to force the browser to hide the native arrow */
+  cursor: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') 0 0, none !important;
 }
 
 /* Ensure that even during active states and drags, nothing shows the cursor */
@@ -28,7 +28,7 @@ body:active,
 body:active *,
 .is-dragging-custom,
 .is-dragging-custom * {
-  cursor: none !important;
+  cursor: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') 0 0, none !important;
 }
 
 /* Custom Cursor Follower Styles */
