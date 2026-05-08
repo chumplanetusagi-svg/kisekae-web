@@ -2227,8 +2227,10 @@ export default function App() {
       if (window.innerWidth > 820) {
         let offset = Math.max(0, scrollTop - containerTop + 24);
         const rightCol = document.querySelector('.rightColumn');
-        if (rightCol) {
-          const maxOffset = rightCol.offsetHeight - 540; 
+        const previewCard = document.querySelector('.closetDesktopPreview');
+        if (rightCol && previewCard) {
+          // Calculate limit more accurately: Right column height minus the preview card's own height
+          const maxOffset = rightCol.offsetHeight - previewCard.offsetHeight; 
           offset = Math.min(offset, Math.max(0, maxOffset));
         }
         setClosetPreviewTop(offset);

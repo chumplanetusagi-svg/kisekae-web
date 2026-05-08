@@ -96,7 +96,6 @@ a {
   font-family: 'Shippori Mincho', serif;
   overflow-x: hidden; /* Prevent horizontal scroll */
   overflow-y: auto;
-  contain: content; /* Contain descendants to prevent them from expanding scroll area */
 }
 
 button, .itemCard, .dragHandle, a {
