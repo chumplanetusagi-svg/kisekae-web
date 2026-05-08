@@ -2192,6 +2192,12 @@ export default function App() {
           e.dataTransfer.setData('application/json', JSON.stringify(item))
           e.dataTransfer.effectAllowed = 'copy'
 
+          // Hide custom cursor and make native cursor transparent
+          setIsDraggingCustom(true)
+          const transparentCursor = "url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') 0 0, none"
+          document.body.style.setProperty('cursor', transparentCursor, 'important')
+          document.documentElement.style.setProperty('cursor', transparentCursor, 'important')
+
           const imgEl = e.currentTarget.querySelector('.itemPreview img')
           if (imgEl) {
             const clone = imgEl.cloneNode(true)
@@ -2211,6 +2217,11 @@ export default function App() {
               }
             }, 10)
           }
+        }}
+        onDragEnd={() => {
+          setIsDraggingCustom(false)
+          document.body.style.cursor = ''
+          document.documentElement.style.cursor = ''
         }}
       >
         <div className="itemPreview">
