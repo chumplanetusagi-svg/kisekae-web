@@ -2225,17 +2225,17 @@ export default function App() {
       const containerTop = containerRect.top + scrollTop;
 
       // --- Desktop Logic ---
-      // --- Desktop Logic ---
       if (window.innerWidth > 820) {
-        let offset = Math.max(0, scrollTop - containerTop + 24);
         const rightCol = document.querySelector('.rightColumn');
-        const previewCard = desktopClosetPreviewRef.current;
-        if (rightCol && previewCard) {
-          // Use the actual height of the ref element
-          const maxOffset = rightCol.offsetHeight - previewCard.offsetHeight; 
+        const previewEl = document.querySelector('.closetDesktopPreview');
+        
+        if (rightCol && previewEl) {
+          let offset = Math.max(0, scrollTop - containerTop + 24);
+          // Calculate max offset based on the actual height of the items list
+          const maxOffset = rightCol.offsetHeight - previewEl.offsetHeight;
           offset = Math.min(offset, Math.max(0, maxOffset));
+          setClosetPreviewTop(offset);
         }
-        setClosetPreviewTop(offset);
       } else {
         // --- Mobile Logic ---
         // Stick to top with some margin
