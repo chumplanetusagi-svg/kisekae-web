@@ -1124,6 +1124,38 @@ export default function App() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [isMouseDown, setIsMouseDown] = useState(false)
 
+  // --- Custom Cursor State ---
+  const [customCursorUrl, setCustomCursorUrl] = useState(
+    () => localStorage.getItem('customCursorUrl') || ''
+  )
+  const [customCursorHoverUrl, setCustomCursorHoverUrl] = useState(
+    () => localStorage.getItem('customCursorHoverUrl') || ''
+  )
+
+  // Apply custom cursor via a dynamic <style> tag
+  useEffect(() => {
+    let styleEl = document.getElementById('custom-cursor-style')
+    if (!styleEl) {
+      styleEl = document.createElement('style')
+      styleEl.id = 'custom-cursor-style'
+      document.head.appendChild(styleEl)
+    }
+    if (customCursorUrl) {
+      const hoverUrl = customCursorHoverUrl || customCursorUrl
+      styleEl.textContent = `
+        html, body, #root, * { cursor: url('${customCursorUrl}') 4 4, auto !important; }
+        button:hover, .itemCard:hover, .dragHandle:hover, a:hover, [role="button"]:hover,
+        .magic-cursor { display: none !important; }
+        .is-dragging-custom, .is-dragging-custom * { cursor: url('${hoverUrl}') 4 4, grabbing !important; }
+      `
+    } else {
+      // Default: use magic-cursor follower (hide native)
+      styleEl.textContent = `
+        html, body, #root, * { cursor: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') 0 0, none !important; }
+      `
+    }
+  }, [customCursorUrl, customCursorHoverUrl])
+
   // --- Gallery State & Fetching ---
   const [galleryPosts, setGalleryPosts] = useState([]);
   const [isFetchingGallery, setIsFetchingGallery] = useState(false);
@@ -3142,6 +3174,9 @@ export default function App() {
                   <button className={`settingsTabButton ${settingsTab === 'credits' ? 'active' : ''}`} onClick={() => setSettingsTab('credits')}>
                     クレジット
                   </button>
+                  <button className={`settingsTabButton ${settingsTab === 'cursor' ? 'active' : ''}`} onClick={() => setSettingsTab('cursor')}>
+                    🖱️ カーソル
+                  </button>
                 </div>
 
                 {settingsTab === 'profile' && (
@@ -3227,6 +3262,89 @@ export default function App() {
                         >
                           https://youtube.com/@hureroppu?si=WEKCPysvMjmOJvx4
                         </a>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {settingsTab === 'cursor' && (
+                  <div className="settingsPanel">
+                    <div className="cursorSettingsBox">
+                      <h3 className="cursorSettingsTitle">🖱️ カーソル画像の設定</h3>
+                      <p className="cursorSettingsHint">自分の好きな画像でカーソルをカスタムできるよ！PNG / GIF がおすすめ。推奨サイズは 32×32 〜 64×64px。</p>
+
+                      {customCursorUrl && (
+                        <div className="cursorPreviewRow">
+                          <div className="cursorPreviewItem">
+                            <span className="cursorPreviewLabel">通常カーソル</span>
+                            <img src={customCursorUrl} className="cursorPreviewImg" alt="cursor" />
+                          </div>
+                          {customCursorHoverUrl && (
+                            <div className="cursorPreviewItem">
+                              <span className="cursorPreviewLabel">クリック時</span>
+                              <img src={customCursorHoverUrl} className="cursorPreviewImg" alt="cursor hover" />
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="cursorUploadGrid">
+                        <label className="cursorUploadLabel">
+                          <span>通常カーソル画像</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="cursorFileInput"
+                            onChange={(e) => {
+                              const file = e.target.files[0]
+                              if (!file) return
+                              const reader = new FileReader()
+                              reader.onload = (ev) => {
+                                const url = ev.target.result
+                                setCustomCursorUrl(url)
+                                localStorage.setItem('customCursorUrl', url)
+                              }
+                              reader.readAsDataURL(file)
+                            }}
+                          />
+                          <span className="cursorUploadBtn">📂 ファイルを選ぶ</span>
+                        </label>
+
+                        <label className="cursorUploadLabel">
+                          <span>クリック時カーソル画像（任意）</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="cursorFileInput"
+                            onChange={(e) => {
+                              const file = e.target.files[0]
+                              if (!file) return
+                              const reader = new FileReader()
+                              reader.onload = (ev) => {
+                                const url = ev.target.result
+                                setCustomCursorHoverUrl(url)
+                                localStorage.setItem('customCursorHoverUrl', url)
+                              }
+                              reader.readAsDataURL(file)
+                            }}
+                          />
+                          <span className="cursorUploadBtn">📂 ファイルを選ぶ</span>
+                        </label>
+                      </div>
+
+                      <div className="cursorActions">
+                        {customCursorUrl ? (
+                          <button className="dangerButton" onClick={() => {
+                            setCustomCursorUrl('')
+                            setCustomCursorHoverUrl('')
+                            localStorage.removeItem('customCursorUrl')
+                            localStorage.removeItem('customCursorHoverUrl')
+                          }}>
+                            🔄 デフォルトに戻す
+                          </button>
+                        ) : (
+                          <p style={{color: 'var(--muted)', fontSize: '14px'}}>現在はデフォルトのカーソルを使用中</p>
+                        )}
                       </div>
                     </div>
                   </div>
