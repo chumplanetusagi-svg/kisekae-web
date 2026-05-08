@@ -2843,3 +2843,32 @@ button, .itemCard, .dragHandle, a {
     text-align: center;
   }
 }
+
+/* Gallery Capture Isolation - To prevent leakage and fix centering */
+.gallery-capture-isolated {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 600px;
+  height: 750px;
+  overflow: hidden;
+  z-index: -9999;
+  pointer-events: none;
+  background: #1a1412;
+}
+
+.gallery-capture-inner {
+  position: relative;
+  width: 600px;
+  height: 750px;
+  display: grid;
+  place-items: center;
+}
+
+.gallery-avatar-wrapper {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  transform: scale(1.4);
+  transform-origin: center;
+}

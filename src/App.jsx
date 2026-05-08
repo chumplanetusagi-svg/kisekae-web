@@ -1206,22 +1206,11 @@ export default function App() {
   const renderGalleryTab = () => {
     return (
       <div className="galleryContainer">
-        {/* 撮影用の隠し要素 (完全に隔離) */}
-        <div style={{ position: 'fixed', top: 0, left: 0, width: 0, height: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: -100 }}>
-          <div 
-            ref={galleryCaptureRef} 
-            className="homeCaptureCard" 
-            style={{ 
-              width: '600px', 
-              height: '750px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              background: '#1a1412' 
-            }}
-          >
-             <div style={{ transform: 'scale(1.2)' }}>
-               {renderAvatarLayers('homeAvatarStage')}
+        {/* 撮影用の隠し要素 (CSSクラスで徹底隔離) */}
+        <div className="gallery-capture-isolated">
+          <div ref={galleryCaptureRef} className="gallery-capture-inner">
+             <div className="gallery-avatar-wrapper">
+               {renderAvatarLayers('galleryAvatarStage')}
              </div>
           </div>
         </div>
