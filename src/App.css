@@ -13,14 +13,14 @@
   --fav-text: #e6b883;
 }
 
-* {
+html, body, * {
   box-sizing: border-box;
-  /* User-provided Steampunk Cursors (PNG with SVG fallback) */
-  cursor: url('/images/cursor.png') 0 0, url('/images/cursor.svg') 0 0, auto !important;
+  /* Use cache-busting query to force reload the lightweight images */
+  cursor: url('/images/cursor.png?v=2') 0 0, auto !important;
 }
 
 button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
-  cursor: url('/images/cursor_hover.png') 32 32, url('/images/cursor_hover.svg') 32 32, pointer !important;
+  cursor: url('/images/cursor_hover.png?v=2') 32 32, pointer !important;
 }
 
 html,
