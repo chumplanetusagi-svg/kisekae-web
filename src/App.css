@@ -13,9 +13,21 @@
   --fav-text: #e6b883;
 }
 
-html, body, * {
-  box-sizing: border-box;
-  /* Completely hide the native cursor everywhere */
+html, 
+body, 
+#root,
+* {
+  /* Use the absolute nuclear option for hiding the native cursor */
+  cursor: none !important;
+}
+
+/* Ensure that even during active states and drags, nothing shows the cursor */
+html:active,
+html:active *,
+body:active,
+body:active *,
+.is-dragging-custom,
+.is-dragging-custom * {
   cursor: none !important;
 }
 
