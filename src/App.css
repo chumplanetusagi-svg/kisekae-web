@@ -15,13 +15,12 @@
 
 * {
   box-sizing: border-box;
-  /* Steampunk Arrow Cursor (Base64) */
-  cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNMiAyIEwxNiAxNiBMOCAxNiBMOCAyNiBMMiAyNiBaIiBmaWxsPSIjY2Q3ZjMyIiBzdHJva2U9IiMzZTI3MjMiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGNpcmNsZSBjeD0iNiIgY3k9IjIwIiByPSIzIiBmaWxsPSIjOGI0NTEzIiBzdHJva2U9IiMzZTI3MjMiIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9Ik02IDE2IEw2IDI0IE0yIDIwIEwxMCAyMCIgc3Ryb2tlPSIjM2UyNzIzIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=') 0 0, auto;
+  /* Hide native cursor to use custom React follower */
+  cursor: none !important;
 }
 
 button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
-  /* Steampunk Gear Hover (Base64) */
-  cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMCIgZmlsbD0iI2YyY2U5ZSIgc3Ryb2tlPSIjOGI0NTEzIiBzdHJva2Utd2lkdGg9IjIiLz48ZyBzdHJva2U9IiM4YjQ1MTMiIHN0cm9rZS13aWR0aD0iNCI+PHBhdGggZD0iTTE2IDIgTDE2IDMwIE0yIDE2IEwzMCAxNiBNNiA2IEwyNiAyNiBNNiAyNiBMMjYgNiIvPjwvZz48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSI0IiBmaWxsPSIjOGI0NTEzIi8+PC9zdmc+') 16 16, pointer !important;
+  cursor: none !important;
 }
 
 html,
@@ -34,7 +33,6 @@ body {
   background-attachment: fixed;
   background-color: #140e0c;
   color: var(--text);
-  cursor: inherit;
 }
 
 button,
@@ -42,10 +40,6 @@ input,
 select,
 textarea {
   font: inherit;
-}
-
-button {
-  cursor: pointer;
 }
 
 img {
@@ -66,7 +60,6 @@ a {
 }
 
 button, .itemCard, .dragHandle, a {
-  cursor: inherit;
 }
 
 .appFrame {
@@ -750,20 +743,19 @@ button, .itemCard, .dragHandle, a {
 }
 
 .dragHandle {
-  width: 34px;
-  min-width: 34px;
+  width: 32px;
+  min-width: 32px;
   height: 34px;
   padding: 0;
   border-radius: 10px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.96);
-  color: var(--text-deep);
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   flex-shrink: 0;
-  cursor: grab;
 }
 
 .layerRowNumberDrag {
@@ -1886,12 +1878,8 @@ button, .itemCard, .dragHandle, a {
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.itemCard[draggable="true"] {
-  cursor: grab;
-}
-
-.itemCard[draggable="true"]:active {
-  cursor: grabbing;
+.sortable-item {
+  touch-action: none;
 }
 
 .itemCard:hover {
