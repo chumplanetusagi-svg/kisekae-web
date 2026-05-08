@@ -2589,3 +2589,257 @@ button, .itemCard, .dragHandle, a {
   font-size: 24px;
   filter: sepia(1) saturate(2);
 }
+
+/* Notice Overlay for external QR scans */
+.noticeOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000000;
+  padding: 24px;
+  animation: noticeFadeIn 0.4s ease;
+}
+
+@keyframes noticeFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.noticeCard {
+  background: var(--card);
+  border: 2px solid #8c6a46;
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  display: flex;
+  gap: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  position: relative;
+  overflow: hidden;
+  animation: noticeSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes noticeSlideIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.noticeIcon {
+  font-size: 48px;
+}
+
+.noticeContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.noticeTitle {
+  margin: 0;
+  font-size: 24px;
+  color: var(--text-deep);
+  font-weight: 800;
+}
+
+.noticeText {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Gallery Tab Styles */
+.galleryContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.galleryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.galleryTitleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.galleryCard {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.galleryCard:hover {
+  transform: translateY(-8px);
+  border-color: #8c6a46;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.galleryCardImage {
+  aspect-ratio: 4/5;
+  background: #1a1412;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.galleryCardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.distributableBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #2d5a27;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.galleryCardInfo {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.galleryCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.galleryPostNickname {
+  font-weight: 800;
+  color: var(--text-deep);
+  font-size: 16px;
+}
+
+.galleryPostDate {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.galleryPostConcept {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 0;
+  height: 3em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.galleryCardActions {
+  margin-top: auto;
+  display: flex;
+  gap: 12px;
+}
+
+.鑑賞用Badge {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 14px;
+  padding: 12px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+}
+
+.checkboxLabel.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(0,0,0,0.4);
+}
+
+.restrictionWarning {
+  margin: 0;
+  font-size: 13px;
+  color: #ff9900;
+  background: rgba(255, 153, 0, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  border-left: 3px solid #ff9900;
+  font-weight: 600;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.galleryLoading, .galleryEmpty {
+  padding: 80px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--card);
+  border-radius: 24px;
+  border: 1px dashed var(--line);
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--line);
+  border-top-color: #8c6a46;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 800px) {
+  .galleryHeader {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+}

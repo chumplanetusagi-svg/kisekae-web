@@ -1108,8 +1108,181 @@ export default function App() {
   }, [notification])
   const [isDragOver, setIsDragOver] = useState(false)
   const [time, setTime] = useState(new Date())
+  const [urlParamNotice, setUrlParamNotice] = useState(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const outfitParam = params.get('outfit');
+    const itemParam = params.get('item');
+
+    if (outfitParam || itemParam) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setUrlParamNotice('QRコードを読み込みました！クローゼット内の「QR」タブにあるカメラで読み込むと、服を着せ替えることができます。');
+    }
+  }, []);
   const [clickParticles, setClickParticles] = useState([])
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
+  // --- Gallery State & Fetching ---
+  const [galleryPosts, setGalleryPosts] = useState([]);
+  const [isFetchingGallery, setIsFetchingGallery] = useState(false);
+  const [showPostDialog, setShowPostDialog] = useState(false);
+  const [isDistributable, setIsDistributable] = useState(true);
+  const [isPosting, setIsPosting] = useState(false);
+  const galleryCaptureRef = useRef(null);
+
+  const fetchGallery = async () => {
+    setIsFetchingGallery(true);
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setGalleryPosts(data || []);
+    } catch (error) {
+      console.error('Gallery fetch error:', error);
+      setGalleryPosts([]);
+    } finally {
+      setIsFetchingGallery(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'gallery') {
+      fetchGallery();
+    }
+  }, [activeTab]);
+
+  const handleImportItem = (item) => {
+    const importedItem = normalizeImportedItem(item);
+    if (!importedItem) throw new Error('データが壊れているみたい');
+    setCustomItems((prev) => {
+      const exists = prev.some((i) => i.id === importedItem.id);
+      if (exists) return prev;
+      return [importedItem, ...prev];
+    });
+    handleEquip(importedItem);
+    return importedItem;
+  };
+
+  const handleImportOutfit = (outfit) => {
+    const allItems = [outfit.upper, outfit.lower, ...outfit.items].filter(Boolean);
+    const newItems = allItems.filter(i => i.source !== 'default');
+    setCustomItems(prev => {
+      const existingIds = new Set(prev.map(i => i.id));
+      const filteredNew = newItems.filter(i => !existingIds.has(i.id)).map(i => ({...i, source: 'imported'}));
+      return [...filteredNew, ...prev];
+    });
+    if (outfit.upper) setEquippedUpperId(outfit.upper.id);
+    if (outfit.lower) setEquippedLowerId(outfit.lower.id);
+    if (outfit.items) setEquippedAccessoryIds(outfit.items.map(i => i.id));
+    if (outfit.layerOrder) setEquippedLayerOrder(outfit.layerOrder);
+  };
+
+  const renderGalleryTab = () => {
+    return (
+      <div className="galleryContainer">
+        <div style={{ position: 'absolute', top: '-5000px', left: '-5000px' }}>
+          <div ref={galleryCaptureRef} className="homeCaptureCard" style={{ width: '800px', height: '600px' }}>
+             <div className="homeCaptureInner">
+               <div className="homeLeftCol">
+                 {renderAvatarLayers('homeAvatarStage')}
+               </div>
+             </div>
+          </div>
+        </div>
+        <header className="galleryHeader">
+          <div className="galleryTitleArea">
+            <h2 className="sectionTitle">みんなのコーデギャラリー</h2>
+            <p className="sectionHint">オシャレなコーデを参考にしたり、自分のコーデを自慢しちゃおう！</p>
+          </div>
+          <button className="primaryButton" onClick={() => setShowPostDialog(true)}>
+            自分のコーデを投稿する
+          </button>
+        </header>
+        {isFetchingGallery ? (
+          <div className="galleryLoading">
+            <div className="loadingSpinner" />
+            <p>ギャラリーを読み込み中...</p>
+          </div>
+        ) : galleryPosts.length === 0 ? (
+          <div className="galleryEmpty">
+            <p>まだ投稿がないみたい。一番乗りに投稿してみない？</p>
+          </div>
+        ) : (
+          <div className="galleryGrid">
+            {galleryPosts.map((post) => (
+              <div key={post.id} className="galleryCard">
+                <div className="galleryCardImage">
+                  <img src={post.preview_image_url} alt={post.concept} crossOrigin="anonymous" />
+                  {post.is_distributable && <div className="distributableBadge">配布OK</div>}
+                </div>
+                <div className="galleryCardInfo">
+                  <div className="galleryCardHeader">
+                    <span className="galleryPostNickname">{post.nickname}</span>
+                    <span className="galleryPostDate">{new Date(post.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <p className="galleryPostConcept">{post.concept || 'コンセプトなし'}</p>
+                  <div className="galleryCardActions">
+                    {post.is_distributable ? (
+                      <button className="secondaryButton small" onClick={() => {
+                        handleImportOutfit(post.outfit_data);
+                        setNotification(`${post.nickname}さんのコーデにお着替えしたよ！`);
+                      }}>おそろいにする</button>
+                    ) : (
+                      <span className="鑑賞用Badge">鑑賞用</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const handlePostToGallery = async () => {
+    if (!nickname.trim()) {
+      setNotification('ニックネームを入力してね');
+      return;
+    }
+    setIsPosting(true);
+    try {
+      const canvas = await html2canvas(galleryCaptureRef.current, { backgroundColor: null, scale: 2, useCORS: true });
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      const fileName = `gallery/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
+      const { error: uploadError } = await supabase.storage.from('clothes').upload(fileName, blob);
+      if (uploadError) throw uploadError;
+      const { data: publicUrlData } = supabase.storage.from('clothes').getPublicUrl(fileName);
+      const outfitData = {
+        nickname,
+        concept,
+        items: equippedAccessoryIds.map(id => accessoryItems.find(i => i.id === id)).filter(Boolean),
+        upper: equippedUpper,
+        lower: equippedLower,
+        base: equippedBase,
+        layerOrder: equippedLayerOrder
+      };
+      const { error: postError } = await supabase.from('posts').insert([{
+        nickname,
+        concept,
+        preview_image_url: publicUrlData.publicUrl,
+        outfit_data: outfitData,
+        is_distributable: isDistributable
+      }]);
+      if (postError) throw postError;
+      setNotification('ギャラリーに投稿したよ！ありがとう！');
+      setShowPostDialog(false);
+      fetchGallery();
+    } catch (error) {
+      console.error('Post error:', error);
+      setNotification(`投稿に失敗しちゃった: ${error.message}`);
+    } finally {
+      setIsPosting(false);
+    }
+  };
 
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
@@ -1357,6 +1530,20 @@ export default function App() {
       }))
       .filter((entry) => entry.item)
   }, [equippedLower, equippedUpper, equippedAccessories, equippedLayerOrder])
+
+  // --- Gallery Distribution Restriction ---
+  const hasImportedItems = useMemo(() => {
+    const allEquipped = [equippedUpper, equippedLower, ...equippedAccessories].filter(Boolean);
+    return allEquipped.some(item => item.source === 'imported');
+  }, [equippedUpper, equippedLower, equippedAccessories]);
+
+  useEffect(() => {
+    if (hasImportedItems) {
+      setIsDistributable(false);
+    } else {
+      setIsDistributable(true);
+    }
+  }, [hasImportedItems, showPostDialog]);
 
   const qrPreviewUpper = selectedQrItem?.category === 'upper' ? selectedQrItem : null
   const qrPreviewLower = selectedQrItem?.category === 'lower' ? selectedQrItem : null
@@ -1670,6 +1857,55 @@ export default function App() {
     }
   }
 
+  const qrValue = useMemo(() => {
+    if (!selectedQrItem) return ''
+    const payload = { kind: 'cloth-item', item: selectedQrItem }
+    const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    return `${window.location.origin}${window.location.pathname}?item=${base64}`;
+  }, [selectedQrItem])
+
+  const handleReadQrImage = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setQrMessage('読み込み中…')
+    try {
+      const reader = new BrowserMultiFormatReader()
+      const result = await reader.decodeFromImageUrl(URL.createObjectURL(file))
+      handleScan(result.getText())
+    } catch (error) {
+      setQrMessage('QRコードが見つからなかったよ')
+    }
+  }
+
+  const handleScan = (data) => {
+    if (data) {
+      try {
+        let parsed;
+        if (data.startsWith('http')) {
+          const url = new URL(data);
+          const outfitBase64 = url.searchParams.get('outfit');
+          const itemBase64 = url.searchParams.get('item');
+          const base64 = outfitBase64 || itemBase64;
+          if (!base64) throw new Error('データが見つからないよ');
+          parsed = JSON.parse(decodeURIComponent(escape(atob(base64))));
+        } else {
+          parsed = JSON.parse(data);
+        }
+
+        if (parsed.kind === 'cloth-item') {
+          const item = handleImportItem(parsed.item);
+          setQrMessage(`「${item.name}」を読み込んだよ`)
+        } else if (parsed.kind === 'outfit') {
+          handleImportOutfit(parsed.outfit);
+          setQrMessage(`${parsed.outfit.nickname}さんのコーデを読み込んだよ`)
+        }
+      } catch (error) {
+        setQrMessage(error.message || 'QRが読み取れなかったよ')
+      }
+    }
+  }
+
   const handleDeleteCustomItem = (itemId) => {
     const target = customItems.find((item) => item.id === itemId)
     if (!target) return
@@ -1729,60 +1965,7 @@ export default function App() {
     setEquippedLayerOrder(['base', ...movedVisible])
   }
 
-  const handleReadQrImage = async (event) => {
-    const file = event.target.files?.[0]
-    if (!file) return
 
-    setQrMessage('QRを読み取り中…')
-
-    const objectUrl = URL.createObjectURL(file)
-    const image = new Image()
-    image.crossOrigin = 'anonymous'
-    const reader = new BrowserMultiFormatReader()
-
-    image.onload = async () => {
-      try {
-        const result = await reader.decodeFromImageElement(image)
-        const text = result.getText()
-        const parsed = JSON.parse(text)
-
-        if (parsed?.app !== 'kisekae-web' || parsed?.kind !== 'cloth-item') {
-          throw new Error('このQRは服データじゃないよ')
-        }
-
-        const importedItem = normalizeImportedItem(parsed.item)
-        if (!importedItem) {
-          throw new Error('QRのデータ形式が正しくないよ')
-        }
-
-        setCustomItems((prev) => {
-          const exists = prev.some((item) => item.id === importedItem.id)
-          if (exists) return prev
-          return [importedItem, ...prev]
-        })
-
-        handleEquip(importedItem)
-        setClosetTab(importedItem.category)
-        setSelectedQrItemId(null)
-        setQrMessage(`「${importedItem.name}」を読み込んだよ`)
-      } catch (error) {
-        setQrMessage(error.message || 'QRが読み取れなかったよ')
-      } finally {
-        URL.revokeObjectURL(objectUrl)
-        event.target.value = ''
-        if (qrReadInputRef.current) qrReadInputRef.current.value = ''
-      }
-    }
-
-    image.onerror = () => {
-      setQrMessage('画像が読み込めなかったよ')
-      URL.revokeObjectURL(objectUrl)
-      event.target.value = ''
-      if (qrReadInputRef.current) qrReadInputRef.current.value = ''
-    }
-
-    image.src = objectUrl
-  }
 
   const handleResetDress = () => {
     setEquippedUpperId(DEFAULT_SAVE.equippedUpperId)
@@ -1811,20 +1994,7 @@ export default function App() {
     setEquippedLayerOrder(DEFAULT_LAYER_ORDER)
   }
 
-  const qrValue = selectedQrItem
-    ? JSON.stringify({
-      app: 'kisekae-web',
-      kind: 'cloth-item',
-      item: {
-        id: selectedQrItem.id,
-        name: selectedQrItem.name,
-        category: selectedQrItem.category,
-        imageUrl: selectedQrItem.imageUrl,
-        creatorName: getDisplayCreatorName(selectedQrItem),
-        creatorUrl: selectedQrItem.creatorUrl || '',
-      },
-    })
-    : ''
+
 
   const renderAvatarLayers = (stageClassName = 'characterStage', enableDrop = false) => {
     const backAccessories = equippedAccessories.filter((item) => isBackAccessory(item))
@@ -2271,6 +2441,59 @@ export default function App() {
           </div>
         </div>
       )}
+      {urlParamNotice && (
+        <div className="noticeOverlay">
+          <div className="noticeCard">
+            <div className="noticeIcon">💡</div>
+            <div className="noticeContent">
+              <h3 className="noticeTitle">おしらせ</h3>
+              <p className="noticeText">{urlParamNotice}</p>
+              <button className="primaryButton" onClick={() => setUrlParamNotice(null)}>OK</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPostDialog && (
+        <div className="noticeOverlay">
+          <div className="noticeCard postDialog">
+            <div className="noticeContent">
+              <h3 className="noticeTitle">ギャラリーに投稿する</h3>
+              <p className="noticeText">今のコーディネートをギャラリーに公開します。ニックネームとコンセプトを確認してね。</p>
+              <div className="formGrid">
+                <label className="fieldLabel">
+                  ニックネーム
+                  <input className="textInput" type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
+                </label>
+                <label className="fieldLabel">
+                  コンセプト
+                  <textarea className="textArea" value={concept} onChange={(e) => setConcept(e.target.value)} maxLength={40} />
+                </label>
+                <label className={`checkboxLabel ${hasImportedItems ? 'disabled' : ''}`}>
+                  <input 
+                    type="checkbox" 
+                    checked={isDistributable} 
+                    onChange={(e) => setIsDistributable(e.target.checked)} 
+                    disabled={hasImportedItems}
+                  />
+                  <span>他の人がこのコーデを着るのを許可する（配布あり）</span>
+                </label>
+                {hasImportedItems && (
+                  <p className="restrictionWarning">
+                    ⚠️ 他の方の服が含まれているため、配布なし（鑑賞用）として公開されます。
+                  </p>
+                )}
+              </div>
+              <div className="dialogActions">
+                <button className="secondaryButton" onClick={() => setShowPostDialog(false)} disabled={isPosting}>キャンセル</button>
+                <button className="primaryButton" onClick={handlePostToGallery} disabled={isPosting}>
+                  {isPosting ? '投稿中...' : 'ギャラリーに公開！'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {clickParticles.map(p => (
         <div key={p.id} className="magic-particle" style={{ left: p.x, top: p.y, '--tx': p.tx, '--ty': p.ty }} />
       ))}
@@ -2357,6 +2580,9 @@ export default function App() {
             </button>
             <button className={`tabButton ${activeTab === 'qr' ? 'active' : ''}`} onClick={() => setActiveTab('qr')}>
               QR
+            </button>
+            <button className={`tabButton ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => setActiveTab('gallery')}>
+              ギャラリー
             </button>
             <button className={`tabButton ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
               設定
@@ -2836,6 +3062,8 @@ export default function App() {
               </section>
             </div>
           )}
+
+          {activeTab === 'gallery' && renderGalleryTab()}
 
           {activeTab === 'settings' && (
             <div className="settingsLayoutWide">
