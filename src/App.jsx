@@ -1130,6 +1130,29 @@ export default function App() {
   const [isDistributable, setIsDistributable] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
   const galleryCaptureRef = useRef(null);
+  const [myPostIds, setMyPostIds] = useState(() => {
+    const saved = localStorage.getItem('myGalleryPostIds');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('myGalleryPostIds', JSON.stringify(myPostIds));
+  }, [myPostIds]);
+
+  const handleDeletePost = async (postId) => {
+    const ok = window.confirm('この投稿をギャラリーから削除してもいい？');
+    if (!ok) return;
+    try {
+      const { error } = await supabase.from('posts').delete().eq('id', postId);
+      if (error) throw error;
+      setNotification('投稿を削除したよ');
+      setMyPostIds(prev => prev.filter(id => id !== postId));
+      fetchGallery();
+    } catch (error) {
+      console.error('Delete error:', error);
+      setNotification(`削除に失敗したよ: ${error.message}`);
+    }
+  };
 
   const fetchGallery = async () => {
     setIsFetchingGallery(true);
@@ -1183,7 +1206,7 @@ export default function App() {
   const renderGalleryTab = () => {
     return (
       <div className="galleryContainer">
-        <div style={{ position: 'absolute', top: '-5000px', left: '-5000px' }}>
+        <div style={{ position: 'fixed', top: '-10000px', left: '-10000px', visibility: 'hidden', opacity: 0, pointerEvents: 'none', zIndex: -1 }}>
           <div ref={galleryCaptureRef} className="homeCaptureCard" style={{ width: '800px', height: '600px' }}>
              <div className="homeCaptureInner">
                <div className="homeLeftCol">
@@ -1233,6 +1256,9 @@ export default function App() {
                     ) : (
                       <span className="鑑賞用Badge">鑑賞用</span>
                     )}
+                    {myPostIds.includes(post.id) && (
+                      <button className="dangerButton small" style={{ marginLeft: 'auto' }} onClick={() => handleDeletePost(post.id)}>削除</button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1265,14 +1291,15 @@ export default function App() {
         base: equippedBase,
         layerOrder: equippedLayerOrder
       };
-      const { error: postError } = await supabase.from('posts').insert([{
+      const { data: newPost, error: postError } = await supabase.from('posts').insert([{
         nickname,
         concept,
         preview_image_url: publicUrlData.publicUrl,
         outfit_data: outfitData,
         is_distributable: isDistributable
-      }]);
+      }]).select('id').single();
       if (postError) throw postError;
+      if (newPost) setMyPostIds(prev => [newPost.id, ...prev]);
       setNotification('ギャラリーに投稿したよ！ありがとう！');
       setShowPostDialog(false);
       fetchGallery();
