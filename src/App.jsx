@@ -2152,30 +2152,59 @@ export default function App() {
 
   // --- Drag Event Handlers for Global Cursor Fix ---
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
+  const [isDraggingCustom, setIsDraggingCustom] = useState(false);
+
+  const handleGlobalMouseDown = (e) => {
+    const target = e.target;
+    if (target.closest('.itemCard, .dragHandle, [draggable="true"]')) {
+      setIsDraggingCustom(true);
+      setDragPos({ x: e.clientX, y: e.clientY });
+      document.documentElement.classList.add('is-dragging-custom');
+      document.body.classList.add('is-dragging-custom');
+    }
+  };
+
+  const handleGlobalMouseUp = () => {
+    setIsDraggingCustom(false);
+    document.documentElement.classList.remove('is-dragging-custom');
+    document.body.classList.remove('is-dragging-custom');
+  };
+
   const handleDragStart = (e) => {
+    setIsDraggingCustom(true);
     document.documentElement.classList.add('is-dragging-custom');
     document.body.classList.add('is-dragging-custom');
   };
 
   const handleDragMoveGlobal = (e) => {
-    if (document.body.classList.contains('is-dragging-custom')) {
+    if (isDraggingCustom) {
       setDragPos({ x: e.clientX, y: e.clientY });
     }
   };
 
   const handleDragEndGlobal = () => {
+    setIsDraggingCustom(false);
     document.documentElement.classList.remove('is-dragging-custom');
     document.body.classList.remove('is-dragging-custom');
   };
 
   useEffect(() => {
-    window.addEventListener('mousemove', handleDragMoveGlobal);
-    return () => window.removeEventListener('mousemove', handleDragMoveGlobal);
-  }, []);
+    window.addEventListener('mousedown', handleGlobalMouseDown);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    if (isDraggingCustom) {
+      window.addEventListener('mousemove', handleDragMoveGlobal);
+    }
+    return () => {
+      window.removeEventListener('mousedown', handleGlobalMouseDown);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+      window.removeEventListener('mousemove', handleDragMoveGlobal);
+    };
+  }, [isDraggingCustom]);
 
   return (
     <div
       className={`appShell ${activeTab === 'closet' ? 'closet-open' : ''}`}
+      onMouseUp={handleGlobalMouseUp}
       onClick={handleGlobalClick}
       onDragOver={(e) => e.preventDefault()}
       onDragEnter={(e) => e.preventDefault()}
@@ -2208,7 +2237,7 @@ export default function App() {
           backgroundRepeat: 'no-repeat',
           pointerEvents: 'none',
           zIndex: 1000000,
-          display: document.body?.classList.contains('is-dragging-custom') ? 'block' : 'none',
+          display: isDraggingCustom ? 'block' : 'none',
           transform: 'translate(0, 0)' // Top-left as requested
         }}
       />

@@ -15,12 +15,12 @@
 
 html, body, * {
   box-sizing: border-box;
-  /* Use a higher cache-busting version v=4 */
-  cursor: url('/images/cursor.png?v=4') 0 0, auto !important;
+  /* Use a higher cache-busting version v=5 */
+  cursor: url('/images/cursor.png?v=5') 0 0, auto !important;
 }
 
 button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
-  cursor: url('/images/cursor_hover.png?v=4') 0 0, pointer !important;
+  cursor: url('/images/cursor_hover.png?v=5') 0 0, pointer !important;
 }
 
 /* Force custom cursor during drag-and-drop aggressively */
@@ -1041,6 +1041,24 @@ button, .itemCard, .dragHandle, a {
 }
 
 @media (max-width: 820px) {
+  /* High-priority Mobile Layout Fix for Closet Open */
+  .appShell.closet-open {
+    padding-bottom: 500px !important;
+  }
+  
+  .closet-open .appFrame {
+    transform: translateY(-40px) !important;
+  }
+
+  /* Version 5 Cursor Cache Busting */
+  html, body, * {
+    cursor: url('/images/cursor.png?v=5') 0 0, auto !important;
+  }
+  
+  button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
+    cursor: url('/images/cursor_hover.png?v=5') 0 0, pointer !important;
+  }
+
   .appShell {
     padding: 16px;
   }
