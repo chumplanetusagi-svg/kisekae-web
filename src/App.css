@@ -23,10 +23,18 @@ button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [ro
   cursor: url('/images/cursor_hover.png?v=3') 0 0, pointer !important;
 }
 
-/* Force custom cursor during drag-and-drop */
+/* Force custom cursor during drag-and-drop aggressively */
 .itemCard[draggable="true"]:active,
 .dragHandle:active,
+[draggable="true"]:active,
+body:active,
 body:active * {
+  cursor: url('/images/cursor_hover.png?v=3') 0 0, grabbing !important;
+}
+
+/* Specific fix for dnd-kit and general browser drag states */
+[aria-pressed="true"],
+.grabbing {
   cursor: url('/images/cursor_hover.png?v=3') 0 0, grabbing !important;
 }
 
