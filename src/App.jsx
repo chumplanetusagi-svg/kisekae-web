@@ -2200,6 +2200,40 @@ export default function App() {
     document.body.classList.remove('is-dragging-custom');
   };
 
+  // --- Character Preview Sticky Support via JS (for Desktop) ---
+  const [closetPreviewTop, setClosetPreviewTop] = useState(0);
+
+  useEffect(() => {
+    if (activeTab !== 'closet') return;
+
+    const handleScroll = () => {
+      if (window.innerWidth <= 820) return; // Only for desktop
+      
+      const scrollTop = window.scrollY;
+      const closetContainer = document.querySelector('.closetLayout');
+      if (!closetContainer) return;
+
+      const containerRect = closetContainer.getBoundingClientRect();
+      const containerTop = containerRect.top + window.scrollY;
+      
+      // Calculate how much to offset the preview relative to its column
+      let offset = Math.max(0, scrollTop - containerTop + 24);
+      
+      // Don't let it scroll past the bottom of the right column
+      const rightCol = document.querySelector('.rightColumn');
+      if (rightCol) {
+        const maxOffset = rightCol.offsetHeight - 540; // Approx height of preview card
+        offset = Math.min(offset, Math.max(0, maxOffset));
+      }
+
+      setClosetPreviewTop(offset);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [activeTab, closetTab]);
+
   useEffect(() => {
     window.addEventListener('mousedown', handleGlobalMouseDown);
     window.addEventListener('mouseup', handleGlobalMouseUp);
@@ -2458,7 +2492,14 @@ export default function App() {
 
           {activeTab === 'closet' && (
             <div className="closetLayout">
-              <section ref={desktopClosetPreviewRef} className="leftColumn closetDesktopPreview">
+              <section 
+                ref={desktopClosetPreviewRef} 
+                className="leftColumn closetDesktopPreview"
+                style={{ 
+                  transform: `translateY(${closetPreviewTop}px)`,
+                  transition: 'transform 0.05s ease-out' 
+                }}
+              >
                 <div className="mainCard previewCard">
                   {renderAvatarLayers('characterStage smallStage', true)}
                   <div className="namePlate compact">{nickname || DEFAULT_NICKNAME}</div>
