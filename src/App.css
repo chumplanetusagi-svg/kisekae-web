@@ -37,7 +37,8 @@ body.is-dragging-custom *,
   cursor: none !important;
 }
 
-/* Nuclear option: If the html has the dragging class, hide cursor on EVERYTHING */
+/* Nuclear option: If the html has the dragging class, hide cursor on EVERYTHING including the root */
+html.is-dragging-custom,
 html.is-dragging-custom * {
   cursor: none !important;
 }
