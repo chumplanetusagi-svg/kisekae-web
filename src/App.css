@@ -28,10 +28,17 @@ html.is-dragging-custom,
 html.is-dragging-custom *,
 body.is-dragging-custom,
 body.is-dragging-custom *,
+[data-dnd-kit-drag-overlay],
+[data-dnd-kit-drag-overlay] *,
 .itemCard[draggable="true"]:active,
 .dragHandle:active,
 [draggable="true"]:active {
   /* Hide native cursor during drag to use the React follower (bypasses browser drag restrictions) */
+  cursor: none !important;
+}
+
+/* Nuclear option: If the html has the dragging class, hide cursor on EVERYTHING */
+html.is-dragging-custom * {
   cursor: none !important;
 }
 
@@ -41,7 +48,8 @@ body.is-dragging-custom *,
 
 /* Specific fix for dnd-kit and general browser drag states */
 [aria-pressed="true"],
-.grabbing {
+.grabbing,
+.is-dragging-custom {
   cursor: none !important;
 }
 
