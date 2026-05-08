@@ -2226,16 +2226,9 @@ export default function App() {
 
       // --- Desktop Logic (Wider screens) ---
       if (window.innerWidth > 800) {
-        const rightCol = document.querySelector('.rightColumn');
-        const previewEl = document.querySelector('.closetDesktopPreview');
-        
-        if (rightCol && previewEl) {
-          let offset = Math.max(0, scrollTop - containerTop + 24);
-          // Calculate max offset based on the actual height of the items list
-          const maxOffset = rightCol.offsetHeight - previewEl.offsetHeight;
-          offset = Math.min(offset, Math.max(0, maxOffset));
-          setClosetPreviewTop(offset);
-        }
+        // We will now use CSS sticky for better reliability on PC
+        // so we don't need to manually calculate closetPreviewTop here.
+        setClosetPreviewTop(0); 
       } else {
         // --- Mobile Logic ---
         // Stick to top with some margin
@@ -2287,7 +2280,7 @@ export default function App() {
         zIndex: 2000000,
         boxShadow: '0 4px 20px rgba(0,0,0,0.8)'
       }}>
-        【更新確認用】PC追従・羊皮紙通知 修正版 (14:00)
+        【更新確認用】PC追従・羊皮紙通知 修正版 (14:05)
       </div>
       {clickParticles.map(p => (
         <div key={p.id} className="magic-particle" style={{ left: p.x, top: p.y, '--tx': p.tx, '--ty': p.ty }} />

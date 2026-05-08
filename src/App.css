@@ -94,8 +94,7 @@ a {
   position: relative;
   z-index: 1;
   font-family: 'Shippori Mincho', serif;
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  overflow-y: auto;
+  overflow: visible !important; /* CRITICAL for sticky to work */
 }
 
 button, .itemCard, .dragHandle, a {
@@ -1708,8 +1707,10 @@ button, .itemCard, .dragHandle, a {
 
   .closetDesktopPreview {
     display: block !important;
-    position: relative !important; /* JS handles the movement */
+    position: sticky !important;
+    top: 24px;
     z-index: 100;
+    align-self: start;
   }
 }
 
