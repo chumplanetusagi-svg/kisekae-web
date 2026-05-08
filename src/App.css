@@ -435,13 +435,15 @@ button, .itemCard, .dragHandle, a {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
-  align-items: start;
+  align-items: stretch; /* Ensure left column is as tall as the right column */
   overflow: visible !important;
 }
 
 .leftColumn {
   position: relative;
   width: 340px;
+  display: flex;
+  flex-direction: column;
   overflow: visible !important;
 }
 
@@ -1329,7 +1331,7 @@ button, .itemCard, .dragHandle, a {
     display: block !important;
     position: -webkit-sticky !important;
     position: sticky !important;
-    top: 8px !important;
+    top: 4px !important; /* Slightly more space */
     z-index: 2000 !important;
     margin: 0 0 16px;
     pointer-events: none;
