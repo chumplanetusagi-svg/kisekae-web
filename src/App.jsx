@@ -2177,9 +2177,14 @@ export default function App() {
   };
 
   const handleDragMoveGlobal = (e) => {
-    if (isDraggingCustom) {
-      setDragPos({ x: e.clientX, y: e.clientY });
-    }
+    // During native drag, mousemove is often blocked. Use clientX from drag events if possible.
+    // However, window.dragover is the most reliable way during dnd-kit or native drags.
+    setDragPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleGlobalDragOver = (e) => {
+    e.preventDefault(); // Necessary for dragover to work
+    setDragPos({ x: e.clientX, y: e.clientY });
   };
 
   const handleDragEndGlobal = () => {
@@ -2193,11 +2198,13 @@ export default function App() {
     window.addEventListener('mouseup', handleGlobalMouseUp);
     if (isDraggingCustom) {
       window.addEventListener('mousemove', handleDragMoveGlobal);
+      window.addEventListener('dragover', handleGlobalDragOver);
     }
     return () => {
       window.removeEventListener('mousedown', handleGlobalMouseDown);
       window.removeEventListener('mouseup', handleGlobalMouseUp);
       window.removeEventListener('mousemove', handleDragMoveGlobal);
+      window.removeEventListener('dragover', handleGlobalDragOver);
     };
   }, [isDraggingCustom]);
 

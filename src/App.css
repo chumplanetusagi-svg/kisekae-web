@@ -15,12 +15,12 @@
 
 html, body, * {
   box-sizing: border-box;
-  /* Use a higher cache-busting version v=5 */
-  cursor: url('/images/cursor.png?v=5') 0 0, auto !important;
+  /* Use a higher cache-busting version v=6 */
+  cursor: url('/images/cursor.png?v=6') 0 0, auto !important;
 }
 
 button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
-  cursor: url('/images/cursor_hover.png?v=5') 0 0, pointer !important;
+  cursor: url('/images/cursor_hover.png?v=6') 0 0, pointer !important;
 }
 
 /* Force custom cursor during drag-and-drop aggressively */
@@ -46,12 +46,15 @@ body:active * {
 /* Closet Open Layout Fixes - Push the main character area down/adjust */
 .appShell.closet-open {
   transition: all 0.3s ease;
-  padding-bottom: 400px; /* Make room for the closet at the bottom */
+  padding-bottom: 200px; /* Adjusted padding */
 }
 
-/* Ensure character stage shifts when closet is open */
-.closet-open .appFrame {
-  transform: translateY(-20px);
+/* Ensure character stage stays in view while scrolling through clothes */
+.closetDesktopPreview,
+.mobileClosetFollowCard {
+  position: sticky !important;
+  top: 24px;
+  z-index: 100;
 }
 
 html,
