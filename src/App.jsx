@@ -1139,20 +1139,26 @@ export default function App() {
     localStorage.setItem('myGalleryPostIds', JSON.stringify(myPostIds));
   }, [myPostIds]);
 
-  const handleDeletePost = async (postId) => {
-    // カスタムカーソルの「クリック中（消去）」状態を解除するため、一瞬だけ待ってからダイアログを出す
-    await new Promise(resolve => setTimeout(resolve, 50));
-    const ok = window.confirm('この投稿をギャラリーから削除してもいい？');
-    if (!ok) return;
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+
+  const handleDeletePost = (postId) => {
+    // window.confirmを廃止し、カスタムダイアログを表示
+    setDeleteConfirmId(postId);
+  };
+
+  const executeDeletePost = async () => {
+    if (!deleteConfirmId) return;
     try {
-      const { error } = await supabase.from('posts').delete().eq('id', postId);
+      const { error } = await supabase.from('posts').delete().eq('id', deleteConfirmId);
       if (error) throw error;
       setNotification('投稿を削除したよ');
-      setMyPostIds(prev => prev.filter(id => id !== postId));
+      setMyPostIds(prev => prev.filter(id => id !== deleteConfirmId));
       fetchGallery();
     } catch (error) {
       console.error('Delete error:', error);
       setNotification(`削除に失敗したよ: ${error.message}`);
+    } finally {
+      setDeleteConfirmId(null);
     }
   };
 
@@ -2521,6 +2527,21 @@ export default function App() {
                 <button className="primaryButton" onClick={handlePostToGallery} disabled={isPosting}>
                   {isPosting ? '投稿中...' : 'ギャラリーに公開！'}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmId && (
+        <div className="noticeOverlay">
+          <div className="noticeCard deleteDialog">
+            <div className="noticeContent">
+              <h3 className="noticeTitle" style={{ color: '#ff6b6b' }}>投稿を削除しますか？</h3>
+              <p className="noticeText">この操作は取り消せません。本当に削除してもよろしいですか？</p>
+              <div className="dialogActions">
+                <button className="secondaryButton" onClick={() => setDeleteConfirmId(null)}>キャンセル</button>
+                <button className="primaryButton danger" onClick={executeDeletePost}>削除する</button>
               </div>
             </div>
           </div>

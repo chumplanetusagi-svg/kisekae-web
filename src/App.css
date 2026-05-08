@@ -35,6 +35,10 @@ body.is-dragging-custom *,
   cursor: none !important;
 }
 
+.primaryButton.danger {
+  background: linear-gradient(135deg, #7a3131 0%, #4a1919 100%);
+}
+
 /* Specific fix for dnd-kit and general browser drag states */
 [aria-pressed="true"],
 .grabbing {
