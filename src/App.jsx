@@ -1122,6 +1122,7 @@ export default function App() {
   }, []);
   const [clickParticles, setClickParticles] = useState([])
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [isMouseDown, setIsMouseDown] = useState(false)
 
   // --- Gallery State & Fetching ---
   const [galleryPosts, setGalleryPosts] = useState([]);
@@ -1330,8 +1331,17 @@ export default function App() {
       document.documentElement.style.setProperty('--my', `${y}px`)
       setMousePos({ x: e.clientX, y: e.clientY })
     }
+    const handleGlobalMouseDown = () => setIsMouseDown(true)
+    const handleGlobalMouseUp = () => setIsMouseDown(false)
+
     window.addEventListener('mousemove', handleGlobalMouseMove)
-    return () => window.removeEventListener('mousemove', handleGlobalMouseMove)
+    window.addEventListener('mousedown', handleGlobalMouseDown)
+    window.addEventListener('mouseup', handleGlobalMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove)
+      window.removeEventListener('mousedown', handleGlobalMouseDown)
+      window.removeEventListener('mouseup', handleGlobalMouseUp)
+    }
   }, [])
 
   useEffect(() => {
@@ -2547,6 +2557,19 @@ export default function App() {
           </div>
         </div>
       )}
+      <div 
+        className="magic-cursor" 
+        style={{ 
+          left: mousePos.x, 
+          top: mousePos.y,
+          transform: `translate(-50%, -50%) scale(${isDraggingCustom || isMouseDown ? 1.2 : 1})`,
+          opacity: isPosting ? 0 : 1
+        }}
+      >
+        <div className="magic-cursor-inner">
+          <img src={isDraggingCustom || isMouseDown ? "/images/cursor_hover.png" : "/images/cursor.png"} alt="" />
+        </div>
+      </div>
       {clickParticles.map(p => (
         <div key={p.id} className="magic-particle" style={{ left: p.x, top: p.y, '--tx': p.tx, '--ty': p.ty }} />
       ))}
@@ -2562,7 +2585,23 @@ export default function App() {
         ))}
       </div>
 
-      </div>
+      {/* Temporary Drag Follower (Only during drag to bypass browser restrictions) */}
+      <div 
+        style={{
+          position: 'fixed',
+          left: dragPos.x,
+          top: dragPos.y,
+          width: '64px',
+          height: '64px',
+          backgroundImage: "url('/images/cursor_hover.png?v=4')",
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          pointerEvents: 'none',
+          zIndex: 1000000,
+          display: isDraggingCustom ? 'block' : 'none',
+          transform: 'translate(0, 0)' // Top-left as requested
+        }}
+      />
 
       <div className="floatingAvatarContainer">
         <img src="/images/gear_bronze.png" className="deco-gear gear-1" style={randomPositions.gears[0]} alt="" />

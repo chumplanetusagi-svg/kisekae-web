@@ -14,26 +14,47 @@
 }
 
 html, body, * {
-  /* Versioning for cache busting */
-  cursor: url('/images/cursor.png?v=10') 0 0, auto !important;
+  box-sizing: border-box;
+  /* Completely hide the native cursor everywhere */
+  cursor: none !important;
 }
 
-/* Change cursor when clicking */
-body:active, 
-body:active *,
-button:active,
-.itemCard:active {
-  cursor: url('/images/cursor_hover.png?v=10') 0 0, pointer !important;
+/* Custom Cursor Follower Styles */
+.magic-cursor {
+  position: fixed;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  z-index: 10000000;
+  transition: transform 0.1s ease-out;
+  mix-blend-mode: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Specific fix for dragging state */
+.magic-cursor-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.magic-cursor img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Force hide native cursor during drag */
 html.is-dragging-custom,
 html.is-dragging-custom *,
 body.is-dragging-custom,
 body.is-dragging-custom *,
 [data-dnd-kit-drag-overlay],
 [data-dnd-kit-drag-overlay] * {
-  cursor: url('/images/cursor_hover.png?v=10') 0 0, grabbing !important;
+  cursor: none !important;
 }
 
 .primaryButton.danger {
