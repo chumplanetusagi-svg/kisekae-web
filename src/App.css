@@ -446,21 +446,23 @@ button, .itemCard, .dragHandle, a {
   overflow: visible !important;
 }
 
+.closetContainer {
+  position: relative;
+  height: calc(100vh - 120px); /* Fill available space */
+  overflow: hidden !important; /* Container doesn't scroll, children do */
+}
+
 .closetLayout {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
-  align-items: stretch !important; /* Force columns to stretch to the same height */
-  overflow: visible !important;
-  min-height: 0;
+  height: 100%;
 }
 
 .leftColumn {
   position: relative;
   width: 340px;
-  overflow: visible !important;
-  display: block;
-  height: 100%; /* Ensure it takes full height of the grid cell */
+  height: 100%;
 }
 
 .rightColumn {
@@ -468,14 +470,17 @@ button, .itemCard, .dragHandle, a {
   flex-direction: column;
   gap: 24px;
   min-width: 0;
+  height: 100%;
+  overflow-y: auto !important; /* Items column scrolls independently */
+  padding-right: 12px;
 }
 
 .closetDesktopPreview {
-  position: -webkit-sticky !important;
-  position: sticky !important;
-  top: 24px !important; /* Slightly more space from top */
+  position: absolute !important; /* Relative to leftColumn */
+  top: 0;
+  left: 0;
+  width: 340px;
   z-index: 100;
-  display: block;
 }
 
 /* Hide scrollbar for aesthetic, but keep functionality */
