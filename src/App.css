@@ -15,29 +15,36 @@
 
 html, body, * {
   box-sizing: border-box;
-  /* Hotspot at Top-Left (0 0) as requested */
-  cursor: url('/images/cursor.png?v=3') 0 0, auto !important;
+  /* Use a higher cache-busting version v=4 */
+  cursor: url('/images/cursor.png?v=4') 0 0, auto !important;
 }
 
 button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
-  cursor: url('/images/cursor_hover.png?v=3') 0 0, pointer !important;
+  cursor: url('/images/cursor_hover.png?v=4') 0 0, pointer !important;
 }
 
 /* Force custom cursor during drag-and-drop aggressively */
+html.is-dragging-custom,
+html.is-dragging-custom *,
+body.is-dragging-custom,
+body.is-dragging-custom *,
 .itemCard[draggable="true"]:active,
 .dragHandle:active,
 [draggable="true"]:active,
 body:active,
-body:active *,
-body.is-dragging-custom,
-body.is-dragging-custom * {
-  cursor: url('/images/cursor_hover.png?v=3') 0 0, grabbing !important;
+body:active * {
+  cursor: url('/images/cursor_hover.png?v=4') 0 0, grabbing !important;
 }
 
 /* Specific fix for dnd-kit and general browser drag states */
 [aria-pressed="true"],
 .grabbing {
-  cursor: url('/images/cursor_hover.png?v=3') 0 0, grabbing !important;
+  cursor: url('/images/cursor_hover.png?v=4') 0 0, grabbing !important;
+}
+
+/* Closet Open Layout Fixes */
+.appShell.closet-open {
+  transition: padding 0.3s ease;
 }
 
 html,

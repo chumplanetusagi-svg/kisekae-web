@@ -2150,6 +2150,17 @@ export default function App() {
     )
   }
 
+  // --- Drag Event Handlers for Global Cursor Fix ---
+  const handleDragStart = () => {
+    document.documentElement.classList.add('is-dragging-custom');
+    document.body.classList.add('is-dragging-custom');
+  };
+
+  const handleDragEndGlobal = () => {
+    document.documentElement.classList.remove('is-dragging-custom');
+    document.body.classList.remove('is-dragging-custom');
+  };
+
   return (
     <div
       className={`appShell ${activeTab === 'closet' ? 'closet-open' : ''}`}
