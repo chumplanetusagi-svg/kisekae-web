@@ -435,16 +435,12 @@ button, .itemCard, .dragHandle, a {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
-  align-items: stretch; /* Ensure left column is as tall as the right column */
-  overflow: visible !important;
+  align-items: stretch;
 }
 
 .leftColumn {
   position: relative;
   width: 340px;
-  display: flex;
-  flex-direction: column;
-  overflow: visible !important;
 }
 
 .rightColumn {
@@ -457,7 +453,7 @@ button, .itemCard, .dragHandle, a {
 .closetDesktopPreview {
   position: -webkit-sticky !important;
   position: sticky !important;
-  top: 24px;
+  top: 20px;
   z-index: 100;
   align-self: flex-start;
 }
@@ -1329,13 +1325,11 @@ button, .itemCard, .dragHandle, a {
 
   .mobileClosetFollowCard {
     display: block !important;
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 4px !important; /* Slightly more space */
-    z-index: 2000 !important;
+    position: relative !important; /* No longer sticky */
+    top: auto !important;
+    z-index: 10 !important;
     margin: 0 0 16px;
-    pointer-events: none;
-    overflow: visible !important;
+    pointer-events: auto;
   }
   
   /* Reset padding that was used for fixed preview */
