@@ -33,18 +33,25 @@ body.is-dragging-custom *,
 [draggable="true"]:active,
 body:active,
 body:active * {
-  cursor: url('/images/cursor_hover.png?v=4') 0 0, grabbing !important;
+  /* Hide native cursor during drag to use the React follower (bypasses browser drag restrictions) */
+  cursor: none !important;
 }
 
 /* Specific fix for dnd-kit and general browser drag states */
 [aria-pressed="true"],
 .grabbing {
-  cursor: url('/images/cursor_hover.png?v=4') 0 0, grabbing !important;
+  cursor: none !important;
 }
 
-/* Closet Open Layout Fixes */
+/* Closet Open Layout Fixes - Push the main character area down/adjust */
 .appShell.closet-open {
-  transition: padding 0.3s ease;
+  transition: all 0.3s ease;
+  padding-bottom: 400px; /* Make room for the closet at the bottom */
+}
+
+/* Ensure character stage shifts when closet is open */
+.closet-open .appFrame {
+  transform: translateY(-20px);
 }
 
 html,

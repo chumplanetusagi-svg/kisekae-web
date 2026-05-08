@@ -2151,15 +2151,27 @@ export default function App() {
   }
 
   // --- Drag Event Handlers for Global Cursor Fix ---
-  const handleDragStart = () => {
+  const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
+  const handleDragStart = (e) => {
     document.documentElement.classList.add('is-dragging-custom');
     document.body.classList.add('is-dragging-custom');
+  };
+
+  const handleDragMoveGlobal = (e) => {
+    if (document.body.classList.contains('is-dragging-custom')) {
+      setDragPos({ x: e.clientX, y: e.clientY });
+    }
   };
 
   const handleDragEndGlobal = () => {
     document.documentElement.classList.remove('is-dragging-custom');
     document.body.classList.remove('is-dragging-custom');
   };
+
+  useEffect(() => {
+    window.addEventListener('mousemove', handleDragMoveGlobal);
+    return () => window.removeEventListener('mousemove', handleDragMoveGlobal);
+  }, []);
 
   return (
     <div
@@ -2182,6 +2194,24 @@ export default function App() {
           }} />
         ))}
       </div>
+
+      {/* Temporary Drag Follower (Only during drag to bypass browser restrictions) */}
+      <div 
+        style={{
+          position: 'fixed',
+          left: dragPos.x,
+          top: dragPos.y,
+          width: '64px',
+          height: '64px',
+          backgroundImage: "url('/images/cursor_hover.png?v=4')",
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          pointerEvents: 'none',
+          zIndex: 1000000,
+          display: document.body?.classList.contains('is-dragging-custom') ? 'block' : 'none',
+          transform: 'translate(0, 0)' // Top-left as requested
+        }}
+      />
 
       <div className="floatingAvatarContainer">
         <img src="/images/gear_bronze.png" className="deco-gear gear-1" style={randomPositions.gears[0]} alt="" />
