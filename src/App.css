@@ -103,7 +103,6 @@ a {
   position: relative;
   z-index: 1;
   font-family: 'Shippori Mincho', serif;
-  overflow: visible !important; /* Enable sticky children */
 }
 
 button, .itemCard, .dragHandle, a {
@@ -114,7 +113,6 @@ button, .itemCard, .dragHandle, a {
   margin: 0 auto;
   position: relative;
   z-index: 2;
-  overflow: visible !important; /* Ensure children can stick */
 }
 
 .topHeader {
@@ -429,43 +427,24 @@ button, .itemCard, .dragHandle, a {
 }
 
 .closetContainer {
-  overflow: visible !important;
   position: relative;
-  min-height: min-content;
 }
 
 .closetLayout {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
-  align-items: stretch;
-  overflow: visible !important;
 }
 
 .leftColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  min-width: 0;
   position: relative;
-  height: auto;
-  overflow: visible !important;
-}
-
-.rightColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  min-width: 0;
 }
 
 .closetDesktopPreview {
-  position: -webkit-sticky !important;
-  position: sticky !important;
-  top: 20px; /* Adjusted for better visibility */
+  position: fixed !important;
+  top: 100px;
+  width: 340px;
   z-index: 100;
-  align-self: flex-start;
-  height: fit-content; /* Ensure it doesn't take full height if not needed */
 }
 
 .closetActionCard {
