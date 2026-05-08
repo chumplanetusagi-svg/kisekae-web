@@ -2844,31 +2844,40 @@ button, .itemCard, .dragHandle, a {
   }
 }
 
-/* Gallery Capture Isolation - To prevent leakage and fix centering */
-.gallery-capture-isolated {
-  position: absolute;
-  left: -9999px;
-  top: -9999px;
+/* Clean Capture Room - No gears, no leaks, perfect centering */
+.capture-clean-room {
+  position: fixed;
+  top: -10000px;
+  left: -10000px;
   width: 600px;
   height: 750px;
   overflow: hidden;
-  z-index: -9999;
-  pointer-events: none;
   background: #1a1412;
+  z-index: -9999;
+  display: block !important;
 }
 
-.gallery-capture-inner {
+.capture-canvas-target {
   position: relative;
   width: 600px;
   height: 750px;
-  display: grid;
-  place-items: center;
+  background: #1a1412;
 }
 
-.gallery-avatar-wrapper {
-  position: relative;
+.capture-avatar-fit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 500px;
   height: 500px;
-  transform: scale(1.4);
-  transform-origin: center;
+  transform: translate(-50%, -45%) scale(1.5);
+}
+
+/* Ensure character layers inside capture room are contained */
+.capture-avatar-fit .layerImage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
 }

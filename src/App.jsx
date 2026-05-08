@@ -1206,11 +1206,11 @@ export default function App() {
   const renderGalleryTab = () => {
     return (
       <div className="galleryContainer">
-        {/* 撮影用の隠し要素 (CSSクラスで徹底隔離) */}
-        <div className="gallery-capture-isolated">
-          <div ref={galleryCaptureRef} className="gallery-capture-inner">
-             <div className="gallery-avatar-wrapper">
-               {renderAvatarLayers('galleryAvatarStage')}
+        {/* 撮影用の隠し要素 (徹底隔離＆クリーンルーム) */}
+        <div className="capture-clean-room">
+          <div ref={galleryCaptureRef} className="capture-canvas-target">
+             <div className="capture-avatar-fit">
+               {renderAvatarLayers('capture-avatar-layers')}
              </div>
           </div>
         </div>
