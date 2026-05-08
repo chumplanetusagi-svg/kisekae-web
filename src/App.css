@@ -14,33 +14,26 @@
 }
 
 html, body, * {
-  box-sizing: border-box;
-  /* Use a higher cache-busting version v=6 */
-  cursor: url('/images/cursor.png?v=6') 0 0, auto !important;
+  /* Versioning for cache busting */
+  cursor: url('/images/cursor.png?v=10') 0 0, auto !important;
 }
 
-button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
-  cursor: url('/images/cursor_hover.png?v=6') 0 0, pointer !important;
+/* Change cursor when clicking */
+body:active, 
+body:active *,
+button:active,
+.itemCard:active {
+  cursor: url('/images/cursor_hover.png?v=10') 0 0, pointer !important;
 }
 
-/* Force custom cursor during drag-and-drop aggressively */
+/* Specific fix for dragging state */
 html.is-dragging-custom,
 html.is-dragging-custom *,
 body.is-dragging-custom,
 body.is-dragging-custom *,
 [data-dnd-kit-drag-overlay],
-[data-dnd-kit-drag-overlay] *,
-.itemCard[draggable="true"]:active,
-.dragHandle:active,
-[draggable="true"]:active {
-  /* Hide native cursor during drag to use the React follower (bypasses browser drag restrictions) */
-  cursor: none !important;
-}
-
-/* Nuclear option: If the html has the dragging class, hide cursor on EVERYTHING including the root */
-html.is-dragging-custom,
-html.is-dragging-custom * {
-  cursor: none !important;
+[data-dnd-kit-drag-overlay] * {
+  cursor: url('/images/cursor_hover.png?v=10') 0 0, grabbing !important;
 }
 
 .primaryButton.danger {

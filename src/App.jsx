@@ -2562,23 +2562,7 @@ export default function App() {
         ))}
       </div>
 
-      {/* Temporary Drag Follower (Only during drag to bypass browser restrictions) */}
-      <div 
-        style={{
-          position: 'fixed',
-          left: dragPos.x,
-          top: dragPos.y,
-          width: '64px',
-          height: '64px',
-          backgroundImage: "url('/images/cursor_hover.png?v=4')",
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          pointerEvents: 'none',
-          zIndex: 1000000,
-          display: isDraggingCustom ? 'block' : 'none',
-          transform: 'translate(0, 0)' // Top-left as requested
-        }}
-      />
+      </div>
 
       <div className="floatingAvatarContainer">
         <img src="/images/gear_bronze.png" className="deco-gear gear-1" style={randomPositions.gears[0]} alt="" />
