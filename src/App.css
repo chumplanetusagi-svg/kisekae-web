@@ -68,7 +68,8 @@ body.is-dragging-custom *,
 html,
 body {
   margin: 0;
-  overflow-x: hidden; /* Prevent horizontal scroll from hidden elements */
+  overflow-x: hidden;
+  overflow-y: visible !important; /* Crucial for sticky */
   min-height: 100%;
   font-family: 'Shippori Mincho', serif;
   background: var(--bg);
@@ -431,16 +432,26 @@ button, .itemCard, .dragHandle, a {
   overflow: visible !important;
 }
 
+.closetContainer {
+  position: relative;
+  overflow: visible !important;
+}
+
 .closetLayout {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
   align-items: stretch;
+  overflow: visible !important;
 }
 
 .leftColumn {
   position: relative;
   width: 340px;
+  display: flex;
+  flex-direction: column;
+  overflow: visible !important;
+  min-height: 100%;
 }
 
 .rightColumn {
@@ -1345,10 +1356,13 @@ button, .itemCard, .dragHandle, a {
 
   .mobileClosetFollowCard {
     display: block !important;
-    position: relative !important;
-    z-index: 10 !important;
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 4px !important;
+    z-index: 2000 !important;
     width: 100%;
     margin-bottom: 20px;
+    overflow: visible !important;
   }
   
   .rightColumn {
