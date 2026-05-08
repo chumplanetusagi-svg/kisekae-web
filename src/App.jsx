@@ -2192,31 +2192,13 @@ export default function App() {
           e.dataTransfer.setData('application/json', JSON.stringify(item))
           e.dataTransfer.effectAllowed = 'copy'
 
-          // Hide custom cursor and make native cursor transparent
+          // Show custom cursor during drag (it will follow mouse via mousemove)
           setIsDraggingCustom(true)
-          const transparentCursor = "url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') 0 0, none"
-          document.body.style.setProperty('cursor', transparentCursor, 'important')
-          document.documentElement.style.setProperty('cursor', transparentCursor, 'important')
 
-          const imgEl = e.currentTarget.querySelector('.itemPreview img')
-          if (imgEl) {
-            const clone = imgEl.cloneNode(true)
-            clone.style.position = 'absolute'
-            clone.style.top = '-9999px'
-            clone.style.width = '150px'
-            clone.style.height = '150px'
-            clone.style.objectFit = 'contain'
-            document.body.appendChild(clone)
-
-            // Set the clone as drag image, centered on cursor
-            e.dataTransfer.setDragImage(clone, 75, 75)
-
-            setTimeout(() => {
-              if (document.body.contains(clone)) {
-                document.body.removeChild(clone)
-              }
-            }, 10)
-          }
+          // Use a fully transparent 1x1 ghost image so the browser shows NO native drag image/cursor
+          const ghostImg = new Image()
+          ghostImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+          e.dataTransfer.setDragImage(ghostImg, 0, 0)
         }}
         onDragEnd={() => {
           setIsDraggingCustom(false)
@@ -2590,18 +2572,18 @@ export default function App() {
         ))}
       </div>
 
-      {/* カスタムカーソルの本体 */}
+      {/* カスタムカーソルの本体 - ドラッグ中も表示して白い矢印の代わりになる */}
       <div 
         className="magic-cursor" 
         style={{ 
           left: mousePos.x, 
           top: mousePos.y,
           transform: `translate(-50%, -50%) scale(${isDraggingCustom || isMouseDown ? 1.2 : 1})`,
-          opacity: (isPosting || isDraggingCustom) ? 0 : 1 // ドラッグ中や投稿中は隠す
+          opacity: isPosting ? 0 : 1
         }}
       >
         <div className="magic-cursor-inner">
-          <img src={isMouseDown ? "/images/cursor_hover.png" : "/images/cursor.png"} alt="" />
+          <img src={(isDraggingCustom || isMouseDown) ? "/images/cursor_hover.png" : "/images/cursor.png"} alt="" />
         </div>
       </div>
 
