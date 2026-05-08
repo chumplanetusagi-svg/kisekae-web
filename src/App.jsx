@@ -2146,51 +2146,13 @@ export default function App() {
     )
   }
 
-  // --- Custom Mouse Follower ---
-  const [customCursorPos, setCustomCursorPos] = useState({ x: -100, y: -100 });
-  const [isHovering, setIsHovering] = useState(false);
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setCustomCursorPos({ x: e.clientX, y: e.clientY });
-      
-      // Simple hover detection for custom cursor
-      const target = e.target;
-      const isClickable = target.closest('button, a, .itemCard, .dragHandle, .tabButton, [role="button"]');
-      setIsHovering(!!isClickable);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
   return (
     <div
       className="appShell"
       onClick={handleGlobalClick}
       onDragOver={(e) => e.preventDefault()}
       onDragEnter={(e) => e.preventDefault()}
-      style={{ cursor: 'none' }}
     >
-      {/* Custom Follower Cursor */}
-      <div 
-        className="custom-cursor-follower"
-        style={{
-          position: 'fixed',
-          left: customCursorPos.x,
-          top: customCursorPos.y,
-          transform: isHovering ? 'translate(-50%, -50%)' : 'translate(0, 0)',
-          width: '64px',
-          height: '64px',
-          backgroundImage: `url(${isHovering ? '/images/cursor_hover.png' : '/images/cursor.png'})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          pointerEvents: 'none',
-          zIndex: 999999,
-          transition: 'transform 0.1s ease-out',
-          display: customCursorPos.x < 0 ? 'none' : 'block'
-        }}
-      />
-
       {clickParticles.map(p => (
         <div key={p.id} className="magic-particle" style={{ left: p.x, top: p.y, '--tx': p.tx, '--ty': p.ty }} />
       ))}
