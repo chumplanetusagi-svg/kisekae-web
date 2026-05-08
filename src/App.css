@@ -890,12 +890,16 @@ button, .itemCard, .dragHandle, a {
 .qrCardBadge {
   display: inline-flex;
   width: fit-content;
-  padding: 8px 14px;
+  padding: 6px 16px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #9cd5ff 0%, #bfb6ff 100%);
-  color: white;
-  font-size: 13px;
+  background: #594129;
+  border: 1px solid #8c6a46;
+  color: #f2ce9e;
+  font-size: 12px;
   font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
 }
 
 .qrCardTitleBlock {
