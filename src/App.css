@@ -440,14 +440,17 @@ button, .itemCard, .dragHandle, a {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
-  align-items: stretch; /* Crucial: stretches leftColumn to match rightColumn height */
+  align-items: stretch !important; /* Force columns to stretch to the same height */
   overflow: visible !important;
+  min-height: 0;
 }
 
 .leftColumn {
   position: relative;
   width: 340px;
   overflow: visible !important;
+  display: block;
+  height: 100%; /* Ensure it takes full height of the grid cell */
 }
 
 .rightColumn {
@@ -460,9 +463,9 @@ button, .itemCard, .dragHandle, a {
 .closetDesktopPreview {
   position: -webkit-sticky !important;
   position: sticky !important;
-  top: 16px;
+  top: 24px !important; /* Slightly more space from top */
   z-index: 100;
-  align-self: start;
+  display: block;
 }
 
 /* Hide scrollbar for aesthetic, but keep functionality */
