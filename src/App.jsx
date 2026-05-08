@@ -1557,7 +1557,7 @@ export default function App() {
           return prev.filter((id) => id !== item.id)
         }
         if (prev.length >= MAX_ACCESSORIES) {
-          setNotification(`アクセサリーは最大${MAX_ACCESSORIES}個までだよ`)
+          setNotification(`${MAX_ACCESSORIES}種類しかアクセはつけられないよ`)
           return prev
         }
         return [...prev, item.id]
@@ -2220,16 +2220,18 @@ export default function App() {
       const closetContainer = document.querySelector('.closetLayout');
       if (!closetContainer) return;
 
+      // Use pageYOffset + getBoundingClientRect().top for a more stable absolute top
       const containerRect = closetContainer.getBoundingClientRect();
-      const containerTop = containerRect.top + window.scrollY;
+      const containerTop = containerRect.top + scrollTop;
 
+      // --- Desktop Logic ---
       // --- Desktop Logic ---
       if (window.innerWidth > 820) {
         let offset = Math.max(0, scrollTop - containerTop + 24);
         const rightCol = document.querySelector('.rightColumn');
-        const previewCard = document.querySelector('.closetDesktopPreview');
+        const previewCard = desktopClosetPreviewRef.current;
         if (rightCol && previewCard) {
-          // Calculate limit more accurately: Right column height minus the preview card's own height
+          // Use the actual height of the ref element
           const maxOffset = rightCol.offsetHeight - previewCard.offsetHeight; 
           offset = Math.min(offset, Math.max(0, maxOffset));
         }
