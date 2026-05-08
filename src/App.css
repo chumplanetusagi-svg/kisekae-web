@@ -46,7 +46,6 @@ body:active * {
 /* Closet Open Layout Fixes - Push the main character area down/adjust */
 .appShell.closet-open {
   transition: all 0.3s ease;
-  padding-bottom: 200px; /* Adjusted padding */
 }
 
 /* Ensure character stage stays in view while scrolling through clothes */
@@ -63,9 +62,9 @@ body,
   margin: 0;
   overflow: visible !important;
   min-height: 100%;
+  background-color: #140e0c !important; /* Ensure no white space ever shows */
   background: var(--bg);
   background-attachment: fixed;
-  background-color: #140e0c;
   color: var(--text);
 }
 /* Ensure the body itself also hides the cursor if needed */
