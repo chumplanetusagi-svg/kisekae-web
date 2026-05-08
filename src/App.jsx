@@ -1098,6 +1098,14 @@ export default function App() {
   const [qrMessage, setQrMessage] = useState('')
   const [equipAnimClass, setEquipAnimClass] = useState('')
   const [showTutorial, setShowTutorial] = useState(false)
+  const [notification, setNotification] = useState(null)
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [notification])
   const [isDragOver, setIsDragOver] = useState(false)
   const [time, setTime] = useState(new Date())
   const [clickParticles, setClickParticles] = useState([])
@@ -1468,7 +1476,7 @@ export default function App() {
 
       downloadCanvas(canvas, `${nickname || DEFAULT_NICKNAME}-home.png`)
     } catch (error) {
-      alert(`ホーム画像の保存に失敗したよ: ${error.message}`)
+      setNotification(`ホーム画像の保存に失敗したよ: ${error.message}`)
       console.error(error)
     } finally {
       setIsSavingHomeImage(false)
@@ -1485,7 +1493,7 @@ export default function App() {
 
       downloadCanvas(canvas, `${nickname || DEFAULT_NICKNAME}-base-only.png`)
     } catch (error) {
-      alert(`素体画像の保存に失敗したよ: ${error.message}`)
+      setNotification(`素体画像の保存に失敗したよ: ${error.message}`)
       console.error(error)
     } finally {
       setIsSavingBaseImage(false)
@@ -1525,7 +1533,7 @@ export default function App() {
 
       downloadCanvas(canvas, `${selectedQrItem.name}-qr-card.png`)
     } catch (error) {
-      alert(`QR画像の保存に失敗したよ: ${error.message}`)
+      setNotification(`QR画像の保存に失敗したよ: ${error.message}`)
       console.error(error)
     } finally {
       setIsSavingQrImage(false)
@@ -1549,7 +1557,7 @@ export default function App() {
           return prev.filter((id) => id !== item.id)
         }
         if (prev.length >= MAX_ACCESSORIES) {
-          alert(`アクセサリーは最大${MAX_ACCESSORIES}個までだよ`)
+          setNotification(`アクセサリーは最大${MAX_ACCESSORIES}個までだよ`)
           return prev
         }
         return [...prev, item.id]
@@ -1574,7 +1582,7 @@ export default function App() {
           return prev.filter((id) => id !== item.id)
         }
         if (prev.length >= MAX_ACCESSORIES) {
-          alert(`お気に入りアクセは最大${MAX_ACCESSORIES}個までだよ`)
+          setNotification(`お気に入りアクセは最大${MAX_ACCESSORIES}個までだよ`)
           return prev
         }
         return [...prev, item.id]
@@ -1610,11 +1618,11 @@ export default function App() {
 
   const handleUpload = async () => {
     if (!uploadName.trim()) {
-      alert('名前を入れてね')
+      setNotification('名前を入れてね')
       return
     }
     if (!uploadFile) {
-      alert('画像を選んでね')
+      setNotification('画像を選んでね')
       return
     }
 
@@ -1654,9 +1662,9 @@ export default function App() {
       setUploadFile(null)
       if (uploadFileInputRef.current) uploadFileInputRef.current.value = ''
 
-      alert('アップロードできたよ')
+      setNotification('アップロードできたよ')
     } catch (error) {
-      alert(`アップロード失敗: ${error.message}`)
+      setNotification(`アップロード失敗: ${error.message}`)
     } finally {
       setIsUploading(false)
     }
@@ -1699,12 +1707,12 @@ export default function App() {
     const lowerSafeLine = window.innerHeight - 72
 
     if (translated.top < upperSafeLine) {
-      window.scrollBy({ top: -24, behavior: 'auto' })
+      window.scrollBy({ top: -8, behavior: 'auto' })
       return
     }
 
     if (translated.bottom > lowerSafeLine) {
-      window.scrollBy({ top: 24, behavior: 'auto' })
+      window.scrollBy({ top: 8, behavior: 'auto' })
     }
   }
 

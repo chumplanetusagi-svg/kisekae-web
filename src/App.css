@@ -94,6 +94,9 @@ a {
   position: relative;
   z-index: 1;
   font-family: 'Shippori Mincho', serif;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-y: auto;
+  contain: content; /* Contain descendants to prevent them from expanding scroll area */
 }
 
 button, .itemCard, .dragHandle, a {
@@ -2524,4 +2527,38 @@ button, .itemCard, .dragHandle, a {
     top: 5px;
     left: 5px;
   }
+}
+
+/* Custom Toast / Notification System */
+.customToast {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  pointer-events: auto;
+  animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.customToastInner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 28px;
+  border-radius: 20px;
+  background: rgba(36, 26, 22, 0.98);
+  border: 3px solid var(--line);
+  color: var(--text-deep);
+  font-weight: 800;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(140, 106, 70, 0.2);
+  white-space: nowrap;
+}
+
+.toastIcon {
+  font-size: 20px;
 }
