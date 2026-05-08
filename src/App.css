@@ -453,9 +453,21 @@ button, .itemCard, .dragHandle, a {
 .closetDesktopPreview {
   position: -webkit-sticky !important;
   position: sticky !important;
-  top: 20px;
+  top: 10px;
   z-index: 100;
   align-self: flex-start;
+  max-height: calc(100vh - 40px); /* Keep sidebar within screen bounds */
+  overflow-y: auto; /* Allow scrolling if content is too tall */
+  padding-right: 4px; /* Space for scrollbar */
+}
+
+/* Hide scrollbar for aesthetic, but keep functionality */
+.closetDesktopPreview::-webkit-scrollbar {
+  width: 4px;
+}
+.closetDesktopPreview::-webkit-scrollbar-thumb {
+  background: var(--gold-btn);
+  border-radius: 4px;
 }
 
 .closetActionCard {
@@ -1323,19 +1335,25 @@ button, .itemCard, .dragHandle, a {
     display: none !important;
   }
 
+  /* Re-fix mobile visibility: Ensure grid doesn't hide items */
+  .closetLayout {
+    display: flex !important;
+    flex-direction: column !important;
+    padding-top: 0 !important;
+    gap: 16px;
+  }
+
   .mobileClosetFollowCard {
     display: block !important;
-    position: relative !important; /* No longer sticky */
-    top: auto !important;
+    position: relative !important;
     z-index: 10 !important;
-    margin: 0 0 16px;
-    pointer-events: auto;
+    width: 100%;
+    margin-bottom: 20px;
   }
   
-  /* Reset padding that was used for fixed preview */
-  .closetLayout {
-    padding-top: 0 !important; 
-    grid-template-columns: 1fr !important;
+  .rightColumn {
+    display: block !important;
+    width: 100% !important;
   }
 
   .mobileClosetFollowInner {
