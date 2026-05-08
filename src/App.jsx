@@ -2174,6 +2174,13 @@ export default function App() {
     setIsDraggingCustom(true);
     document.documentElement.classList.add('is-dragging-custom');
     document.body.classList.add('is-dragging-custom');
+
+    // Hide native browser drag image (ghost) to only show our custom follower
+    if (e.dataTransfer) {
+      const img = new Image();
+      img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // Transparent 1x1
+      e.dataTransfer.setDragImage(img, 0, 0);
+    }
   };
 
   const handleDragMoveGlobal = (e) => {
