@@ -68,7 +68,7 @@ body.is-dragging-custom *,
 html,
 body {
   margin: 0;
-  overflow-x: hidden;
+  overflow-x: visible; /* Changed from hidden to avoid breaking sticky in some browsers */
   min-height: 100%;
   font-family: 'Shippori Mincho', serif;
   background: var(--bg);
@@ -433,18 +433,21 @@ button, .itemCard, .dragHandle, a {
 
 .closetContainer {
   position: relative;
+  overflow: visible !important;
 }
 
 .closetLayout {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
-  align-items: start;
+  align-items: stretch; /* Crucial: stretches leftColumn to match rightColumn height */
+  overflow: visible !important;
 }
 
 .leftColumn {
   position: relative;
   width: 340px;
+  overflow: visible !important;
 }
 
 .rightColumn {
