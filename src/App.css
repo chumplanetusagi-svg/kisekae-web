@@ -106,7 +106,7 @@ body,
 }
 /* Ensure the body itself also hides the cursor if needed */
 body.is-dragging-custom {
-  cursor: url('/images/cursor_hover.png?v=3') 0 0, grabbing !important;
+  cursor: none !important;
 }
 
 button,
@@ -1106,13 +1106,9 @@ button, .itemCard, .dragHandle, a {
     transform: translateY(-40px) !important;
   }
 
-  /* Version 5 Cursor Cache Busting */
+  /* All cursors handled globally by none */
   html, body, * {
-    cursor: url('/images/cursor.png?v=5') 0 0, auto !important;
-  }
-  
-  button:hover, .itemCard:hover, .dragHandle:hover, a:hover, .tabButton:hover, [role="button"]:hover {
-    cursor: url('/images/cursor_hover.png?v=5') 0 0, pointer !important;
+    cursor: none !important;
   }
 
   .appShell {

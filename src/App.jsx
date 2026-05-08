@@ -2400,6 +2400,9 @@ export default function App() {
     setIsDraggingCustom(true);
     document.documentElement.classList.add('is-dragging-custom');
     document.body.classList.add('is-dragging-custom');
+    // 強制的にネイティブカーソルを消す (インラインスタイルが最強)
+    document.body.style.setProperty('cursor', 'none', 'important');
+    document.documentElement.style.setProperty('cursor', 'none', 'important');
 
     // Hide native browser drag image (ghost) to only show our custom follower
     if (e.dataTransfer) {
@@ -2424,6 +2427,9 @@ export default function App() {
     setIsDraggingCustom(false);
     document.documentElement.classList.remove('is-dragging-custom');
     document.body.classList.remove('is-dragging-custom');
+    // ネイティブカーソルを元に戻す
+    document.body.style.cursor = '';
+    document.documentElement.style.cursor = '';
   };
 
   // --- Character Preview Sticky Support via JS (for Desktop & Mobile) ---
@@ -2557,19 +2563,6 @@ export default function App() {
           </div>
         </div>
       )}
-      <div 
-        className="magic-cursor" 
-        style={{ 
-          left: mousePos.x, 
-          top: mousePos.y,
-          transform: `translate(-50%, -50%) scale(${isDraggingCustom || isMouseDown ? 1.2 : 1})`,
-          opacity: isPosting ? 0 : 1
-        }}
-      >
-        <div className="magic-cursor-inner">
-          <img src={isDraggingCustom || isMouseDown ? "/images/cursor_hover.png" : "/images/cursor.png"} alt="" />
-        </div>
-      </div>
       {clickParticles.map(p => (
         <div key={p.id} className="magic-particle" style={{ left: p.x, top: p.y, '--tx': p.tx, '--ty': p.ty }} />
       ))}
@@ -2585,23 +2578,20 @@ export default function App() {
         ))}
       </div>
 
-      {/* Temporary Drag Follower (Only during drag to bypass browser restrictions) */}
+      {/* カスタムカーソルの本体 */}
       <div 
-        style={{
-          position: 'fixed',
-          left: dragPos.x,
-          top: dragPos.y,
-          width: '64px',
-          height: '64px',
-          backgroundImage: "url('/images/cursor_hover.png?v=4')",
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          pointerEvents: 'none',
-          zIndex: 1000000,
-          display: isDraggingCustom ? 'block' : 'none',
-          transform: 'translate(0, 0)' // Top-left as requested
+        className="magic-cursor" 
+        style={{ 
+          left: mousePos.x, 
+          top: mousePos.y,
+          transform: `translate(-50%, -50%) scale(${isDraggingCustom || isMouseDown ? 1.2 : 1})`,
+          opacity: (isPosting || isDraggingCustom) ? 0 : 1 // ドラッグ中や投稿中は隠す
         }}
-      />
+      >
+        <div className="magic-cursor-inner">
+          <img src={isMouseDown ? "/images/cursor_hover.png" : "/images/cursor.png"} alt="" />
+        </div>
+      </div>
 
       <div className="floatingAvatarContainer">
         <img src="/images/gear_bronze.png" className="deco-gear gear-1" style={randomPositions.gears[0]} alt="" />
