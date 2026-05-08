@@ -1278,7 +1278,11 @@ export default function App() {
       fetchGallery();
     } catch (error) {
       console.error('Post error:', error);
-      setNotification(`投稿に失敗しちゃった: ${error.message}`);
+      if (error.code === 'PGRST205' || error.message?.includes('posts')) {
+        setNotification('ギャラリーの準備がまだできていないみたい。管理画面でテーブルを作ってみてね！');
+      } else {
+        setNotification(`投稿に失敗しちゃった: ${error.message || '通信エラーかな？'}`);
+      }
     } finally {
       setIsPosting(false);
     }
