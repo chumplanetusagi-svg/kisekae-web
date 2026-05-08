@@ -2224,8 +2224,8 @@ export default function App() {
       const containerRect = closetContainer.getBoundingClientRect();
       const containerTop = containerRect.top + scrollTop;
 
-      // --- Desktop Logic ---
-      if (window.innerWidth > 820) {
+      // --- Desktop Logic (Wider screens) ---
+      if (window.innerWidth > 800) {
         const rightCol = document.querySelector('.rightColumn');
         const previewEl = document.querySelector('.closetDesktopPreview');
         
@@ -2272,6 +2272,23 @@ export default function App() {
       onDragOver={(e) => e.preventDefault()}
       onDragEnter={(e) => e.preventDefault()}
     >
+      {/* --- 更新確認用バナー (確認後に削除可能) --- */}
+      <div style={{ 
+        background: '#ff0000', 
+        color: '#ffffff', 
+        padding: '12px', 
+        textAlign: 'center', 
+        fontWeight: 'bold',
+        fontSize: '16px',
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        width: '100%', 
+        zIndex: 2000000,
+        boxShadow: '0 4px 20px rgba(0,0,0,0.8)'
+      }}>
+        【更新確認用】PC追従・羊皮紙通知 修正版 (14:00)
+      </div>
       {clickParticles.map(p => (
         <div key={p.id} className="magic-particle" style={{ left: p.x, top: p.y, '--tx': p.tx, '--ty': p.ty }} />
       ))}
