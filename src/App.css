@@ -69,7 +69,6 @@ html,
 body {
   margin: 0;
   overflow-x: hidden;
-  overflow-y: visible !important; /* Crucial for sticky */
   min-height: 100%;
   font-family: 'Shippori Mincho', serif;
   background: var(--bg);
@@ -434,24 +433,18 @@ button, .itemCard, .dragHandle, a {
 
 .closetContainer {
   position: relative;
-  overflow: visible !important;
 }
 
 .closetLayout {
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   gap: 24px;
-  align-items: stretch;
-  overflow: visible !important;
+  align-items: start;
 }
 
 .leftColumn {
   position: relative;
   width: 340px;
-  display: flex;
-  flex-direction: column;
-  overflow: visible !important;
-  min-height: 100%;
 }
 
 .rightColumn {
@@ -464,12 +457,9 @@ button, .itemCard, .dragHandle, a {
 .closetDesktopPreview {
   position: -webkit-sticky !important;
   position: sticky !important;
-  top: 10px;
+  top: 16px;
   z-index: 100;
-  align-self: flex-start;
-  max-height: calc(100vh - 40px); /* Keep sidebar within screen bounds */
-  overflow-y: auto; /* Allow scrolling if content is too tall */
-  padding-right: 4px; /* Space for scrollbar */
+  align-self: start;
 }
 
 /* Hide scrollbar for aesthetic, but keep functionality */
@@ -1358,11 +1348,10 @@ button, .itemCard, .dragHandle, a {
     display: block !important;
     position: -webkit-sticky !important;
     position: sticky !important;
-    top: 4px !important;
-    z-index: 2000 !important;
-    width: 100%;
-    margin-bottom: 20px;
-    overflow: visible !important;
+    top: 8px !important;
+    z-index: 35 !important;
+    margin: -2px 0 12px;
+    pointer-events: none;
   }
   
   .rightColumn {
