@@ -1255,7 +1255,7 @@ export default function App() {
                     ) : (
                       <span className="鑑賞用Badge">鑑賞用</span>
                     )}
-                    {(myPostIds.includes(post.id) || post.nickname === nickname) && (
+                    {(window.location.hostname === 'localhost' || myPostIds.includes(post.id) || post.nickname === nickname) && (
                       <button className="dangerButton small" style={{ marginLeft: 'auto' }} onClick={() => handleDeletePost(post.id)}>削除</button>
                     )}
                   </div>
