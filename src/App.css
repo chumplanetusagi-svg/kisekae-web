@@ -3232,3 +3232,130 @@ body,
 * {
   /* cursor: none !important; */
 }
+
+/* DL Tab Styles */
+.dlLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dlGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.dlCard {
+  background: rgba(36, 26, 22, 0.9);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dlCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+  border-color: var(--text);
+}
+
+.dlCard::after {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background-image: url('/images/gear_silver.png');
+  background-size: contain;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.dlCardIcon {
+  font-size: 32px;
+  color: var(--text-deep);
+  background: rgba(20, 14, 11, 0.6);
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+
+.dlCardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.dlItemTitle {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-deep);
+  font-weight: 800;
+}
+
+.dlItemDesc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.dlItemMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.dlBadge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+.dlBadge.free {
+  background: #2d4a2d;
+  color: #a3d9a3;
+  border: 1px solid #3d663d;
+}
+
+.dlBadge.password {
+  background: #4a3d2d;
+  color: #d9c5a3;
+  border: 1px solid #66523d;
+}
+
+.dlSize {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.dlPasswordSection {
+  margin: 8px 0;
+}
+
+.textInput.small {
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.fullWidth {
+  width: 100%;
+}

@@ -22,7 +22,16 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { IoSettingsSharp } from 'react-icons/io5'
-import { FaHeart } from 'react-icons/fa'
+import { 
+  FaHeart, 
+  FaHome, 
+  FaTshirt, 
+  FaQrcode, 
+  FaImage, 
+  FaDownload, 
+  FaCog, 
+  FaVolumeUp 
+} from 'react-icons/fa'
 
 const STORAGE_BUCKET = 'clothes'
 const LS_KEY = 'kisekae-app-save'
@@ -627,6 +636,65 @@ function splitAccessoryImageUrls(accessoryImageUrls = []) {
   return { back, front }
 }
 
+const pixelCache = new Map()
+
+async function getPixelAlpha(url, xPercent, yPercent) {
+  if (!url) return 0
+  
+  try {
+    let data = pixelCache.get(url)
+    if (!data) {
+      const img = await loadImage(url)
+      const canvas = document.createElement('canvas')
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0)
+      data = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      pixelCache.set(url, data)
+    }
+
+    const ix = Math.floor(xPercent * data.width)
+    const iy = Math.floor(yPercent * data.height)
+    
+    if (ix < 0 || ix >= data.width || iy < 0 || iy >= data.height) return 0
+    
+    // Alpha is the 4th value in the RGBA sequence
+    return data.data[(iy * data.width + ix) * 4 + 3]
+  } catch (e) {
+    console.warn('Pixel check failed', e)
+    return 0
+  }
+}
+
+function getPixelAlphaSync(url, xPercent, yPercent, radius = 0) {
+  if (!url) return 0
+  const data = pixelCache.get(url)
+  if (!data) return 0
+  const ix = Math.floor(xPercent * data.width)
+  const iy = Math.floor(yPercent * data.height)
+
+  if (radius <= 0) {
+    if (ix < 0 || ix >= data.width || iy < 0 || iy >= data.height) return 0
+    return data.data[(iy * data.width + ix) * 4 + 3]
+  }
+
+  // Neighborhood check for better sensitivity (especially for touch)
+  let maxAlpha = 0
+  for (let dy = -radius; dy <= radius; dy++) {
+    for (let dx = -radius; dx <= radius; dx++) {
+      const nx = ix + dx
+      const ny = iy + dy
+      if (nx >= 0 && nx < data.width && ny >= 0 && ny < data.height) {
+        const alpha = data.data[(ny * data.width + nx) * 4 + 3]
+        if (alpha > maxAlpha) maxAlpha = alpha
+        if (maxAlpha > 50) return maxAlpha // Lower threshold for quick exit
+      }
+    }
+  }
+  return maxAlpha
+}
+
 const PAGE_TURN_SOUND_URL = 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
 
 function roundedRect(ctx, x, y, width, height, radius) {
@@ -926,7 +994,9 @@ async function createQrCardCanvas({
     console.warn('Gears failed to load for QR card', e)
   }
 
-  // Header Plate
+  // --- Render Helpers ---
+
+  // --- Render Helpers ---
   ctx.fillStyle = '#594129'
   ctx.strokeStyle = '#8c6a46'
   ctx.lineWidth = 4
@@ -1129,6 +1199,42 @@ export default function App() {
   const [customCursorUrl, setCustomCursorUrl] = useState(() => localStorage.getItem('customCursorUrl') || '')
   const [customCursorHoverUrl, setCustomCursorHoverUrl] = useState(() => localStorage.getItem('customCursorHoverUrl') || '')
   const [isHoveringInteractive, setIsHoveringInteractive] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const cursorRef = useRef(null)
+  const lastMousePos = useRef({ x: 0, y: 0 })
+  const currentCursorPos = useRef({ x: 0, y: 0 })
+  const lastGrabInfo = useRef({ itemId: null, time: 0 })
+  const lastClosetClick = useRef({ itemId: null, time: 0 })
+
+  // --- Download Tab State ---
+  const [dlPasswords, setDlPasswords] = useState({}) // { itemId: 'input_value' }
+  const downloadItems = [
+    {
+      id: 'voice-pack-1',
+      title: '基本ボイスパック',
+      description: 'うさぎさんの基本的なボイスが詰まったパックだよ。',
+      type: 'free',
+      fileUrl: '#', // Placeholder
+      fileSize: '2.4MB'
+    },
+    {
+      id: 'voice-pack-special',
+      title: '限定ボイス：おやすみ編',
+      description: '特別な衣装を着た時だけ聞けるボイスの詰め合わせ。',
+      type: 'password',
+      password: 'usagi', // Correct password
+      fileUrl: '#', // Placeholder
+      fileSize: '5.1MB'
+    },
+    {
+      id: 'wallpaper-set',
+      title: '特製壁紙セット',
+      description: 'スマホやPCで使える、スチームパンクな壁紙だよ。',
+      type: 'free',
+      fileUrl: '#',
+      fileSize: '12MB'
+    }
+  ]
 
   // --- Gallery State & Fetching ---
   const [galleryPosts, setGalleryPosts] = useState([]);
@@ -1169,16 +1275,37 @@ export default function App() {
   }, [MAX_ACCESSORIES])
 
   const handleGrabFromAvatar = useCallback((item, e) => {
-    if (e.type === 'mousedown' && e.button !== 0) return
-    if (e.cancelable) e.preventDefault()
-    setDraggingItem(item)
-    if (item.category === 'upper') {
-      setEquippedUpperId(null)
-    } else if (item.category === 'lower') {
-      setEquippedLowerId(null)
-    } else if (item.category === 'accessory') {
-      setEquippedAccessoryIds(prev => prev.filter(id => id !== item.id))
+    // Basic event check - only left click for mousedown
+    if (e && e.type === 'mousedown' && e.button !== 0) return
+    // preventDefault should be called early to be effective
+    if (e && e.cancelable && typeof e.preventDefault === 'function') {
+      e.preventDefault()
     }
+    
+    // Use the values from the event immediately or provided values
+    const clientX = e?.clientX ?? (e?.touches?.[0]?.clientX)
+    const clientY = e?.clientY ?? (e?.touches?.[0]?.clientY)
+    
+    if (clientX !== undefined && clientY !== undefined) {
+      // Calculate offset relative to the stage to keep it where it was clicked
+      const stage = e.currentTarget.closest('.characterStage, .homeAvatarStage')
+      if (stage) {
+        const rect = stage.getBoundingClientRect()
+        // Offset is how far the mouse is from the stage's top-left
+        // Since the item images are 100% width/height of the stage, 
+        // the offset is just the relative coordinate.
+        setDragOffset({ x: clientX - rect.left, y: clientY - rect.top })
+      } else {
+        // Fallback for closet items (they are usually centered in the preview)
+        setDragOffset({ x: 100, y: 150 }) // Approximation
+      }
+    }
+    
+    setDraggingItem(item)
+    // Clear from equipped state
+    if (item.category === 'upper') setEquippedUpperId(null)
+    else if (item.category === 'lower') setEquippedLowerId(null)
+    else setEquippedAccessoryIds((prev) => prev.filter((id) => id !== item.id))
   }, [])
 
   const handleDeletePost = (postId) => {
@@ -1363,24 +1490,65 @@ export default function App() {
   };
 
   useEffect(() => {
-    const handleGlobalMouseMove = (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20
-      const y = (e.clientY / window.innerHeight - 0.5) * 20
-      document.documentElement.style.setProperty('--mx', `${x}px`)
-      document.documentElement.style.setProperty('--my', `${y}px`)
-      setMousePos({ x: e.clientX, y: e.clientY })
-      
-      const isOver = !!e.target.closest('button, a, .itemCard, .dragHandle, .layerRowDrag')
-      setIsHoveringInteractive(isOver)
+    const updateCursor = () => {
+      // Smoother lerp for a premium feel
+      const lerp = draggingItem ? 0.15 : 0.2
+      currentCursorPos.current.x += (lastMousePos.current.x - currentCursorPos.current.x) * lerp
+      currentCursorPos.current.y += (lastMousePos.current.y - currentCursorPos.current.y) * lerp
+
+      const cursor = document.getElementById('magic-cursor-root')
+      if (cursor) {
+        cursor.style.transform = `translate3d(${currentCursorPos.current.x}px, ${currentCursorPos.current.y}px, 0)`
+        cursor.style.visibility = 'visible'
+      }
+      rafId.current = requestAnimationFrame(updateCursor)
     }
 
-    const handleGlobalTouchMove = (e) => {
-      if (!e.touches[0]) return
-      const touch = e.touches[0]
-      setMousePos({ x: touch.clientX, y: touch.clientY })
-      if (draggingItem && e.cancelable) {
-        e.preventDefault()
+    const rafId = { current: requestAnimationFrame(updateCursor) }
+
+    const handleGlobalMouseMove = (e) => {
+      lastMousePos.current = { x: e.clientX, y: e.clientY }
+
+      const target = e.target
+      const stageEl = target.closest('.characterStage, .homeAvatarStage, .mobileFollowStage')
+      let isOverPixel = false
+      
+      if (stageEl) {
+        const rect = stageEl.getBoundingClientRect()
+        const xp = (e.clientX - rect.left) / rect.width
+        const yp = (e.clientY - rect.top) / rect.height
+        
+        const frontItems = [equippedUpper, equippedLower, ...equippedAccessories.filter(a => !isBackAccessory(a))].filter(Boolean)
+        const backItems = equippedAccessories.filter(isBackAccessory)
+        
+        const radius = 4 
+
+        // Check Front Items
+        for (const it of frontItems) {
+          if (getPixelAlphaSync(it.imageUrl, xp, yp, radius) > 5) {
+            isOverPixel = true
+            break
+          }
+        }
+        
+        // Check Body (Priority over Back items)
+        if (!isOverPixel && getPixelAlphaSync(equippedBase?.imageUrl, xp, yp, radius) > 5) {
+          isOverPixel = true
+        }
+
+        // Check Back Items
+        if (!isOverPixel) {
+          for (const it of backItems) {
+            if (getPixelAlphaSync(it.imageUrl, xp, yp, radius) > 5) {
+              isOverPixel = true
+              break
+            }
+          }
+        }
       }
+
+      const isOver = !!target.closest('button, a, .itemCard, .dragHandle, .layerRowDrag') || isOverPixel
+      setIsHoveringInteractive(isOver)
     }
 
     const handleGlobalMouseDown = () => setIsMouseDown(true)
@@ -1389,7 +1557,6 @@ export default function App() {
       setIsMouseDown(false)
       setIsManualDragOver(false)
       if (draggingItem) {
-        // Handle both Mouse and Touch coordinate detection
         const clientX = e.clientX ?? (e.changedTouches ? e.changedTouches[0]?.clientX : undefined)
         const clientY = e.clientY ?? (e.changedTouches ? e.changedTouches[0]?.clientY : undefined)
 
@@ -1406,12 +1573,23 @@ export default function App() {
       }
     }
 
+    const handleGlobalTouchMove = (e) => {
+      if (!e.touches[0]) return
+      const touch = e.touches[0]
+      lastMousePos.current = { x: touch.clientX, y: touch.clientY }
+      if (draggingItem && e.cancelable) {
+        e.preventDefault()
+      }
+    }
+
     window.addEventListener('mousemove', handleGlobalMouseMove)
     window.addEventListener('touchmove', handleGlobalTouchMove, { passive: false })
     window.addEventListener('mousedown', handleGlobalMouseDown)
     window.addEventListener('mouseup', handleGlobalMouseUp)
     window.addEventListener('touchend', handleGlobalMouseUp)
+    
     return () => {
+      cancelAnimationFrame(rafId.current)
       window.removeEventListener('mousemove', handleGlobalMouseMove)
       window.removeEventListener('touchmove', handleGlobalTouchMove)
       window.removeEventListener('mousedown', handleGlobalMouseDown)
@@ -1709,6 +1887,23 @@ export default function App() {
     selectedQrItemId,
     equippedLayerOrder,
   ])
+
+  // Pre-cache pixel data for equipped items
+  useEffect(() => {
+    const urls = [
+      equippedBase?.imageUrl,
+      equippedUpper?.imageUrl,
+      equippedLower?.imageUrl,
+      ...equippedAccessories.map(a => a.imageUrl)
+    ].filter(Boolean)
+
+    urls.forEach(url => {
+      if (!pixelCache.has(url)) {
+        // Just calling it will trigger the load and cache
+        getPixelAlpha(url, 0, 0).catch(() => {})
+      }
+    })
+  }, [equippedBase, equippedUpper, equippedLower, equippedAccessories])
 
   useEffect(() => {
     if (!selectedQrItemId && qrShareableItems.length > 0) {
@@ -2067,6 +2262,65 @@ export default function App() {
 
 
 
+  const handleDownloadItem = (item) => {
+    if (item.type === 'password') {
+      const input = dlPasswords[item.id] || ''
+      if (input !== item.password) {
+        setNotification('パスワードが違うみたいだよ')
+        return
+      }
+    }
+    setNotification(`${item.title}のダウンロードを開始するよ！`)
+    // In a real app, window.location.href = item.fileUrl or similar
+  }
+
+  const renderDLTab = () => {
+    return (
+      <div className="dlLayout">
+        <section className="mainCard">
+          <div className="sectionHeader">
+            <h2 className="sectionTitle">ダウンロード</h2>
+            <p className="infoText">ボイスパックや壁紙などの素材をダウンロードできるよ。</p>
+          </div>
+
+          <div className="dlGrid">
+            {downloadItems.map((item) => (
+              <div key={item.id} className="dlCard">
+                <div className="dlCardIcon">
+                  {item.id.includes('voice') ? <FaVolumeUp /> : <FaImage />}
+                </div>
+                <div className="dlCardInfo">
+                  <h3 className="dlItemTitle">{item.title}</h3>
+                  <p className="dlItemDesc">{item.description}</p>
+                  <div className="dlItemMeta">
+                    <span className={`dlBadge ${item.type}`}>{item.type === 'free' ? 'FREE' : 'PASSWORD'}</span>
+                    <span className="dlSize">{item.fileSize}</span>
+                  </div>
+                  
+                  {item.type === 'password' && (
+                    <div className="dlPasswordSection">
+                      <input
+                        type="password"
+                        className="textInput small"
+                        placeholder="パスワードを入力"
+                        value={dlPasswords[item.id] || ''}
+                        onChange={(e) => setDlPasswords(prev => ({ ...prev, [item.id]: e.target.value }))}
+                      />
+                    </div>
+                  )}
+                  
+                  <button className="secondaryButton fullWidth" onClick={() => handleDownloadItem(item)}>
+                    {item.type === 'password' ? '解除して保存' : '保存する'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    )
+  }
+
   const handleResetDress = () => {
     setEquippedUpperId(DEFAULT_SAVE.equippedUpperId)
     setEquippedLowerId(DEFAULT_SAVE.equippedLowerId)
@@ -2110,22 +2364,62 @@ export default function App() {
       'accessory-5': frontAccessories[4] || null,
     }
 
-    const grabProps = (item) => ({
-      onMouseDown: (e) => handleGrabFromAvatar(item, e),
-      onTouchStart: (e) => {
-        const touch = e.touches[0]
-        if (touch) {
-          setMousePos({ x: touch.clientX, y: touch.clientY })
+    const handleStagePointerDown = (e) => {
+      const now = Date.now()
+      const rect = e.currentTarget.getBoundingClientRect()
+      const xp = (e.clientX - rect.left) / rect.width
+      const yp = (e.clientY - rect.top) / rect.height
+
+      const layerOrder = ensureLayerOrder(equippedLayerOrder)
+      const frontItems = layerOrder
+        .filter((k) => k !== 'base')
+        .map((k) => frontLayerMap[k])
+        .filter(Boolean)
+        .reverse()
+        
+      const backItems = [...backAccessories].reverse()
+      const allGrabbables = [...frontItems, ...backItems]
+
+      const isTouch = e.pointerType === 'touch'
+      const radius = isTouch ? 15 : 6
+
+      // Double-tap detection
+      if (lastGrabInfo.current.itemId && (now - lastGrabInfo.current.time < 300)) {
+        setDraggingItem(null)
+        lastGrabInfo.current = { itemId: null, time: 0 }
+        return
+      }
+
+      // 1. Check Front Items (Accessories, Clothing)
+      for (const item of frontItems) {
+        if (getPixelAlphaSync(item.imageUrl, xp, yp, radius) > 5) {
+          lastGrabInfo.current = { itemId: item.id, time: now }
           handleGrabFromAvatar(item, e)
+          return
         }
-      },
-      style: { cursor: 'grab' }
-    })
+      }
+
+      // 2. Check Base Character (Ears, Body) - Priority over Back Items
+      if (getPixelAlphaSync(equippedBase?.imageUrl, xp, yp, radius) > 5) {
+        handleCharacterClick()
+        return // Hits the body, so we stop and don't check items behind it
+      }
+
+      // 3. Check Back Items (Scroll, etc.) - Only if body wasn't hit
+      for (const item of backItems) {
+        if (getPixelAlphaSync(item.imageUrl, xp, yp, radius) > 5) {
+          lastGrabInfo.current = { itemId: item.id, time: now }
+          handleGrabFromAvatar(item, e)
+          return
+        }
+      }
+    }
 
     return (
       <div
         className={`${stageClassName} ${equipAnimClass} ${(enableDrop && isDragOver) || (draggingItem && isManualDragOver) ? 'drag-over' : ''}`}
         style={{ touchAction: 'none' }}
+        onPointerDown={handleStagePointerDown}
         onMouseEnter={() => {
           if (draggingItem) setIsManualDragOver(true)
         }}
@@ -2168,7 +2462,7 @@ export default function App() {
             src={item.imageUrl}
             alt={item.name}
             crossOrigin="anonymous"
-            {...grabProps(item)}
+            style={{ pointerEvents: 'none' }}
           />
         ))}
 
@@ -2179,6 +2473,7 @@ export default function App() {
             src={equippedBase.imageUrl}
             alt={equippedBase.name}
             crossOrigin="anonymous"
+            style={{ pointerEvents: 'none' }}
           />
         )}
 
@@ -2194,7 +2489,7 @@ export default function App() {
                 src={item.imageUrl}
                 alt={item.name}
                 crossOrigin="anonymous"
-                {...grabProps(item)}
+                style={{ pointerEvents: 'none' }}
               />
             )
           })}
@@ -2260,15 +2555,77 @@ export default function App() {
       <div
         key={item.id}
         className={`itemCard ${favorite ? 'glow-favorite' : ''}`}
-        onMouseDown={(e) => {
+        onMouseEnter={() => {
+          // Pre-cache pixel data when hovering in closet
+          getPixelAlpha(item.imageUrl, 0, 0).catch(() => {})
+        }}
+        onMouseDown={async (e) => {
           if (e.button !== 0) return
+          const now = Date.now()
+          
+          // Double-click to equip immediately
+          if (lastClosetClick.current.itemId === item.id && (now - lastClosetClick.current.time < 300)) {
+            handleEquip(item)
+            setDraggingItem(null)
+            lastClosetClick.current = { itemId: null, time: 0 }
+            return
+          }
+          lastClosetClick.current = { itemId: item.id, time: now }
+
+          // Pixel-perfect check for closet cards
+          const rect = e.currentTarget.getBoundingClientRect()
+          const previewEl = e.currentTarget.querySelector('.itemPreview')
+          if (previewEl) {
+            const prect = previewEl.getBoundingClientRect()
+            const xp = (e.clientX - prect.left) / prect.width
+            const yp = (e.clientY - prect.top) / prect.height
+            // Check pixel in the image (radius 5 for ease)
+            const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 5)
+            if (alpha <= 5) return // Clicked on empty area of the card
+            
+            // Calculate offset relative to the preview to maintain grab position
+            setDragOffset({ x: e.clientX - prect.left, y: e.clientY - prect.top })
+          } else {
+            setDragOffset({ x: 100, y: 150 })
+          }
+          
           setDraggingItem(item)
           e.preventDefault()
         }}
-        onTouchStart={(e) => {
+        onTouchStart={async (e) => {
           if (!e.touches[0]) return
           const touch = e.touches[0]
-          setMousePos({ x: touch.clientX, y: touch.clientY })
+          const now = Date.now()
+
+          // Double-tap to equip immediately
+          if (lastClosetClick.current.itemId === item.id && (now - lastClosetClick.current.time < 300)) {
+            handleEquip(item)
+            setDraggingItem(null)
+            lastClosetClick.current = { itemId: null, time: 0 }
+            return
+          }
+          lastClosetClick.current = { itemId: item.id, time: now }
+          
+          // Pixel-perfect check for closet cards (touch)
+          const previewEl = e.currentTarget.querySelector('.itemPreview')
+          if (previewEl) {
+            const prect = previewEl.getBoundingClientRect()
+            const xp = (touch.clientX - prect.left) / prect.width
+            const yp = (touch.clientY - prect.top) / prect.height
+            const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 10) // Larger radius for touch
+            if (alpha <= 5) return 
+            
+            setDragOffset({ x: touch.clientX - prect.left, y: touch.clientY - prect.top })
+          } else {
+            setDragOffset({ x: 100, y: 150 })
+          }
+
+          lastMousePos.current = { x: touch.clientX, y: touch.clientY }
+          // Initialize cursor pos so it doesn't jump from (0,0)
+          if (currentCursorPos.current.x === 0) {
+            currentCursorPos.current = { x: touch.clientX, y: touch.clientY }
+          }
+          
           setDraggingItem(item)
         }}
       >
@@ -2460,7 +2817,6 @@ export default function App() {
         const offset = Math.min(maxOffset, Math.max(0, scrollTop - containerTop + 20));
         setClosetPreviewTop(offset);
       } else {
-        // --- Mobile Logic ---
         const followEl = document.querySelector('.mobileClosetFollowCard');
         const followHeight = followEl ? followEl.offsetHeight : 300;
         const maxMOffset = Math.max(0, containerHeight - followHeight - 40);
@@ -2574,16 +2930,21 @@ export default function App() {
       </div>
 
       <div 
+        id="magic-cursor-root"
         className={`magic-cursor ${draggingItem ? 'is-dragging-item' : ''}`} 
         style={{ 
-          transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0)`,
           opacity: isPosting ? 0 : 1,
-          visibility: (mousePos.x === 0 && mousePos.y === 0) ? 'hidden' : 'visible'
+          visibility: 'hidden'
         }}
       >
         <div className="magic-cursor-inner">
           {draggingItem && (
-            <div className="dragged-item-wrapper">
+            <div 
+              className="dragged-item-wrapper"
+              style={{
+                transform: `translate3d(${-dragOffset.x}px, ${-dragOffset.y}px, 0)`
+              }}
+            >
               <img src={draggingItem.imageUrl} className="dragged-item-img" alt="" />
             </div>
           )}
@@ -2657,6 +3018,9 @@ export default function App() {
             <button className={`tabButton ${activeTab === 'gallery' ? 'active' : ''}`} onClick={() => setActiveTab('gallery')}>
               ギャラリー
             </button>
+            <button className={`tabButton ${activeTab === 'dl' ? 'active' : ''}`} onClick={() => setActiveTab('dl')}>
+              DL
+            </button>
             <button className={`tabButton ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
               設定
             </button>
@@ -2689,9 +3053,9 @@ export default function App() {
                   
                   <div className="homeCaptureInner">
                     <div className="homeLeftCol">
-                      <button className="homeAvatarButton" onClick={handleCharacterClick}>
+                      <div className="homeAvatarButton">
                         {renderAvatarLayers('homeAvatarStage', true)}
-                      </button>
+                      </div>
                     </div>
 
                     <div className="homeRightCol">
@@ -2776,8 +3140,8 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div className="notebookCard">
-                          <div className="notebookTitle">今日のコーデ</div>
+                      <div className="notebookCard">
+                        <div className="notebookTitle">今日のコーデ</div>
                           <div className="equippedItemsRow">
                             {layeredEquippedItems.map(entry => (
                               entry.item && (
@@ -3137,6 +3501,8 @@ export default function App() {
           )}
 
           {activeTab === 'gallery' && renderGalleryTab()}
+
+          {activeTab === 'dl' && renderDLTab()}
 
           {activeTab === 'settings' && (
             <div className="settingsLayoutWide">
