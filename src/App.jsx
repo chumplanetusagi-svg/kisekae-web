@@ -2450,15 +2450,21 @@ export default function App() {
 
       const containerRect = closetContainer.getBoundingClientRect();
       const containerTop = containerRect.top + scrollTop;
+      const containerHeight = closetContainer.offsetHeight;
 
       // --- Desktop Logic (Wider screens) ---
       if (window.innerWidth > 800) {
-        // PCでもJavaScriptで位置を計算して追従させる
-        const offset = Math.max(0, scrollTop - containerTop + 20);
+        const previewEl = document.querySelector('.closetDesktopPreview');
+        const previewHeight = previewEl ? previewEl.offsetHeight : 600;
+        const maxOffset = Math.max(0, containerHeight - previewHeight - 60);
+        const offset = Math.min(maxOffset, Math.max(0, scrollTop - containerTop + 20));
         setClosetPreviewTop(offset);
       } else {
         // --- Mobile Logic ---
-        let mOffset = Math.max(0, scrollTop - containerTop + 8);
+        const followEl = document.querySelector('.mobileClosetFollowCard');
+        const followHeight = followEl ? followEl.offsetHeight : 300;
+        const maxMOffset = Math.max(0, containerHeight - followHeight - 40);
+        const mOffset = Math.min(maxMOffset, Math.max(0, scrollTop - containerTop + 8));
         setMobilePreviewTop(mOffset);
       }
     };
