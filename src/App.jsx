@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import { supabase } from './supabase'
@@ -1124,37 +1124,11 @@ export default function App() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [isMouseDown, setIsMouseDown] = useState(false)
 
-  // --- Custom Cursor State ---
-  const [customCursorUrl, setCustomCursorUrl] = useState(
-    () => localStorage.getItem('customCursorUrl') || ''
-  )
-  const [customCursorHoverUrl, setCustomCursorHoverUrl] = useState(
-    () => localStorage.getItem('customCursorHoverUrl') || ''
-  )
-
-  // Apply custom cursor via a dynamic <style> tag
-  useEffect(() => {
-    let styleEl = document.getElementById('custom-cursor-style')
-    if (!styleEl) {
-      styleEl = document.createElement('style')
-      styleEl.id = 'custom-cursor-style'
-      document.head.appendChild(styleEl)
-    }
-    if (customCursorUrl) {
-      const hoverUrl = customCursorHoverUrl || customCursorUrl
-      styleEl.textContent = `
-        html, body, #root, * { cursor: url('${customCursorUrl}') 4 4, auto !important; }
-        button:hover, .itemCard:hover, .dragHandle:hover, a:hover, [role="button"]:hover,
-        .magic-cursor { display: none !important; }
-        .is-dragging-custom, .is-dragging-custom * { cursor: url('${hoverUrl}') 4 4, grabbing !important; }
-      `
-    } else {
-      // Default: use magic-cursor follower (hide native)
-      styleEl.textContent = `
-        html, body, #root, * { cursor: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') 0 0, none !important; }
-      `
-    }
-  }, [customCursorUrl, customCursorHoverUrl])
+  const [draggingItem, setDraggingItem] = useState(null)
+  const [isManualDragOver, setIsManualDragOver] = useState(false)
+  const [customCursorUrl, setCustomCursorUrl] = useState(() => localStorage.getItem('customCursorUrl') || '')
+  const [customCursorHoverUrl, setCustomCursorHoverUrl] = useState(() => localStorage.getItem('customCursorHoverUrl') || '')
+  const [isHoveringInteractive, setIsHoveringInteractive] = useState(false)
 
   // --- Gallery State & Fetching ---
   const [galleryPosts, setGalleryPosts] = useState([]);
@@ -1173,6 +1147,39 @@ export default function App() {
   }, [myPostIds]);
 
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+
+  const handleEquip = useCallback((item) => {
+    if (!item) return
+    if (item.category === 'upper') {
+      setEquippedUpperId(item.id)
+    } else if (item.category === 'lower') {
+      setEquippedLowerId(item.id)
+    } else if (item.category === 'accessory') {
+      setEquippedAccessoryIds((prev) => {
+        if (prev.includes(item.id)) {
+          return prev.filter((id) => id !== item.id)
+        }
+        if (prev.length >= MAX_ACCESSORIES) {
+          setNotification(`${MAX_ACCESSORIES}種類しかアクセはつけられないよ`)
+          return prev
+        }
+        return [...prev, item.id]
+      })
+    }
+  }, [MAX_ACCESSORIES])
+
+  const handleGrabFromAvatar = useCallback((item, e) => {
+    if (e.type === 'mousedown' && e.button !== 0) return
+    if (e.cancelable) e.preventDefault()
+    setDraggingItem(item)
+    if (item.category === 'upper') {
+      setEquippedUpperId(null)
+    } else if (item.category === 'lower') {
+      setEquippedLowerId(null)
+    } else if (item.category === 'accessory') {
+      setEquippedAccessoryIds(prev => prev.filter(id => id !== item.id))
+    }
+  }, [])
 
   const handleDeletePost = (postId) => {
     // window.confirmを廃止し、カスタムダイアログを表示
@@ -1362,19 +1369,56 @@ export default function App() {
       document.documentElement.style.setProperty('--mx', `${x}px`)
       document.documentElement.style.setProperty('--my', `${y}px`)
       setMousePos({ x: e.clientX, y: e.clientY })
+      
+      const isOver = !!e.target.closest('button, a, .itemCard, .dragHandle, .layerRowDrag')
+      setIsHoveringInteractive(isOver)
     }
+
+    const handleGlobalTouchMove = (e) => {
+      if (!e.touches[0]) return
+      const touch = e.touches[0]
+      setMousePos({ x: touch.clientX, y: touch.clientY })
+      if (draggingItem && e.cancelable) {
+        e.preventDefault()
+      }
+    }
+
     const handleGlobalMouseDown = () => setIsMouseDown(true)
-    const handleGlobalMouseUp = () => setIsMouseDown(false)
+
+    const handleGlobalMouseUp = (e) => {
+      setIsMouseDown(false)
+      setIsManualDragOver(false)
+      if (draggingItem) {
+        // Handle both Mouse and Touch coordinate detection
+        const clientX = e.clientX ?? (e.changedTouches ? e.changedTouches[0]?.clientX : undefined)
+        const clientY = e.clientY ?? (e.changedTouches ? e.changedTouches[0]?.clientY : undefined)
+
+        if (clientX !== undefined && clientY !== undefined) {
+          const el = document.elementFromPoint(clientX, clientY)
+          const isOverStage = el?.closest('.characterStage') || el?.closest('.homeAvatarStage') || el?.closest('.mobileFollowStage')
+          if (isOverStage) {
+            if (draggingItem.category === 'upper') setEquippedUpperId(draggingItem.id)
+            else if (draggingItem.category === 'lower') setEquippedLowerId(draggingItem.id)
+            else handleEquip(draggingItem)
+          }
+        }
+        setDraggingItem(null)
+      }
+    }
 
     window.addEventListener('mousemove', handleGlobalMouseMove)
+    window.addEventListener('touchmove', handleGlobalTouchMove, { passive: false })
     window.addEventListener('mousedown', handleGlobalMouseDown)
     window.addEventListener('mouseup', handleGlobalMouseUp)
+    window.addEventListener('touchend', handleGlobalMouseUp)
     return () => {
       window.removeEventListener('mousemove', handleGlobalMouseMove)
+      window.removeEventListener('touchmove', handleGlobalTouchMove)
       window.removeEventListener('mousedown', handleGlobalMouseDown)
       window.removeEventListener('mouseup', handleGlobalMouseUp)
+      window.removeEventListener('touchend', handleGlobalMouseUp)
     }
-  }, [])
+  }, [draggingItem, isManualDragOver, handleEquip])
 
   useEffect(() => {
     let timer
@@ -1807,30 +1851,6 @@ export default function App() {
     }
   }
 
-  const handleEquip = (item) => {
-    if (item.category === 'upper') {
-      setEquippedUpperId(item.id)
-      return
-    }
-
-    if (item.category === 'lower') {
-      setEquippedLowerId(item.id)
-      return
-    }
-
-    if (item.category === 'accessory') {
-      setEquippedAccessoryIds((prev) => {
-        if (prev.includes(item.id)) {
-          return prev.filter((id) => id !== item.id)
-        }
-        if (prev.length >= MAX_ACCESSORIES) {
-          setNotification(`${MAX_ACCESSORIES}種類しかアクセはつけられないよ`)
-          return prev
-        }
-        return [...prev, item.id]
-      })
-    }
-  }
 
   const handleToggleFavorite = (item) => {
     if (item.category === 'upper') {
@@ -2090,9 +2110,28 @@ export default function App() {
       'accessory-5': frontAccessories[4] || null,
     }
 
+    const grabProps = (item) => ({
+      onMouseDown: (e) => handleGrabFromAvatar(item, e),
+      onTouchStart: (e) => {
+        const touch = e.touches[0]
+        if (touch) {
+          setMousePos({ x: touch.clientX, y: touch.clientY })
+          handleGrabFromAvatar(item, e)
+        }
+      },
+      style: { cursor: 'grab' }
+    })
+
     return (
       <div
-        className={`${stageClassName} ${equipAnimClass} ${enableDrop && isDragOver ? 'drag-over' : ''}`}
+        className={`${stageClassName} ${equipAnimClass} ${(enableDrop && isDragOver) || (draggingItem && isManualDragOver) ? 'drag-over' : ''}`}
+        style={{ touchAction: 'none' }}
+        onMouseEnter={() => {
+          if (draggingItem) setIsManualDragOver(true)
+        }}
+        onMouseLeave={() => {
+          setIsManualDragOver(false)
+        }}
         onDragOver={(e) => {
           if (!enableDrop) return
           e.preventDefault()
@@ -2129,6 +2168,7 @@ export default function App() {
             src={item.imageUrl}
             alt={item.name}
             crossOrigin="anonymous"
+            {...grabProps(item)}
           />
         ))}
 
@@ -2154,6 +2194,7 @@ export default function App() {
                 src={item.imageUrl}
                 alt={item.name}
                 crossOrigin="anonymous"
+                {...grabProps(item)}
               />
             )
           })}
@@ -2219,23 +2260,16 @@ export default function App() {
       <div
         key={item.id}
         className={`itemCard ${favorite ? 'glow-favorite' : ''}`}
-        draggable={true}
-        onDragStart={(e) => {
-          e.dataTransfer.setData('application/json', JSON.stringify(item))
-          e.dataTransfer.effectAllowed = 'copy'
-
-          // Show custom cursor during drag (it will follow mouse via mousemove)
-          setIsDraggingCustom(true)
-
-          // Use a fully transparent 1x1 ghost image so the browser shows NO native drag image/cursor
-          const ghostImg = new Image()
-          ghostImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-          e.dataTransfer.setDragImage(ghostImg, 0, 0)
+        onMouseDown={(e) => {
+          if (e.button !== 0) return
+          setDraggingItem(item)
+          e.preventDefault()
         }}
-        onDragEnd={() => {
-          setIsDraggingCustom(false)
-          document.body.style.cursor = ''
-          document.documentElement.style.cursor = ''
+        onTouchStart={(e) => {
+          if (!e.touches[0]) return
+          const touch = e.touches[0]
+          setMousePos({ x: touch.clientX, y: touch.clientY })
+          setDraggingItem(item)
         }}
       >
         <div className="itemPreview">
@@ -2378,11 +2412,9 @@ export default function App() {
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
             onDragMove={handleDragAutoScroll}
             onDragEnd={(event) => {
               handleLayerDragEnd(event);
-              handleDragEndGlobal();
             }}
           >
             <SortableContext
@@ -2401,62 +2433,8 @@ export default function App() {
     )
   }
 
-  // --- Drag Event Handlers for Global Cursor Fix ---
-  const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
-  const [isDraggingCustom, setIsDraggingCustom] = useState(false);
 
-  const handleGlobalMouseDown = (e) => {
-    const target = e.target;
-    if (target.closest('.itemCard, .dragHandle, [draggable="true"]')) {
-      setIsDraggingCustom(true);
-      setDragPos({ x: e.clientX, y: e.clientY });
-      document.documentElement.classList.add('is-dragging-custom');
-      document.body.classList.add('is-dragging-custom');
-    }
-  };
-
-  const handleGlobalMouseUp = () => {
-    setIsDraggingCustom(false);
-    document.documentElement.classList.remove('is-dragging-custom');
-    document.body.classList.remove('is-dragging-custom');
-  };
-
-  const handleDragStart = (e) => {
-    setIsDraggingCustom(true);
-    document.documentElement.classList.add('is-dragging-custom');
-    document.body.classList.add('is-dragging-custom');
-    // 強制的にネイティブカーソルを消す (透明画像で上書き)
-    const transparentCursor = "url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') 0 0, none";
-    document.body.style.setProperty('cursor', transparentCursor, 'important');
-    document.documentElement.style.setProperty('cursor', transparentCursor, 'important');
-
-    // Hide native browser drag image (ghost) to only show our custom follower
-    if (e.dataTransfer) {
-      const img = new Image();
-      img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // Transparent 1x1
-      e.dataTransfer.setDragImage(img, 0, 0);
-    }
-  };
-
-  const handleDragMoveGlobal = (e) => {
-    // During native drag, mousemove is often blocked. Use clientX from drag events if possible.
-    // However, window.dragover is the most reliable way during dnd-kit or native drags.
-    setDragPos({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleGlobalDragOver = (e) => {
-    e.preventDefault(); // Necessary for dragover to work
-    setDragPos({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleDragEndGlobal = () => {
-    setIsDraggingCustom(false);
-    document.documentElement.classList.remove('is-dragging-custom');
-    document.body.classList.remove('is-dragging-custom');
-    // ネイティブカーソルを元に戻す
-    document.body.style.cursor = '';
-    document.documentElement.style.cursor = '';
-  };
+  // --- Character Preview Sticky Support via JS (for Desktop & Mobile) ---
 
   // --- Character Preview Sticky Support via JS (for Desktop & Mobile) ---
   const [closetPreviewTop, setClosetPreviewTop] = useState(0);
@@ -2490,25 +2468,10 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeTab, closetTab]);
 
-  useEffect(() => {
-    window.addEventListener('mousedown', handleGlobalMouseDown);
-    window.addEventListener('mouseup', handleGlobalMouseUp);
-    if (isDraggingCustom) {
-      window.addEventListener('mousemove', handleDragMoveGlobal);
-      window.addEventListener('dragover', handleGlobalDragOver);
-    }
-    return () => {
-      window.removeEventListener('mousedown', handleGlobalMouseDown);
-      window.removeEventListener('mouseup', handleGlobalMouseUp);
-      window.removeEventListener('mousemove', handleDragMoveGlobal);
-      window.removeEventListener('dragover', handleGlobalDragOver);
-    };
-  }, [isDraggingCustom]);
 
   return (
     <div
       className={`appShell ${activeTab === 'closet' ? 'closet-open' : ''}`}
-      onMouseUp={handleGlobalMouseUp}
       onClick={handleGlobalClick}
       onDragOver={(e) => e.preventDefault()}
       onDragEnter={(e) => e.preventDefault()}
@@ -2604,18 +2567,30 @@ export default function App() {
         ))}
       </div>
 
-      {/* カスタムカーソルの本体 - ドラッグ中も表示して白い矢印の代わりになる */}
       <div 
-        className="magic-cursor" 
+        className={`magic-cursor ${draggingItem ? 'is-dragging-item' : ''}`} 
         style={{ 
-          left: mousePos.x, 
-          top: mousePos.y,
-          transform: `translate(-50%, -50%) scale(${isDraggingCustom || isMouseDown ? 1.2 : 1})`,
-          opacity: isPosting ? 0 : 1
+          transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0)`,
+          opacity: isPosting ? 0 : 1,
+          visibility: (mousePos.x === 0 && mousePos.y === 0) ? 'hidden' : 'visible'
         }}
       >
         <div className="magic-cursor-inner">
-          <img src={(isDraggingCustom || isMouseDown) ? "/images/cursor_hover.png" : "/images/cursor.png"} alt="" />
+          {draggingItem && (
+            <div className="dragged-item-wrapper">
+              <img src={draggingItem.imageUrl} className="dragged-item-img" alt="" />
+            </div>
+          )}
+          <div className="native-cursor-wrapper">
+            <img 
+              src={(isMouseDown || isHoveringInteractive) 
+                ? (customCursorHoverUrl || '/cursor_hover.png') 
+                : (customCursorUrl || '/cursor_normal.png')
+              } 
+              className="native-cursor-replacement" 
+              alt="" 
+            />
+          </div>
         </div>
       </div>
 
@@ -2709,7 +2684,7 @@ export default function App() {
                   <div className="homeCaptureInner">
                     <div className="homeLeftCol">
                       <button className="homeAvatarButton" onClick={handleCharacterClick}>
-                        {renderAvatarLayers('homeAvatarStage')}
+                        {renderAvatarLayers('homeAvatarStage', true)}
                       </button>
                     </div>
 
@@ -2778,7 +2753,7 @@ export default function App() {
                     <div className="homeCaptureInner">
                       <div className="homeLeftCol">
                         <div className="homeAvatarStage">
-                          {renderAvatarLayers('homeAvatarStage')}
+                          {renderAvatarLayers('homeAvatarStage', true)}
                         </div>
                       </div>
 
@@ -3174,9 +3149,6 @@ export default function App() {
                   <button className={`settingsTabButton ${settingsTab === 'credits' ? 'active' : ''}`} onClick={() => setSettingsTab('credits')}>
                     クレジット
                   </button>
-                  <button className={`settingsTabButton ${settingsTab === 'cursor' ? 'active' : ''}`} onClick={() => setSettingsTab('cursor')}>
-                    🖱️ カーソル
-                  </button>
                 </div>
 
                 {settingsTab === 'profile' && (
@@ -3267,88 +3239,6 @@ export default function App() {
                   </div>
                 )}
 
-                {settingsTab === 'cursor' && (
-                  <div className="settingsPanel">
-                    <div className="cursorSettingsBox">
-                      <h3 className="cursorSettingsTitle">🖱️ カーソル画像の設定</h3>
-                      <p className="cursorSettingsHint">自分の好きな画像でカーソルをカスタムできるよ！PNG / GIF がおすすめ。推奨サイズは 32×32 〜 64×64px。</p>
-
-                      {customCursorUrl && (
-                        <div className="cursorPreviewRow">
-                          <div className="cursorPreviewItem">
-                            <span className="cursorPreviewLabel">通常カーソル</span>
-                            <img src={customCursorUrl} className="cursorPreviewImg" alt="cursor" />
-                          </div>
-                          {customCursorHoverUrl && (
-                            <div className="cursorPreviewItem">
-                              <span className="cursorPreviewLabel">クリック時</span>
-                              <img src={customCursorHoverUrl} className="cursorPreviewImg" alt="cursor hover" />
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      <div className="cursorUploadGrid">
-                        <label className="cursorUploadLabel">
-                          <span>通常カーソル画像</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="cursorFileInput"
-                            onChange={(e) => {
-                              const file = e.target.files[0]
-                              if (!file) return
-                              const reader = new FileReader()
-                              reader.onload = (ev) => {
-                                const url = ev.target.result
-                                setCustomCursorUrl(url)
-                                localStorage.setItem('customCursorUrl', url)
-                              }
-                              reader.readAsDataURL(file)
-                            }}
-                          />
-                          <span className="cursorUploadBtn">📂 ファイルを選ぶ</span>
-                        </label>
-
-                        <label className="cursorUploadLabel">
-                          <span>クリック時カーソル画像（任意）</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="cursorFileInput"
-                            onChange={(e) => {
-                              const file = e.target.files[0]
-                              if (!file) return
-                              const reader = new FileReader()
-                              reader.onload = (ev) => {
-                                const url = ev.target.result
-                                setCustomCursorHoverUrl(url)
-                                localStorage.setItem('customCursorHoverUrl', url)
-                              }
-                              reader.readAsDataURL(file)
-                            }}
-                          />
-                          <span className="cursorUploadBtn">📂 ファイルを選ぶ</span>
-                        </label>
-                      </div>
-
-                      <div className="cursorActions">
-                        {customCursorUrl ? (
-                          <button className="dangerButton" onClick={() => {
-                            setCustomCursorUrl('')
-                            setCustomCursorHoverUrl('')
-                            localStorage.removeItem('customCursorUrl')
-                            localStorage.removeItem('customCursorHoverUrl')
-                          }}>
-                            🔄 デフォルトに戻す
-                          </button>
-                        ) : (
-                          <p style={{color: 'var(--muted)', fontSize: '14px'}}>現在はデフォルトのカーソルを使用中</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
               </section>
             </div>
           )}
