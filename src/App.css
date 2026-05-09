@@ -1188,7 +1188,7 @@ a {}
 
   /* High-priority Mobile Layout Fix for Closet Open */
   .appShell.closet-open {
-    padding-bottom: 500px !important;
+    padding-bottom: 120px !important;
   }
 
   .closet-open .appFrame {
