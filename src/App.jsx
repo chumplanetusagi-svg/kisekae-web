@@ -1147,6 +1147,11 @@ export default function App() {
   const closetContainerTopRef = useRef(0) // Stable top position
 
   const [activeTab, setActiveTab] = useState(initialSave.activeTab)
+  
+  // Reset tracking ref when tab changes
+  useEffect(() => {
+    closetContainerTopRef.current = 0
+  }, [activeTab])
   const [closetTab, setClosetTab] = useState(initialSave.closetTab)
   const [settingsTab, setSettingsTab] = useState(initialSave.settingsTab)
   const [nickname, setNickname] = useState(initialSave.nickname)
