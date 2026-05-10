@@ -2898,44 +2898,6 @@ export default function App() {
   }
 
 
-  // --- Character Preview Sticky Support via JS (for Desktop & Mobile) ---
-
-  // --- Character Preview Sticky Support via JS (for Desktop & Mobile) ---
-  const [closetPreviewTop, setClosetPreviewTop] = useState(0);
-  const [mobilePreviewTop, setMobilePreviewTop] = useState(0);
-
-  useEffect(() => {
-    if (activeTab !== 'closet') return;
-
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const closetContainer = document.querySelector('.closetLayout');
-      if (!closetContainer) return;
-
-      const containerRect = closetContainer.getBoundingClientRect();
-      const containerTop = containerRect.top + scrollTop;
-      const containerHeight = closetContainer.offsetHeight;
-
-      // --- Desktop Logic (Wider screens) ---
-      if (window.innerWidth > 800) {
-        const previewEl = document.querySelector('.closetDesktopPreview');
-        const previewHeight = previewEl ? previewEl.offsetHeight : 600;
-        const maxOffset = Math.max(0, containerHeight - previewHeight - 60);
-        const offset = Math.min(maxOffset, Math.max(0, scrollTop - containerTop + 20));
-        setClosetPreviewTop(offset);
-      } else {
-        const followEl = document.querySelector('.mobileClosetFollowCard');
-        const followHeight = followEl ? followEl.offsetHeight : 300;
-        const maxMOffset = Math.max(0, containerHeight - followHeight - 40);
-        const mOffset = Math.min(maxMOffset, Math.max(0, scrollTop - containerTop + 8));
-        setMobilePreviewTop(mOffset);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [activeTab, closetTab]);
 
 
   return (
