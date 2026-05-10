@@ -1221,48 +1221,42 @@ export default function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Get scroll position from multiple sources for cross-browser compatibility
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-      
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const closetContainer = document.querySelector('.closetLayout');
       if (!closetContainer) return;
 
-      // Calculate the absolute top of the container once (or relative to viewport + scroll)
-      const containerRect = closetContainer.getBoundingClientRect();
-      const containerTopFromDoc = containerRect.top + scrollTop;
+      // Use offsetTop for a stable, document-relative starting position
+      const containerTop = closetContainer.offsetTop;
       const containerHeight = closetContainer.offsetHeight;
 
-      // Target elements
       const desktopPreview = desktopClosetPreviewRef.current;
       const mobilePreview = mobileClosetFollowRef.current;
 
       // Desktop tracking
       if (window.innerWidth >= 821 && desktopPreview) {
         const previewHeight = desktopPreview.offsetHeight || 600;
-        
-        // The distance we've scrolled into the container
-        let relativeScroll = scrollTop - containerTopFromDoc;
-        
-        // Clamping range
         const maxOffset = Math.max(0, containerHeight - previewHeight - 60);
-        const offset = Math.min(maxOffset, Math.max(0, relativeScroll + 20));
         
-        setClosetPreviewTop(offset);
+        // Calculate offset: how far we are from the top of the container
+        // Add 20px buffer as per the successful version
+        const targetOffset = scrollTop - containerTop + 20;
+        const clampedOffset = Math.min(maxOffset, Math.max(0, targetOffset));
+        
+        setClosetPreviewTop(clampedOffset);
       } 
       
       // Mobile tracking
       if (window.innerWidth < 821 && mobilePreview) {
         const followHeight = mobilePreview.offsetHeight || 300;
-        let relativeScroll = scrollTop - containerTopFromDoc;
-        
         const maxMOffset = Math.max(0, containerHeight - followHeight - 40);
-        const mOffset = Math.min(maxMOffset, Math.max(0, relativeScroll + 8));
         
-        setMobilePreviewTop(mOffset);
+        const targetMOffset = scrollTop - containerTop + 8;
+        const clampedMOffset = Math.min(maxMOffset, Math.max(0, targetMOffset));
+        
+        setMobilePreviewTop(clampedMOffset);
       }
     };
 
-    // Listen on both window and scrollable elements just in case
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     
