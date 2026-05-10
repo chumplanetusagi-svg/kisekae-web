@@ -1144,14 +1144,8 @@ export default function App() {
   const mobileClosetFollowRef = useRef(null)
   const desktopClosetPreviewRef = useRef(null)
   const previewAudioRef = useRef(null)
-  const closetContainerTopRef = useRef(0) // Stable top position
 
   const [activeTab, setActiveTab] = useState(initialSave.activeTab)
-  
-  // Reset tracking ref when tab changes
-  useEffect(() => {
-    closetContainerTopRef.current = 0
-  }, [activeTab])
   const [closetTab, setClosetTab] = useState(initialSave.closetTab)
   const [settingsTab, setSettingsTab] = useState(initialSave.settingsTab)
   const [nickname, setNickname] = useState(initialSave.nickname)
@@ -1231,45 +1225,27 @@ export default function App() {
       const closetContainer = document.querySelector('.closetLayout');
       if (!closetContainer) return;
 
-      // Initialize the stable top position once when we find the container
-      if (closetContainerTopRef.current === 0) {
-        const rect = closetContainer.getBoundingClientRect();
-        closetContainerTopRef.current = rect.top + scrollTop;
-      }
-
-      const containerTop = closetContainerTopRef.current;
+      const containerRect = closetContainer.getBoundingClientRect();
+      const containerTop = containerRect.top + scrollTop;
       const containerHeight = closetContainer.offsetHeight;
 
-      const desktopPreview = desktopClosetPreviewRef.current;
-      const mobilePreview = mobileClosetFollowRef.current;
-
-      // Tracking logic with stable 1:1 sync
-      if (window.innerWidth >= 821 && desktopPreview) {
-        const previewHeight = desktopPreview.offsetHeight || 600;
+      if (window.innerWidth >= 821) {
+        const previewEl = desktopClosetPreviewRef.current;
+        const previewHeight = previewEl ? previewEl.offsetHeight : 600;
         const maxOffset = Math.max(0, containerHeight - previewHeight - 60);
-        
-        // Offset is strictly 1:1 with scroll distance past the container top
-        const targetOffset = scrollTop - containerTop + 20;
-        const clampedOffset = Math.min(maxOffset, Math.max(0, targetOffset));
-        
-        setClosetPreviewTop(clampedOffset);
-      } 
-      
-      // Mobile tracking
-      if (window.innerWidth < 821 && mobilePreview) {
-        const followHeight = mobilePreview.offsetHeight || 300;
+        const offset = Math.min(maxOffset, Math.max(0, scrollTop - containerTop + 20));
+        setClosetPreviewTop(offset);
+      } else {
+        const followEl = mobileClosetFollowRef.current;
+        const followHeight = followEl ? followEl.offsetHeight : 300;
         const maxMOffset = Math.max(0, containerHeight - followHeight - 40);
-        
-        const targetMOffset = scrollTop - containerTop + 8;
-        const clampedMOffset = Math.min(maxMOffset, Math.max(0, targetMOffset));
-        
-        setMobilePreviewTop(clampedMOffset);
+        const mOffset = Math.min(maxMOffset, Math.max(0, scrollTop - containerTop + 8));
+        setMobilePreviewTop(mOffset);
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll);
     handleScroll();
-    
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeTab, closetTab]);
 
