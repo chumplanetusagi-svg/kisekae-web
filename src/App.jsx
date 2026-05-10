@@ -1221,52 +1221,33 @@ export default function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const closetContainer = document.querySelector('.closetLayout');
       if (!closetContainer) return;
-      
+
       const containerRect = closetContainer.getBoundingClientRect();
       const containerTop = containerRect.top + scrollTop;
       const containerHeight = closetContainer.offsetHeight;
 
-      // Desktop tracking
       if (window.innerWidth >= 821) {
-        if (activeTab === 'closet') {
-          const previewEl = desktopClosetPreviewRef.current;
-          const previewHeight = previewEl ? previewEl.offsetHeight : 600;
-          
-          // Simple offset calculation: follow scroll but stay within closet container
-          const headerOffset = 160; // Approximate header + tab height
-          let targetY = scrollTop - containerTop + 20;
-          
-          // Boundary checks
-          const maxOffset = Math.max(0, containerHeight - previewHeight - 40);
-          targetY = Math.min(maxOffset, Math.max(0, targetY));
-          
-          setClosetPreviewTop(targetY);
-        } else {
-          setClosetPreviewTop(0)
-        }
+        const previewEl = desktopClosetPreviewRef.current;
+        const previewHeight = previewEl ? previewEl.offsetHeight : 600;
+        const maxOffset = Math.max(0, containerHeight - previewHeight - 60);
+        const offset = Math.min(maxOffset, Math.max(0, scrollTop - containerTop + 20));
+        setClosetPreviewTop(offset);
+      } else {
+        const followEl = mobileClosetFollowRef.current;
+        const followHeight = followEl ? followEl.offsetHeight : 300;
+        const maxMOffset = Math.max(0, containerHeight - followHeight - 40);
+        const mOffset = Math.min(maxMOffset, Math.max(0, scrollTop - containerTop + 8));
+        setMobilePreviewTop(mOffset);
       }
-      
-      // Mobile tracking
-      if (window.innerWidth < 821) {
-        if (activeTab === 'closet') {
-          const followEl = mobileClosetFollowRef.current;
-          const followHeight = followEl ? followEl.offsetHeight : 300;
-          const maxMOffset = Math.max(0, containerHeight - followHeight - 20);
-          const mOffset = Math.min(maxMOffset, Math.max(0, scrollTop - containerTop + 8));
-          setMobilePreviewTop(mOffset);
-        } else {
-          setMobilePreviewTop(0)
-        }
-      }
-    }
+    };
 
-    window.addEventListener('scroll', handleScroll)
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [activeTab, closetTab])
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [activeTab, closetTab]);
 
   // --- Download Tab State ---
   const [dlPasswords, setDlPasswords] = useState({}) // { itemId: 'input_value' }
