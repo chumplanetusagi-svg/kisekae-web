@@ -2327,8 +2327,16 @@ export default function App() {
         return
       }
     }
-    setNotification(`${item.title}のダウンロードを開始するよ！`)
-    // In a real app, window.location.href = item.fileUrl or similar
+
+    // Create a temporary anchor element to trigger download
+    const link = document.createElement('a')
+    link.href = item.fileUrl
+    link.download = item.fileUrl.split('/').pop() // Use filename from URL
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    setNotification(`${item.title}のダウンロードを開始したよ！`)
   }
 
   const renderDLTab = () => {
