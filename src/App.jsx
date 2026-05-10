@@ -22,15 +22,17 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { IoSettingsSharp } from 'react-icons/io5'
-import { 
-  FaHeart, 
-  FaHome, 
-  FaTshirt, 
-  FaQrcode, 
-  FaImage, 
-  FaDownload, 
-  FaCog, 
-  FaVolumeUp 
+import {
+  FaHeart,
+  FaHome,
+  FaTshirt,
+  FaQrcode,
+  FaImage,
+  FaDownload,
+  FaCog,
+  FaVolumeUp,
+  FaPlay,
+  FaPause
 } from 'react-icons/fa'
 
 const STORAGE_BUCKET = 'clothes'
@@ -640,7 +642,7 @@ const pixelCache = new Map()
 
 async function getPixelAlpha(url, xPercent, yPercent) {
   if (!url) return 0
-  
+
   try {
     let data = pixelCache.get(url)
     if (!data) {
@@ -656,9 +658,9 @@ async function getPixelAlpha(url, xPercent, yPercent) {
 
     const ix = Math.floor(xPercent * data.width)
     const iy = Math.floor(yPercent * data.height)
-    
+
     if (ix < 0 || ix >= data.width || iy < 0 || iy >= data.height) return 0
-    
+
     // Alpha is the 4th value in the RGBA sequence
     return data.data[(iy * data.width + ix) * 4 + 3]
   } catch (e) {
@@ -969,7 +971,7 @@ async function createQrCardCanvas({
       ctx.save()
       ctx.translate(clockCenterX, clockCenterY + 100)
       ctx.rotate(-5 * Math.PI / 180) // Match CSS rotation
-      
+
       ctx.fillStyle = '#f2ce9e'
       ctx.strokeStyle = '#594129'
       ctx.lineWidth = 3
@@ -989,7 +991,7 @@ async function createQrCardCanvas({
     } catch (e) {
       console.warn('Clock assets failed for QR canvas', e)
     }
-    
+
   } catch (e) {
     console.warn('Gears failed to load for QR card', e)
   }
@@ -1134,6 +1136,7 @@ export default function App() {
   const uploadFileInputRef = useRef(null)
   const mobileClosetFollowRef = useRef(null)
   const desktopClosetPreviewRef = useRef(null)
+  const previewAudioRef = useRef(null)
 
   const [activeTab, setActiveTab] = useState(initialSave.activeTab)
   const [closetTab, setClosetTab] = useState(initialSave.closetTab)
@@ -1321,11 +1324,11 @@ export default function App() {
     if (e && e.cancelable && typeof e.preventDefault === 'function') {
       e.preventDefault()
     }
-    
+
     // Use the values from the event immediately or provided values
     const clientX = e?.clientX ?? (e?.touches?.[0]?.clientX)
     const clientY = e?.clientY ?? (e?.touches?.[0]?.clientY)
-    
+
     if (clientX !== undefined && clientY !== undefined) {
       // Calculate offset relative to the stage to keep it where it was clicked
       const stage = e.currentTarget.closest('.characterStage, .homeAvatarStage')
@@ -1340,7 +1343,7 @@ export default function App() {
         setDragOffset({ x: 100, y: 150 }) // Approximation
       }
     }
-    
+
     setDraggingItem(item)
     // Clear from equipped state
     if (item.category === 'upper') setEquippedUpperId(null)
@@ -1409,7 +1412,7 @@ export default function App() {
     const newItems = allItems.filter(i => i.source !== 'default');
     setCustomItems(prev => {
       const existingIds = new Set(prev.map(i => i.id));
-      const filteredNew = newItems.filter(i => !existingIds.has(i.id)).map(i => ({...i, source: 'imported'}));
+      const filteredNew = newItems.filter(i => !existingIds.has(i.id)).map(i => ({ ...i, source: 'imported' }));
       return [...filteredNew, ...prev];
     });
     if (outfit.upper) setEquippedUpperId(outfit.upper.id);
@@ -1424,9 +1427,9 @@ export default function App() {
         {/* 撮影用の隠し要素 (徹底隔離＆クリーンルーム) */}
         <div className="capture-clean-room">
           <div ref={galleryCaptureRef} className="capture-canvas-target">
-             <div className="capture-avatar-fit" style={{ transform: 'scale(1.6)' }}>
-               {renderAvatarLayers('capture-avatar-layers')}
-             </div>
+            <div className="capture-avatar-fit" style={{ transform: 'scale(1.6)' }}>
+              {renderAvatarLayers('capture-avatar-layers')}
+            </div>
           </div>
         </div>
         <header className="galleryHeader">
@@ -1552,16 +1555,16 @@ export default function App() {
       const target = e.target
       const stageEl = target.closest('.characterStage, .homeAvatarStage, .mobileFollowStage')
       let isOverPixel = false
-      
+
       if (stageEl) {
         const rect = stageEl.getBoundingClientRect()
         const xp = (e.clientX - rect.left) / rect.width
         const yp = (e.clientY - rect.top) / rect.height
-        
+
         const frontItems = [equippedUpper, equippedLower, ...equippedAccessories.filter(a => !isBackAccessory(a))].filter(Boolean)
         const backItems = equippedAccessories.filter(isBackAccessory)
-        
-        const radius = 4 
+
+        const radius = 4
 
         // Check Front Items
         for (const it of frontItems) {
@@ -1570,7 +1573,7 @@ export default function App() {
             break
           }
         }
-        
+
         // Check Body (Priority over Back items)
         if (!isOverPixel && getPixelAlphaSync(equippedBase?.imageUrl, xp, yp, radius) > 5) {
           isOverPixel = true
@@ -1627,7 +1630,7 @@ export default function App() {
     window.addEventListener('mousedown', handleGlobalMouseDown)
     window.addEventListener('mouseup', handleGlobalMouseUp)
     window.addEventListener('touchend', handleGlobalMouseUp)
-    
+
     return () => {
       cancelAnimationFrame(rafId.current)
       window.removeEventListener('mousemove', handleGlobalMouseMove)
@@ -1645,18 +1648,18 @@ export default function App() {
       timer = setTimeout(() => {
         const audio = new Audio(PAGE_TURN_SOUND_URL)
         audio.volume = 0.15
-        audio.play().catch(() => {})
+        audio.play().catch(() => { })
         playRandomPageTurn()
       }, delay)
     }
-    
+
     // Start after first interaction
     const startAudio = () => {
       playRandomPageTurn()
       window.removeEventListener('click', startAudio)
     }
     window.addEventListener('click', startAudio)
-    
+
     return () => clearTimeout(timer)
   }, [])
 
@@ -1665,7 +1668,7 @@ export default function App() {
       const rect = e.target.getBoundingClientRect()
       const x = rect.left + rect.width / 2
       const y = rect.top + rect.height / 2
-      const newParticles = Array.from({length: 6}).map((_, i) => ({
+      const newParticles = Array.from({ length: 6 }).map((_, i) => ({
         id: Date.now() + i,
         x,
         y,
@@ -1717,7 +1720,7 @@ export default function App() {
         x = Math.random() * width;
         y = Math.random() * height;
       }
-      
+
       return {
         id: i,
         x,
@@ -1940,7 +1943,7 @@ export default function App() {
     urls.forEach(url => {
       if (!pixelCache.has(url)) {
         // Just calling it will trigger the load and cache
-        getPixelAlpha(url, 0, 0).catch(() => {})
+        getPixelAlpha(url, 0, 0).catch(() => { })
       }
     })
   }, [equippedBase, equippedUpper, equippedLower, equippedAccessories])
@@ -2302,6 +2305,20 @@ export default function App() {
 
 
 
+  const handlePreviewVoice = (url) => {
+    try {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause()
+      }
+      previewAudioRef.current = new Audio(url)
+      previewAudioRef.current.play().catch(() => {
+        setNotification('再生に失敗したよ。ファイルがまだないかも？')
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   const handleDownloadItem = (item) => {
     if (item.type === 'password') {
       const input = dlPasswords[item.id] || ''
@@ -2336,7 +2353,7 @@ export default function App() {
                     <span className={`dlBadge ${item.type}`}>{item.type === 'free' ? 'FREE' : 'PASSWORD'}</span>
                     <span className="dlSize">{item.fileSize}</span>
                   </div>
-                  
+
                   {item.type === 'password' && (
                     <div className="dlPasswordSection">
                       <input
@@ -2348,10 +2365,17 @@ export default function App() {
                       />
                     </div>
                   )}
-                  
-                  <button className="secondaryButton fullWidth" onClick={() => handleDownloadItem(item)}>
-                    {item.type === 'password' ? '解除して保存' : '保存する'}
-                  </button>
+
+                  <div className="dlCardActions">
+                    {item.id.includes('voice') && (
+                      <button className="ghostButton previewBtn" onClick={() => handlePreviewVoice(item.fileUrl)} title="視聴する">
+                        <FaPlay /> 試聴
+                      </button>
+                    )}
+                    <button className="secondaryButton fullWidth" onClick={() => handleDownloadItem(item)}>
+                      {item.type === 'password' ? '解除して保存' : '保存する'}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -2416,7 +2440,7 @@ export default function App() {
         .map((k) => frontLayerMap[k])
         .filter(Boolean)
         .reverse()
-        
+
       const backItems = [...backAccessories].reverse()
       const allGrabbables = [...frontItems, ...backItems]
 
@@ -2597,12 +2621,12 @@ export default function App() {
         className={`itemCard ${favorite ? 'glow-favorite' : ''}`}
         onMouseEnter={() => {
           // Pre-cache pixel data when hovering in closet
-          getPixelAlpha(item.imageUrl, 0, 0).catch(() => {})
+          getPixelAlpha(item.imageUrl, 0, 0).catch(() => { })
         }}
         onMouseDown={async (e) => {
           if (e.button !== 0) return
           const now = Date.now()
-          
+
           // Double-click to equip immediately
           if (lastClosetClick.current.itemId === item.id && (now - lastClosetClick.current.time < 300)) {
             handleEquip(item)
@@ -2622,13 +2646,13 @@ export default function App() {
             // Check pixel in the image (radius 5 for ease)
             const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 5)
             if (alpha <= 5) return // Clicked on empty area of the card
-            
+
             // Calculate offset relative to the preview to maintain grab position
             setDragOffset({ x: e.clientX - prect.left, y: e.clientY - prect.top })
           } else {
             setDragOffset({ x: 100, y: 150 })
           }
-          
+
           setDraggingItem(item)
           e.preventDefault()
         }}
@@ -2645,7 +2669,7 @@ export default function App() {
             return
           }
           lastClosetClick.current = { itemId: item.id, time: now }
-          
+
           // Pixel-perfect check for closet cards (touch)
           const previewEl = e.currentTarget.querySelector('.itemPreview')
           if (previewEl) {
@@ -2653,8 +2677,8 @@ export default function App() {
             const xp = (touch.clientX - prect.left) / prect.width
             const yp = (touch.clientY - prect.top) / prect.height
             const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 10) // Larger radius for touch
-            if (alpha <= 5) return 
-            
+            if (alpha <= 5) return
+
             setDragOffset({ x: touch.clientX - prect.left, y: touch.clientY - prect.top })
           } else {
             setDragOffset({ x: 100, y: 150 })
@@ -2665,7 +2689,7 @@ export default function App() {
           if (currentCursorPos.current.x === 0) {
             currentCursorPos.current = { x: touch.clientX, y: touch.clientY }
           }
-          
+
           setDraggingItem(item)
         }}
       >
@@ -2680,10 +2704,10 @@ export default function App() {
           <div className="itemMeta">
             <span
               className={`miniBadge ${item.source === 'default'
-                  ? 'default'
-                  : item.source === 'imported'
-                    ? 'imported'
-                    : 'custom'
+                ? 'default'
+                : item.source === 'imported'
+                  ? 'imported'
+                  : 'custom'
                 }`}
             >
               {item.source === 'default'
@@ -2915,10 +2939,10 @@ export default function App() {
                   <textarea className="textArea" value={concept} onChange={(e) => setConcept(e.target.value)} maxLength={40} />
                 </label>
                 <label className={`checkboxLabel ${hasImportedItems ? 'disabled' : ''}`}>
-                  <input 
-                    type="checkbox" 
-                    checked={isDistributable} 
-                    onChange={(e) => setIsDistributable(e.target.checked)} 
+                  <input
+                    type="checkbox"
+                    checked={isDistributable}
+                    onChange={(e) => setIsDistributable(e.target.checked)}
                     disabled={hasImportedItems}
                   />
                   <span>他の人がこのコーデを着るのを許可する（配布あり）</span>
@@ -2969,17 +2993,17 @@ export default function App() {
         ))}
       </div>
 
-      <div 
+      <div
         id="magic-cursor-root"
-        className={`magic-cursor ${draggingItem ? 'is-dragging-item' : ''}`} 
-        style={{ 
+        className={`magic-cursor ${draggingItem ? 'is-dragging-item' : ''}`}
+        style={{
           opacity: isPosting ? 0 : 1,
           visibility: 'hidden'
         }}
       >
         <div className="magic-cursor-inner">
           {draggingItem && (
-            <div 
+            <div
               className="dragged-item-wrapper"
               style={{
                 transform: `translate3d(${-dragOffset.x}px, ${-dragOffset.y}px, 0)`
@@ -2989,13 +3013,13 @@ export default function App() {
             </div>
           )}
           <div className="native-cursor-wrapper">
-            <img 
-              src={(isMouseDown || isHoveringInteractive) 
-                ? (customCursorHoverUrl || '/cursor_hover.png') 
+            <img
+              src={(isMouseDown || isHoveringInteractive)
+                ? (customCursorHoverUrl || '/cursor_hover.png')
                 : (customCursorUrl || '/cursor_normal.png')
-              } 
-              className="native-cursor-replacement" 
-              alt="" 
+              }
+              className="native-cursor-replacement"
+              alt=""
             />
           </div>
         </div>
@@ -3090,7 +3114,7 @@ export default function App() {
                     />
                   ))}
                   <div className="centralGearDecoration" />
-                  
+
                   <div className="homeCaptureInner">
                     <div className="homeLeftCol">
                       <div className="homeAvatarButton">
@@ -3180,8 +3204,8 @@ export default function App() {
                           </div>
                         </div>
 
-                      <div className="notebookCard">
-                        <div className="notebookTitle">今日のコーデ</div>
+                        <div className="notebookCard">
+                          <div className="notebookTitle">今日のコーデ</div>
                           <div className="equippedItemsRow">
                             {layeredEquippedItems.map(entry => (
                               entry.item && (
@@ -3209,12 +3233,12 @@ export default function App() {
 
           {activeTab === 'closet' && (
             <div className="closetLayout">
-              <section 
-                ref={desktopClosetPreviewRef} 
+              <section
+                ref={desktopClosetPreviewRef}
                 className="leftColumn closetDesktopPreview"
-                style={{ 
+                style={{
                   transform: `translateY(${closetPreviewTop}px)`,
-                  transition: 'transform 0.05s ease-out' 
+                  transition: 'transform 0.05s ease-out'
                 }}
               >
                 <div className="mainCard previewCard">
@@ -3286,12 +3310,12 @@ export default function App() {
                     </button>
                   </div>
 
-                  <div 
-                    ref={mobileClosetFollowRef} 
+                  <div
+                    ref={mobileClosetFollowRef}
                     className="mobileClosetFollowCard"
-                    style={{ 
+                    style={{
                       transform: `translateY(${mobilePreviewTop}px)`,
-                      transition: 'transform 0.02s ease-out' 
+                      transition: 'transform 0.02s ease-out'
                     }}
                   >
                     <div className="mobileClosetFollowInner">

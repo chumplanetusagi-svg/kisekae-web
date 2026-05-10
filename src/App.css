@@ -3351,6 +3351,28 @@ body,
   margin: 8px 0;
 }
 
+.dlCardActions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.previewBtn {
+  background: rgba(140, 106, 70, 0.2);
+  border: 1px solid var(--line);
+  color: var(--text-deep);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+
+.previewBtn:hover {
+  background: rgba(140, 106, 70, 0.4);
+  transform: scale(1.05);
+}
+
 .textInput.small {
   padding: 10px 12px;
   font-size: 14px;
