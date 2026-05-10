@@ -1222,8 +1222,8 @@ export default function App() {
       const containerTop = containerRect.top + scrollTop;
       const containerHeight = closetContainer.offsetHeight;
 
-      // Desktop tracking
-      if (window.innerWidth >= 1024) {
+      // Desktop tracking (Match CSS media query threshold: 821px)
+      if (window.innerWidth >= 821) {
         if (activeTab === 'closet') {
           const previewEl = desktopClosetPreviewRef.current;
           const previewHeight = previewEl ? previewEl.offsetHeight : 600;
@@ -1236,7 +1236,7 @@ export default function App() {
       }
       
       // Mobile tracking
-      if (window.innerWidth < 1024) {
+      if (window.innerWidth < 821) {
         if (activeTab === 'closet') {
           const followEl = mobileClosetFollowRef.current;
           const followHeight = followEl ? followEl.offsetHeight : 300;
@@ -2715,8 +2715,9 @@ export default function App() {
           const touch = e.touches[0]
           const now = Date.now()
 
-          // Double-tap to equip immediately
-          if (lastClosetClick.current.itemId === item.id && (now - lastClosetClick.current.time < 300)) {
+          // Double-tap to equip immediately (PC only or Base category)
+          const isDesktop = window.innerWidth >= 821;
+          if ((isDesktop || item.category === 'base') && lastClosetClick.current.itemId === item.id && (now - lastClosetClick.current.time < 300)) {
             handleEquip(item)
             setDraggingItem(null)
             lastClosetClick.current = { itemId: null, time: 0 }
@@ -2780,6 +2781,9 @@ export default function App() {
           <button
             className="secondaryButton small"
             onClick={() => {
+              // Disable button click on mobile for clothes
+              if (window.innerWidth < 821 && item.category !== 'base') return;
+
               if (item.category === 'upper') {
                 if (equippedUpperId === item.id) {
                   handleUnequipCategory('upper')
