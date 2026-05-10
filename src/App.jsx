@@ -1144,6 +1144,7 @@ export default function App() {
   const mobileClosetFollowRef = useRef(null)
   const desktopClosetPreviewRef = useRef(null)
   const previewAudioRef = useRef(null)
+  const closetContainerTopRef = useRef(0) // Stable top position
 
   const [activeTab, setActiveTab] = useState(initialSave.activeTab)
   const [closetTab, setClosetTab] = useState(initialSave.closetTab)
@@ -1225,20 +1226,24 @@ export default function App() {
       const closetContainer = document.querySelector('.closetLayout');
       if (!closetContainer) return;
 
-      // Use offsetTop for a stable, document-relative starting position
-      const containerTop = closetContainer.offsetTop;
+      // Initialize the stable top position once when we find the container
+      if (closetContainerTopRef.current === 0) {
+        const rect = closetContainer.getBoundingClientRect();
+        closetContainerTopRef.current = rect.top + scrollTop;
+      }
+
+      const containerTop = closetContainerTopRef.current;
       const containerHeight = closetContainer.offsetHeight;
 
       const desktopPreview = desktopClosetPreviewRef.current;
       const mobilePreview = mobileClosetFollowRef.current;
 
-      // Desktop tracking
+      // Tracking logic with stable 1:1 sync
       if (window.innerWidth >= 821 && desktopPreview) {
         const previewHeight = desktopPreview.offsetHeight || 600;
         const maxOffset = Math.max(0, containerHeight - previewHeight - 60);
         
-        // Calculate offset: how far we are from the top of the container
-        // Add 20px buffer as per the successful version
+        // Offset is strictly 1:1 with scroll distance past the container top
         const targetOffset = scrollTop - containerTop + 20;
         const clampedOffset = Math.min(maxOffset, Math.max(0, targetOffset));
         
