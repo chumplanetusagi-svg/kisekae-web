@@ -1209,41 +1209,6 @@ export default function App() {
   const lastGrabInfo = useRef({ itemId: null, time: 0 })
   const lastClosetClick = useRef({ itemId: null, time: 0 })
 
-  const [closetPreviewTop, setClosetPreviewTop] = useState(0)
-  const [mobilePreviewTop, setMobilePreviewTop] = useState(0)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      
-      // Desktop tracking
-      if (window.innerWidth >= 1024) {
-        if (activeTab === 'closet') {
-          // Adjust this if you want a specific offset from top
-          const offset = Math.max(0, scrollTop)
-          setClosetPreviewTop(offset)
-        } else {
-          setClosetPreviewTop(0)
-        }
-      }
-      
-      // Mobile tracking
-      if (window.innerWidth < 1024) {
-        if (activeTab === 'closet') {
-          setMobilePreviewTop(scrollTop)
-        } else {
-          setMobilePreviewTop(0)
-        }
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    // Run once on mount/tab change
-    handleScroll()
-    
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [activeTab])
-
   // --- Download Tab State ---
   const [dlPasswords, setDlPasswords] = useState({}) // { itemId: 'input_value' }
   const downloadItems = [
@@ -2022,6 +1987,7 @@ export default function App() {
   }
 
   const handleCharacterClick = async () => {
+    if (activeTab !== 'home') return // Only play on home tab
     try {
       const matchedRule = findSpecialVoiceRule({
         upperId: equippedUpperId,
@@ -3241,10 +3207,6 @@ export default function App() {
               <section
                 ref={desktopClosetPreviewRef}
                 className="leftColumn closetDesktopPreview"
-                style={{
-                  transform: `translateY(${closetPreviewTop}px)`,
-                  transition: 'transform 0.05s ease-out'
-                }}
               >
                 <div className="mainCard previewCard">
                   {renderAvatarLayers('characterStage smallStage', true)}
@@ -3318,10 +3280,6 @@ export default function App() {
                   <div
                     ref={mobileClosetFollowRef}
                     className="mobileClosetFollowCard"
-                    style={{
-                      transform: `translateY(${mobilePreviewTop}px)`,
-                      transition: 'transform 0.02s ease-out'
-                    }}
                   >
                     <div className="mobileClosetFollowInner">
                       <div className="mobileFollowAvatarWrap">
