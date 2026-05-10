@@ -1210,29 +1210,69 @@ export default function App() {
   const [dlPasswords, setDlPasswords] = useState({}) // { itemId: 'input_value' }
   const downloadItems = [
     {
-      id: 'voice-pack-1',
-      title: '基本ボイスパック',
-      description: 'うさぎさんの基本的なボイスが詰まったパックだよ。',
+      id: 'voice-anniv-1st',
+      title: '配信1周年記念ボイス',
+      description: '活動1周年を記念した特別なメッセージボイスだよ。',
       type: 'free',
-      fileUrl: '#', // Placeholder
-      fileSize: '2.4MB'
+      fileUrl: assetUrl('downloads/anniv_1st_voice.mp3'),
+      fileSize: '1.5MB'
     },
     {
-      id: 'voice-pack-special',
-      title: '限定ボイス：おやすみ編',
-      description: '特別な衣装を着た時だけ聞けるボイスの詰め合わせ。',
+      id: 'voice-ohayo',
+      title: 'おはようボイス',
+      description: '今日も1日がんばろう！爽やかな朝のボイス。',
+      type: 'free',
+      fileUrl: assetUrl('downloads/ohayo.mp3'),
+      fileSize: '0.8MB'
+    },
+    {
+      id: 'voice-oyasumi',
+      title: 'おやすみボイス',
+      description: 'ゆったり安眠。今日1日の締めくくりに。',
+      type: 'free',
+      fileUrl: assetUrl('downloads/oyasumi.mp3'),
+      fileSize: '0.9MB'
+    },
+    {
+      id: 'voice-otsukare',
+      title: 'お疲れ様ボイス',
+      description: 'がんばったあなたへ。癒やしのメッセージ。',
+      type: 'free',
+      fileUrl: assetUrl('downloads/otsukare.mp3'),
+      fileSize: '1.2MB'
+    },
+    {
+      id: 'voice-ganbare',
+      title: 'がんばれボイス',
+      description: 'ここぞという時に！ふれろっぷが応援するよ。',
+      type: 'free',
+      fileUrl: assetUrl('downloads/ganbare.mp3'),
+      fileSize: '0.7MB'
+    },
+    {
+      id: 'voice-shukkin',
+      title: '出勤ボイス',
+      description: 'いってらっしゃい！玄関で見送る時のボイス。',
+      type: 'free',
+      fileUrl: assetUrl('downloads/shukkin.mp3'),
+      fileSize: '0.8MB'
+    },
+    {
+      id: 'voice-mother-talk',
+      title: 'お母さま掛け合いボイス',
+      description: 'お母さまとふれろっぷの賑やかな掛け合いボイス。',
+      type: 'free',
+      fileUrl: assetUrl('downloads/mother_talk.mp3'),
+      fileSize: '2.5MB'
+    },
+    {
+      id: 'illust-anniv-1st',
+      title: '1周年記念イラスト',
+      description: '1周年を記念して描き下ろした特別な壁紙イラスト。',
       type: 'password',
-      password: 'usagi', // Correct password
-      fileUrl: '#', // Placeholder
-      fileSize: '5.1MB'
-    },
-    {
-      id: 'wallpaper-set',
-      title: '特製壁紙セット',
-      description: 'スマホやPCで使える、スチームパンクな壁紙だよ。',
-      type: 'free',
-      fileUrl: '#',
-      fileSize: '12MB'
+      password: 'anniv1st-love',
+      fileUrl: assetUrl('downloads/anniv_1st_illust.png'),
+      fileSize: '4.2MB'
     }
   ]
 
