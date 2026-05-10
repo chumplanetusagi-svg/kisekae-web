@@ -547,7 +547,7 @@ function loadSaveData() {
     if (!raw) return DEFAULT_SAVE
     const parsed = JSON.parse(raw)
 
-    return {
+    const loaded = {
       ...DEFAULT_SAVE,
       ...parsed,
       customItems: Array.isArray(parsed?.customItems) ? parsed.customItems : [],
@@ -561,6 +561,13 @@ function loadSaveData() {
         ? parsed.equippedLayerOrder
         : DEFAULT_LAYER_ORDER,
     }
+
+    // SANITIZE NICKNAME: Remove any leaked scripts
+    if (loaded.nickname && loaded.nickname.includes('<img')) {
+      loaded.nickname = DEFAULT_NICKNAME
+    }
+
+    return loaded
   } catch {
     return DEFAULT_SAVE
   }
@@ -1259,7 +1266,7 @@ export default function App() {
     window.addEventListener('scroll', handleScroll)
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [activeTab, closetTab, nickname])
+  }, [activeTab, closetTab])
 
   // --- Download Tab State ---
   const [dlPasswords, setDlPasswords] = useState({}) // { itemId: 'input_value' }
