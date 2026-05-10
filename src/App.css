@@ -1782,13 +1782,6 @@ a {}
     z-index: 20;
   }
 }
-    font-size: 11px;
-  }
-
-  .itemGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-}
 
 
 /* desktop lower closet tabs only */
