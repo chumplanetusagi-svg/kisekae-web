@@ -37,7 +37,7 @@ import {
 
 const STORAGE_BUCKET = 'clothes'
 const LS_KEY = 'kisekae-app-save'
-const DEFAULT_NICKNAME = 'ふれろっぷ'
+const DEFAULT_NICKNAME = 'ふれろぷ'
 const MAX_ACCESSORIES = 5
 const BACK_ACCESSORY_IDS = ['default-accessory-22']
 
@@ -3069,8 +3069,8 @@ export default function App() {
               </div>
             </div>
             <div>
-              <p className="subTitle">Hureroppu Closet</p>
-              <h1 className="pageTitle">ろっぷのクローゼット</h1>
+              <p className="subTitle">Hureropu Closet</p>
+              <h1 className="pageTitle">ろぷのクローゼット</h1>
             </div>
           </div>
 
