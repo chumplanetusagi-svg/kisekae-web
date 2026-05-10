@@ -1222,13 +1222,20 @@ export default function App() {
       const containerTop = containerRect.top + scrollTop;
       const containerHeight = closetContainer.offsetHeight;
 
-      // Desktop tracking (Match CSS media query threshold: 821px)
+      // Desktop tracking
       if (window.innerWidth >= 821) {
         if (activeTab === 'closet') {
           const previewEl = desktopClosetPreviewRef.current;
           const previewHeight = previewEl ? previewEl.offsetHeight : 600;
+          
+          // Simple offset calculation: follow scroll but stay within closet container
+          const headerOffset = 160; // Approximate header + tab height
+          let targetY = scrollTop - containerTop + 20;
+          
+          // Boundary checks
           const maxOffset = Math.max(0, containerHeight - previewHeight - 40);
-          const targetY = Math.min(maxOffset, Math.max(0, scrollTop - containerTop + 20));
+          targetY = Math.min(maxOffset, Math.max(0, targetY));
+          
           setClosetPreviewTop(targetY);
         } else {
           setClosetPreviewTop(0)
@@ -1252,7 +1259,7 @@ export default function App() {
     window.addEventListener('scroll', handleScroll)
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [activeTab, closetTab])
+  }, [activeTab, closetTab, nickname])
 
   // --- Download Tab State ---
   const [dlPasswords, setDlPasswords] = useState({}) // { itemId: 'input_value' }
