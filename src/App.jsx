@@ -1328,6 +1328,20 @@ export default function App() {
   const [isFetchingGallery, setIsFetchingGallery] = useState(false);
   const [showPostDialog, setShowPostDialog] = useState(false);
   const [isDistributable, setIsDistributable] = useState(true);
+
+  const RESERVED_NAMES = ['ふれろっぷ', 'ふれろぷ']
+  const OWNER_CODE = 'ropu0511'
+
+  const handleNicknameChange = (val) => {
+    if (RESERVED_NAMES.includes(val)) {
+      const code = window.prompt('この名前は予約されています。本人確認コードを入力してください。')
+      if (code !== OWNER_CODE) {
+        setNotification('予約されている名前は使えません。')
+        return
+      }
+    }
+    setNickname(val)
+  }
   const [isPosting, setIsPosting] = useState(false);
   const galleryCaptureRef = useRef(null);
   const [myPostIds, setMyPostIds] = useState(() => {
@@ -1498,8 +1512,8 @@ export default function App() {
           <div className="galleryGrid">
             {galleryPosts.map((post) => (
               <div key={post.id} className="galleryCard">
-                <div className="galleryCardImage">
-                  <img src={post.preview_image_url} alt={post.concept} crossOrigin="anonymous" />
+                <div className="galleryCardImage userNoSave" onContextMenu={(e) => e.preventDefault()}>
+                  <img src={post.preview_image_url} alt={post.concept} crossOrigin="anonymous" draggable={false} />
                   {post.is_distributable && <div className="distributableBadge">配布OK</div>}
                 </div>
                 <div className="galleryCardInfo">
@@ -2449,7 +2463,7 @@ export default function App() {
           <div className="dlGrid">
             {downloadItems.map((item) => (
               <div key={item.id} className="dlCard">
-                <div className="dlCardIcon">
+                <div className="dlCardIcon userNoSave" onContextMenu={(e) => e.preventDefault()}>
                   {item.id.includes('voice') ? <FaVolumeUp /> : <FaImage />}
                 </div>
                 <div className="dlCardInfo">
@@ -2597,9 +2611,10 @@ export default function App() {
 
     return (
       <div
-        className={`${stageClassName} ${equipAnimClass} ${(enableDrop && isDragOver) || (draggingItem && isManualDragOver) ? 'drag-over' : ''}`}
+        className={`${stageClassName} ${equipAnimClass} ${(enableDrop && isDragOver) || (draggingItem && isManualDragOver) ? 'drag-over' : ''} userNoSave`}
         style={{ touchAction: 'none' }}
         onPointerDown={handleStagePointerDown}
+        onContextMenu={(e) => e.preventDefault()}
         onMouseEnter={() => {
           if (draggingItem) setIsManualDragOver(true)
         }}
@@ -2642,6 +2657,8 @@ export default function App() {
             src={item.imageUrl}
             alt={item.name}
             crossOrigin="anonymous"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
             style={{ pointerEvents: 'none' }}
           />
         ))}
@@ -2653,6 +2670,8 @@ export default function App() {
             src={equippedBase.imageUrl}
             alt={equippedBase.name}
             crossOrigin="anonymous"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
             style={{ pointerEvents: 'none' }}
           />
         )}
@@ -2669,6 +2688,8 @@ export default function App() {
                 src={item.imageUrl}
                 alt={item.name}
                 crossOrigin="anonymous"
+                draggable={false}
+                onContextMenu={(e) => e.preventDefault()}
                 style={{ pointerEvents: 'none' }}
               />
             )
@@ -2682,7 +2703,7 @@ export default function App() {
     const frontQrAccessories = qrPreviewAccessories.filter((item) => !isBackAccessory(item))
 
     return (
-      <div className={stageClassName}>
+      <div className={`${stageClassName} userNoSave`} onContextMenu={(e) => e.preventDefault()}>
         {backQrAccessories.map((item) => (
           <img
             key={`qr-back-${item.id}`}
@@ -2690,6 +2711,7 @@ export default function App() {
             src={item.imageUrl}
             alt={item.name}
             crossOrigin="anonymous"
+            draggable={false}
           />
         ))}
         <img
@@ -2697,6 +2719,7 @@ export default function App() {
           src={equippedBase?.imageUrl || DEFAULT_BASE_ITEMS[0].imageUrl}
           alt={equippedBase?.name || '素体'}
           crossOrigin="anonymous"
+          draggable={false}
         />
         {qrPreviewLower && (
           <img
@@ -2704,6 +2727,7 @@ export default function App() {
             src={qrPreviewLower.imageUrl}
             alt={qrPreviewLower.name}
             crossOrigin="anonymous"
+            draggable={false}
           />
         )}
         {qrPreviewUpper && (
@@ -2712,6 +2736,7 @@ export default function App() {
             src={qrPreviewUpper.imageUrl}
             alt={qrPreviewUpper.name}
             crossOrigin="anonymous"
+            draggable={false}
           />
         )}
         {frontQrAccessories.map((item) => (
@@ -2721,6 +2746,7 @@ export default function App() {
             src={item.imageUrl}
             alt={item.name}
             crossOrigin="anonymous"
+            draggable={false}
           />
         ))}
       </div>
@@ -2838,8 +2864,8 @@ export default function App() {
           if (e.cancelable) e.preventDefault()
         }}
       >
-        <div className="itemPreview">
-          <img src={item.imageUrl} alt={item.name} crossOrigin="anonymous" />
+        <div className="itemPreview userNoSave" onContextMenu={(e) => e.preventDefault()}>
+          <img src={item.imageUrl} alt={item.name} crossOrigin="anonymous" draggable={false} />
           <div className="previewCreatorBadge">{getDisplayCreatorName(item)}</div>
         </div>
 
@@ -3043,7 +3069,7 @@ export default function App() {
               <div className="formGrid">
                 <label className="fieldLabel">
                   ニックネーム
-                  <input className="textInput" type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
+                  <input className="textInput" type="text" value={nickname} onChange={(e) => handleNicknameChange(e.target.value)} />
                 </label>
                 <label className="fieldLabel">
                   コンセプト
@@ -3703,7 +3729,7 @@ export default function App() {
                           className="textInput"
                           type="text"
                           value={nickname}
-                          onChange={(e) => setNickname(e.target.value)}
+                          onChange={(e) => handleNicknameChange(e.target.value)}
                           placeholder="名前を入力"
                         />
                       </label>

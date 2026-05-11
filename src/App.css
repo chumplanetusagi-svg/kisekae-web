@@ -23,16 +23,27 @@ body,
   /* Cursor logic moved to bottom for priority */
 }
 
-/* Pointer fallback handled by React follower */
-
 /* Hide native cursor while dragging items to show only the follower */
 html.is-dragging-native,
 html.is-dragging-native * {
   cursor: none !important;
 }
 
-
-
+/* Image protection against saving */
+.userNoSave,
+.userNoSave img,
+.itemCard img,
+.avatarLayer,
+.itemPreview img,
+.layerImage,
+.dragged-item-img {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  pointer-events: auto;
+}
 
 /* Custom Cursor Follower Styles */
 .magic-cursor {
@@ -1423,7 +1434,7 @@ a {}
 }
 
 
-/* 霑ｽ險・ 繧ｹ繝槭・縺ｧ荳翫ち繝・蛻励・繧ｯ繝ｭ繝ｼ繧ｼ繝・ヨ蜀・ち繝・蛻励・譛・蛻励・邏�菴楢ｿｽ蠕薙ｒ蠑ｷ繧√ｋ */
+/* 追加: スマホで上タブ列、クローゼット内タブ列、横列、素体追従を強める */
 @media (max-width: 640px) {
   .tabRow {
     display: grid !important;
@@ -2639,6 +2650,7 @@ a {}
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  justify-content: center !important;
 }
 
 .force-pc .homeRightCol {
@@ -2970,7 +2982,7 @@ a {}
   gap: 12px;
 }
 
-.髑題ｳ樒畑Badge {
+.鑑賞用Badge {
   color: var(--muted);
   font-size: 13px;
   font-weight: 600;
