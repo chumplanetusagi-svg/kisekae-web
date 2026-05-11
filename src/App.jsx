@@ -1527,7 +1527,17 @@ export default function App() {
                 ))}
               </div>
             )}
-            <div className="capture-avatar-fit">
+            <div className="capture-avatar-fit" style={{ 
+              position: 'absolute', 
+              top: '140px', 
+              left: 0, 
+              width: '100%', 
+              height: '100%', 
+              transform: 'scale(0.75)',
+              transformOrigin: 'top center',
+              margin: 0, 
+              zIndex: 10 
+            }}>
               {renderAvatarLayers('capture-avatar-layers')}
             </div>
           </div>
