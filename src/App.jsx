@@ -1317,7 +1317,7 @@ export default function App() {
       title: '1周年記念イラスト',
       description: '1周年を記念して描き下ろした特別な壁紙イラスト。',
       type: 'password',
-      password: 'ropu0511',
+      password: 'akakuro0411',
       fileUrl: assetUrl('downloads/anniv_1st_illust.png'),
       fileSize: '4.2MB'
     }
@@ -1330,7 +1330,7 @@ export default function App() {
   const [isDistributable, setIsDistributable] = useState(true);
 
   const RESERVED_NAMES = ['ふれろっぷ', 'ふれろぷ']
-  const OWNER_CODE = 'ropu0511'
+  const OWNER_CODE = 'akakuro0411'
 
   const handleNicknameChange = (val) => {
     if (RESERVED_NAMES.includes(val)) {
