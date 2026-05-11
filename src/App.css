@@ -3605,7 +3605,33 @@ body.is-clothes-drag-lock {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45)) brightness(0.92);
 }
 
-/* --- Gallery capture fix: lower only the character group so the head is not cut off in posted gallery images --- */
-.capture-avatar-fit .capture-avatar-layers {
-  transform: translateY(78px) !important;
+/* Gallery capture avatar position fix
+   Custom background and default background use the same avatar size/position.
+   Move the avatar a little upward only inside the hidden gallery capture canvas. */
+.capture-canvas-target {
+  background-size: cover !important;
+  background-position: center center !important;
+}
+
+.capture-canvas-target .capture-avatar-fit {
+  position: absolute !important;
+  left: 0 !important;
+  top: -42px !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  transform: none !important;
+  transform-origin: center center !important;
+  z-index: 10 !important;
+}
+
+.capture-canvas-target .capture-avatar-layers {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  aspect-ratio: 3500 / 2688 !important;
+}
+
+.capture-canvas-target .capture-avatar-fit .layerImage {
+  transform: none !important;
 }
