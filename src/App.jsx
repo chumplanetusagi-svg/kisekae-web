@@ -1318,7 +1318,7 @@ export default function App() {
       title: '1周年記念イラスト',
       description: '1周年を記念して描き下ろした特別な壁紙イラスト。',
       type: 'password',
-      password: 'akakuro0411',
+      password: 'ropu0511',
       fileUrl: assetUrl('downloads/anniv_1st_illust.png'),
       fileSize: '4.2MB'
     }
