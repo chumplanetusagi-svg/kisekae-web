@@ -3605,9 +3605,10 @@ body.is-clothes-drag-lock {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45)) brightness(0.92);
 }
 
-/* Gallery capture avatar position fix
-   Custom background and default background use the same avatar size/position.
-   Move the avatar a little upward only inside the hidden gallery capture canvas. */
+/* Gallery capture avatar position fine tuning
+   - Default gallery background: keep the current scale/shape, but move the character upward.
+   - Custom gallery background: use the previous lower-position style, then move it slightly upward.
+   This affects only the hidden gallery capture canvas used for posting images. */
 .capture-canvas-target {
   background-size: cover !important;
   background-position: center center !important;
@@ -3616,7 +3617,6 @@ body.is-clothes-drag-lock {
 .capture-canvas-target .capture-avatar-fit {
   position: absolute !important;
   left: 0 !important;
-  top: -42px !important;
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
@@ -3625,11 +3625,34 @@ body.is-clothes-drag-lock {
   z-index: 10 !important;
 }
 
+/* Default background: current setting, shifted upward more. */
+.capture-canvas-target.bg-default .capture-avatar-fit {
+  top: -72px !important;
+}
+
+/* Custom background: based on the previous version, shifted upward a little. */
+.capture-canvas-target.bg-custom .capture-avatar-fit {
+  top: 0 !important;
+}
+
+/* Other selectable backgrounds keep the recent balanced position. */
+.capture-canvas-target:not(.bg-default):not(.bg-custom) .capture-avatar-fit {
+  top: -42px !important;
+}
+
 .capture-canvas-target .capture-avatar-layers {
   width: 100% !important;
   height: 100% !important;
   max-width: none !important;
   aspect-ratio: 3500 / 2688 !important;
+}
+
+.capture-canvas-target.bg-custom .capture-avatar-layers {
+  transform: translateY(54px) !important;
+}
+
+.capture-canvas-target:not(.bg-custom) .capture-avatar-layers {
+  transform: none !important;
 }
 
 .capture-canvas-target .capture-avatar-fit .layerImage {
