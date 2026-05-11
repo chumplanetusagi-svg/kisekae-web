@@ -474,7 +474,7 @@ a {}
 .capture-avatar-layers {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3500 / 2688;
   background: transparent;
 }
 
@@ -2915,7 +2915,7 @@ a {}
 }
 
 .galleryCardImage {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3500 / 2688;
   background: #1a1412;
   position: relative;
   display: flex;
@@ -3109,7 +3109,7 @@ a {}
 .capture-canvas-target {
   position: relative;
   width: 800px;
-  height: 600px;
+  height: 614px;
   background: #1a1412;
   overflow: hidden;
   display: flex;
@@ -3118,11 +3118,10 @@ a {}
 }
 
 .capture-avatar-fit {
-  width: 860px;
-  height: 860px;
-  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
   position: relative;
-  margin-top: -40px;
+  z-index: 10;
 }
 
 .capture-gears-layer {
