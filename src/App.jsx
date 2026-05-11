@@ -1267,7 +1267,7 @@ export default function App() {
     {
       id: 'voice-ohayo',
       title: 'おはようボイス',
-      description: '今日も1日がんばろう！爽やかな朝のボイス。',
+      description: '今日も１日がんばろうね!',
       type: 'free',
       fileUrl: assetUrl('downloads/ohayo.mp3'),
       fileSize: '0.8MB'
@@ -1275,7 +1275,7 @@ export default function App() {
     {
       id: 'voice-oyasumi',
       title: 'おやすみボイス',
-      description: 'ゆったり安眠。今日1日の締めくくりに。',
+      description: '１日お疲れ様。ゆっくり休んでね。',
       type: 'free',
       fileUrl: assetUrl('downloads/oyasumi.mp3'),
       fileSize: '0.9MB'
@@ -1283,7 +1283,7 @@ export default function App() {
     {
       id: 'voice-otsukare',
       title: 'お疲れ様ボイス',
-      description: 'がんばったあなたへ。癒やしのメッセージ。',
+      description: 'いつもがんばっててとってもえらい！',
       type: 'free',
       fileUrl: assetUrl('downloads/otsukare.mp3'),
       fileSize: '1.2MB'
@@ -1291,7 +1291,7 @@ export default function App() {
     {
       id: 'voice-ganbare',
       title: 'がんばれボイス',
-      description: 'ここぞという時に！ふれろっぷが応援するよ。',
+      description: '僕が応援するね！君ならきっとできるよ！',
       type: 'free',
       fileUrl: assetUrl('downloads/ganbare.mp3'),
       fileSize: '0.7MB'
@@ -1299,7 +1299,7 @@ export default function App() {
     {
       id: 'voice-shukkin',
       title: '出勤ボイス',
-      description: 'いってらっしゃい！玄関で見送る時のボイス。',
+      description: 'いってらっしゃい！忘れ物はないかな？',
       type: 'free',
       fileUrl: assetUrl('downloads/shukkin.mp3'),
       fileSize: '0.8MB'
@@ -1307,7 +1307,7 @@ export default function App() {
     {
       id: 'voice-mother-talk',
       title: 'お母さま掛け合いボイス',
-      description: 'お母さまとふれろっぷの賑やかな掛け合いボイス。',
+      description: 'お母さまと僕のかけあい……',
       type: 'free',
       fileUrl: assetUrl('downloads/mother_talk.mp3'),
       fileSize: '2.5MB'
@@ -1317,7 +1317,7 @@ export default function App() {
       title: '1周年記念イラスト',
       description: '1周年を記念して描き下ろした特別な壁紙イラスト。',
       type: 'password',
-      password: 'anniv1st-love',
+      password: '0511',
       fileUrl: assetUrl('downloads/anniv_1st_illust.png'),
       fileSize: '4.2MB'
     }
@@ -2544,7 +2544,7 @@ export default function App() {
             clientX: e.clientX,
             clientY: e.clientY,
             currentTarget: e.currentTarget,
-            preventDefault: () => {},
+            preventDefault: () => { },
           },
         }
         pendingDragStartedRef.current = false
