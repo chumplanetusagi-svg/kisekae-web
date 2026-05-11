@@ -2705,6 +2705,25 @@ export default function App() {
     )
   }
 
+
+  const isInsidePreviewDragCircle = (clientX, clientY, previewEl) => {
+    if (!previewEl) return false
+    const rect = previewEl.getBoundingClientRect()
+    if (!rect.width || !rect.height) return false
+
+    const localX = clientX - rect.left
+    const localY = clientY - rect.top
+    if (localX < 0 || localY < 0 || localX > rect.width || localY > rect.height) return false
+
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
+    const radius = Math.min(rect.width, rect.height) / 2
+    const dx = localX - centerX
+    const dy = localY - centerY
+
+    return Math.hypot(dx, dy) <= radius
+  }
+
   const renderItemCard = (item) => {
     const equipped = isEquipped(item)
     const favorite = isFavorite(item.id)
@@ -2736,12 +2755,11 @@ export default function App() {
 
           if (previewEl) {
             const prect = previewEl.getBoundingClientRect()
-            const xp = (e.clientX - prect.left) / prect.width
-            const yp = (e.clientY - prect.top) / prect.height
-            const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 5)
+            if (!isInsidePreviewDragCircle(e.clientX, e.clientY, previewEl)) return
             if (inputSeq !== pendingInputSeqRef.current || !pointerIsDownRef.current) return
-            if (alpha <= 5) return
             offset = { x: e.clientX - prect.left, y: e.clientY - prect.top }
+          } else {
+            return
           }
 
           if (inputSeq !== pendingInputSeqRef.current || !pointerIsDownRef.current) return
@@ -2772,12 +2790,11 @@ export default function App() {
 
           if (previewEl) {
             const prect = previewEl.getBoundingClientRect()
-            const xp = (touch.clientX - prect.left) / prect.width
-            const yp = (touch.clientY - prect.top) / prect.height
-            const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 10)
+            if (!isInsidePreviewDragCircle(touch.clientX, touch.clientY, previewEl)) return
             if (inputSeq !== pendingInputSeqRef.current || !pointerIsDownRef.current) return
-            if (alpha <= 5) return
             offset = { x: touch.clientX - prect.left, y: touch.clientY - prect.top }
+          } else {
+            return
           }
 
           if (inputSeq !== pendingInputSeqRef.current || !pointerIsDownRef.current) return
