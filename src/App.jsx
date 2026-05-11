@@ -1512,8 +1512,8 @@ export default function App() {
           <div className="galleryGrid">
             {galleryPosts.map((post) => (
               <div key={post.id} className="galleryCard">
-                <div className="galleryCardImage userNoSave" onContextMenu={(e) => e.preventDefault()}>
-                  <img src={post.preview_image_url} alt={post.concept} crossOrigin="anonymous" draggable={false} />
+                <div className="galleryCardImage userNoSave">
+                  <img src={post.preview_image_url} alt={post.concept} crossOrigin="anonymous" draggable={false} style={{ pointerEvents: 'none' }} />
                   {post.is_distributable && <div className="distributableBadge">配布OK</div>}
                 </div>
                 <div className="galleryCardInfo">
@@ -2463,7 +2463,7 @@ export default function App() {
           <div className="dlGrid">
             {downloadItems.map((item) => (
               <div key={item.id} className="dlCard">
-                <div className="dlCardIcon userNoSave" onContextMenu={(e) => e.preventDefault()}>
+                <div className="dlCardIcon userNoSave">
                   {item.id.includes('voice') ? <FaVolumeUp /> : <FaImage />}
                 </div>
                 <div className="dlCardInfo">
@@ -2614,7 +2614,6 @@ export default function App() {
         className={`${stageClassName} ${equipAnimClass} ${(enableDrop && isDragOver) || (draggingItem && isManualDragOver) ? 'drag-over' : ''} userNoSave`}
         style={{ touchAction: 'none' }}
         onPointerDown={handleStagePointerDown}
-        onContextMenu={(e) => e.preventDefault()}
         onMouseEnter={() => {
           if (draggingItem) setIsManualDragOver(true)
         }}
@@ -2703,7 +2702,7 @@ export default function App() {
     const frontQrAccessories = qrPreviewAccessories.filter((item) => !isBackAccessory(item))
 
     return (
-      <div className={`${stageClassName} userNoSave`} onContextMenu={(e) => e.preventDefault()}>
+      <div className={`${stageClassName} userNoSave`}>
         {backQrAccessories.map((item) => (
           <img
             key={`qr-back-${item.id}`}
@@ -2864,8 +2863,8 @@ export default function App() {
           if (e.cancelable) e.preventDefault()
         }}
       >
-        <div className="itemPreview userNoSave" onContextMenu={(e) => e.preventDefault()}>
-          <img src={item.imageUrl} alt={item.name} crossOrigin="anonymous" draggable={false} />
+        <div className="itemPreview userNoSave">
+          <img src={item.imageUrl} alt={item.name} crossOrigin="anonymous" draggable={false} style={{ pointerEvents: 'none' }} />
           <div className="previewCreatorBadge">{getDisplayCreatorName(item)}</div>
         </div>
 

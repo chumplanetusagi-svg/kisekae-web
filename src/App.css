@@ -12,8 +12,6 @@
   --pink-btn: linear-gradient(135deg, #7a3131 0%, #4a1919 100%);
   --fav: #4a3424;
   --fav-text: #e6b883;
-  user-select: none;
-  -webkit-user-select: none;
 }
 
 html,
@@ -42,7 +40,7 @@ html.is-dragging-native * {
   -webkit-touch-callout: none !important;
   user-select: none !important;
   -webkit-user-select: none !important;
-  pointer-events: auto;
+  /* Remove pointer-events: auto to let default/inline styles handle it */
 }
 
 /* Custom Cursor Follower Styles */
