@@ -3627,12 +3627,12 @@ body.is-clothes-drag-lock {
 
 /* Default background: place the avatar midway between the previous and current positions. */
 .capture-canvas-target.bg-default .capture-avatar-fit {
-  top: -50px !important;
+  top: -30px !important;
 }
 
 /* Custom background: match the default background avatar position. */
 .capture-canvas-target.bg-custom .capture-avatar-fit {
-  top: -50px !important;
+  top: -30px !important;
 }
 
 /* Other selectable backgrounds keep the recent balanced position. */
