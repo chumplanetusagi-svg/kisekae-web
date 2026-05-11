@@ -1076,12 +1076,100 @@ async function createQrCardCanvas({
   return canvas
 }
 
+const PIXEL_CACHE = new Map()
+
+async function getPixelAlpha(url, x, y, radius = 0) {
+  if (!url) return 0
+  if (x < 0 || x > 1 || y < 0 || y > 1) return 0
+
+  let data = PIXEL_CACHE.get(url)
+  if (!data) {
+    try {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.src = url
+      await new Promise((resolve, reject) => {
+        img.onload = resolve
+        img.onerror = reject
+      })
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d', { willReadFrequently: true })
+      ctx.drawImage(img, 0, 0)
+      data = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      PIXEL_CACHE.set(url, data)
+    } catch (e) {
+      return 0
+    }
+  }
+
+  const ix = Math.floor(x * data.width)
+  const iy = Math.floor(y * data.height)
+
+  if (radius <= 0) {
+    const idx = (iy * data.width + ix) * 4 + 3
+    return data.data[idx] || 0
+  } else {
+    let max = 0
+    for (let dy = -radius; dy <= radius; dy++) {
+      for (let dx = -radius; dx <= radius; dx++) {
+        const nx = ix + dx
+        const ny = iy + dy
+        if (nx >= 0 && nx < data.width && ny >= 0 && ny < data.height) {
+          const idx = (ny * data.width + nx) * 4 + 3
+          max = Math.max(max, data.data[idx] || 0)
+          if (max === 255) return 255
+        }
+      }
+    }
+    return max
+  }
+}
+
+function getPixelAlphaSync(url, x, y, radius = 0) {
+  if (!url) return 0
+  const data = PIXEL_CACHE.get(url)
+  if (!data) return 0
+
+  const ix = Math.floor(x * data.width)
+  const iy = Math.floor(y * data.height)
+
+  if (radius <= 0) {
+    const idx = (iy * data.width + ix) * 4 + 3
+    return data.data[idx] || 0
+  } else {
+    let max = 0
+    for (let dy = -radius; dy <= radius; dy++) {
+      for (let dx = -radius; dx <= radius; dx++) {
+        const nx = ix + dx
+        const ny = iy + dy
+        if (nx >= 0 && nx < data.width && ny >= 0 && ny < data.height) {
+          const idx = (ny * data.width + nx) * 4 + 3
+          max = Math.max(max, data.data[idx] || 0)
+          if (max === 255) return 255
+        }
+      }
+    }
+    return max
+  }
+}
+
+
+
 function ensureLayerOrder(order) {
   const safe = Array.isArray(order) ? [...order] : []
   DEFAULT_LAYER_ORDER.forEach((key) => {
     if (!safe.includes(key)) safe.push(key)
   })
   return safe
+}
+
+function getPointerCoords(e) {
+  if (!e) return { clientX: undefined, clientY: undefined }
+  const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? e.changedTouches?.[0]?.clientX
+  const clientY = e.clientY ?? e.touches?.[0]?.clientY ?? e.changedTouches?.[0]?.clientY
+  return { clientX, clientY }
 }
 
 function SortableLayerRow({ entry, index }) {
@@ -1167,6 +1255,99 @@ export default function App() {
     ensureLayerOrder(initialSave.equippedLayerOrder)
   )
 
+  const isEquipped = (item) => {
+    if (!item) return false
+    if (item.category === 'upper') return equippedUpperId === item.id
+    if (item.category === 'lower') return equippedLowerId === item.id
+    if (item.category === 'accessory') return equippedAccessoryIds.includes(item.id)
+    return false
+  }
+
+  const isFavorite = (itemId) => {
+    return favoriteUpperId === itemId || favoriteLowerId === itemId || favoriteAccessoryIds.includes(itemId)
+  }
+
+  const isBackAccessory = (item) => {
+    return item && item.category === 'accessory' && item.subCategory === 'back'
+  }
+
+  const allItems = useMemo(() => [...DEFAULT_ITEMS, ...customItems], [customItems])
+  const upperItems = useMemo(() => allItems.filter((i) => i.category === 'upper'), [allItems])
+  const lowerItems = useMemo(() => allItems.filter((i) => i.category === 'lower'), [allItems])
+  const accessoryItems = useMemo(() => allItems.filter((i) => i.category === 'accessory'), [allItems])
+
+  const equippedBase = useMemo(() => allItems.find((i) => i.id === equippedBaseId), [allItems, equippedBaseId])
+  const equippedUpper = useMemo(() => allItems.find((i) => i.id === equippedUpperId), [allItems, equippedUpperId])
+  const equippedLower = useMemo(() => allItems.find((i) => i.id === equippedLowerId), [allItems, equippedLowerId])
+  const equippedAccessories = useMemo(
+    () => equippedAccessoryIds.map((id) => allItems.find((i) => i.id === id)).filter(Boolean),
+    [allItems, equippedAccessoryIds]
+  )
+
+  const layeredEquippedItems = useMemo(() => {
+    const order = ensureLayerOrder(equippedLayerOrder)
+    const result = []
+    order.forEach((key) => {
+      if (key === 'base') {
+        result.push({ layerKey: 'base', item: equippedBase })
+      } else if (key === 'upper') {
+        if (equippedUpper) result.push({ layerKey: 'upper', item: equippedUpper })
+      } else if (key === 'lower') {
+        if (equippedLower) result.push({ layerKey: 'lower', item: equippedLower })
+      } else if (key.startsWith('accessory-')) {
+        const idx = parseInt(key.split('-')[1], 10) - 1
+        const item = equippedAccessories[idx]
+        if (item) result.push({ layerKey: key, item })
+      }
+    })
+    return result
+  }, [equippedLayerOrder, equippedBase, equippedUpper, equippedLower, equippedAccessories])
+
+  const selectedQrItem = useMemo(
+    () => allItems.find((i) => i.id === selectedQrItemId),
+    [allItems, selectedQrItemId]
+  )
+
+
+  useEffect(() => {
+    const saveObj = {
+      activeTab,
+      closetTab,
+      settingsTab,
+      nickname,
+      concept,
+      customItems,
+      equippedBaseId,
+      equippedUpperId,
+      equippedLowerId,
+      equippedAccessoryIds,
+      favoriteUpperId,
+      favoriteLowerId,
+      favoriteAccessoryIds,
+      selectedQrItemId,
+      equippedLayerOrder,
+    }
+    localStorage.setItem(LS_KEY, JSON.stringify(saveObj))
+  }, [
+    activeTab,
+    closetTab,
+    settingsTab,
+    nickname,
+    concept,
+    customItems,
+    equippedBaseId,
+    equippedUpperId,
+    equippedLowerId,
+    equippedAccessoryIds,
+    favoriteUpperId,
+    favoriteLowerId,
+    favoriteAccessoryIds,
+    selectedQrItemId,
+    equippedLayerOrder,
+  ])
+
+
+
   const [uploadName, setUploadName] = useState('')
   const [uploadCategory, setUploadCategory] = useState('upper')
   const [uploadFile, setUploadFile] = useState(null)
@@ -1213,41 +1394,15 @@ export default function App() {
   const cursorRef = useRef(null)
   const lastMousePos = useRef({ x: 0, y: 0 })
   const currentCursorPos = useRef({ x: 0, y: 0 })
-  const pendingDragRef = useRef(null)
-  const pendingDragStartedRef = useRef(false)
+  const dragStartPos = useRef(null)
   const lastGrabInfo = useRef({ itemId: null, time: 0 })
   const lastClosetClick = useRef({ itemId: null, time: 0 })
+  const [pendingDrag, setPendingDrag] = useState(null)
+
+  const [closetPreviewTop, setClosetPreviewTop] = useState(0)
   const [mobilePreviewTop, setMobilePreviewTop] = useState(0)
 
-  useEffect(() => {
-    const handleMobileScroll = () => {
-      if (window.innerWidth >= 821) {
-        setMobilePreviewTop(0)
-        return
-      }
-
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      const closetContainer = document.querySelector('.closetLayout')
-      const followEl = mobileClosetFollowRef.current
-      if (!closetContainer || !followEl) return
-
-      const containerRect = closetContainer.getBoundingClientRect()
-      const containerTop = containerRect.top + scrollTop
-      const containerHeight = closetContainer.offsetHeight
-      const followHeight = followEl.offsetHeight || 300
-      const maxOffset = Math.max(0, containerHeight - followHeight - 40)
-      const offset = Math.min(maxOffset, Math.max(0, scrollTop - containerTop + 8))
-      setMobilePreviewTop(offset)
-    }
-
-    window.addEventListener('scroll', handleMobileScroll)
-    window.addEventListener('resize', handleMobileScroll)
-    handleMobileScroll()
-    return () => {
-      window.removeEventListener('scroll', handleMobileScroll)
-      window.removeEventListener('resize', handleMobileScroll)
-    }
-  }, [activeTab, closetTab])
+  // JS scroll tracking removed in favor of CSS sticky
 
 
   // --- Download Tab State ---
@@ -1358,31 +1513,12 @@ export default function App() {
     }
   }, [MAX_ACCESSORIES])
 
-  const handleGrabFromAvatar = useCallback((item, e) => {
-    // Basic event check - only left click for mousedown
-    if (e && e.type === 'mousedown' && e.button !== 0) return
-    // preventDefault should be called early to be effective
-    if (e && e.cancelable && typeof e.preventDefault === 'function') {
-      e.preventDefault()
-    }
-
-    // Use the values from the event immediately or provided values
-    const clientX = e?.clientX ?? (e?.touches?.[0]?.clientX)
-    const clientY = e?.clientY ?? (e?.touches?.[0]?.clientY)
-
-    if (clientX !== undefined && clientY !== undefined) {
-      // Calculate offset relative to the stage to keep it where it was clicked
-      const stage = e.currentTarget.closest('.characterStage, .homeAvatarStage')
-      if (stage) {
-        const rect = stage.getBoundingClientRect()
-        // Offset is how far the mouse is from the stage's top-left
-        // Since the item images are 100% width/height of the stage, 
-        // the offset is just the relative coordinate.
-        setDragOffset({ x: clientX - rect.left, y: clientY - rect.top })
-      } else {
-        // Fallback for closet items (they are usually centered in the preview)
-        setDragOffset({ x: 100, y: 150 }) // Approximation
-      }
+  const handleGrabFromAvatar = useCallback((item, stageEl, startX, startY) => {
+    if (stageEl) {
+      const rect = stageEl.getBoundingClientRect()
+      setDragOffset({ x: startX - rect.left, y: startY - rect.top })
+    } else {
+      setDragOffset({ x: 100, y: 150 })
     }
 
     setDraggingItem(item)
@@ -1590,30 +1726,8 @@ export default function App() {
 
     const rafId = { current: requestAnimationFrame(updateCursor) }
 
-    const beginPendingDragIfNeeded = (clientX, clientY) => {
-      const pending = pendingDragRef.current
-      if (!pending || draggingItem || pendingDragStartedRef.current) return
-
-      const dx = clientX - pending.startX
-      const dy = clientY - pending.startY
-      const distance = Math.hypot(dx, dy)
-      if (distance < 10) return
-
-      pendingDragStartedRef.current = true
-      setDragOffset(pending.offset || { x: 100, y: 150 })
-
-      if (pending.source === 'avatar') {
-        handleGrabFromAvatar(pending.item, pending.event)
-      } else {
-        setDraggingItem(pending.item)
-      }
-
-      pendingDragRef.current = null
-    }
-
     const handleGlobalMouseMove = (e) => {
       lastMousePos.current = { x: e.clientX, y: e.clientY }
-      beginPendingDragIfNeeded(e.clientX, e.clientY)
 
       const target = e.target
       const stageEl = target.closest('.characterStage, .homeAvatarStage, .mobileFollowStage')
@@ -1629,6 +1743,7 @@ export default function App() {
 
         const radius = 4
 
+        // Check Front Items
         for (const it of frontItems) {
           if (getPixelAlphaSync(it.imageUrl, xp, yp, radius) > 5) {
             isOverPixel = true
@@ -1636,10 +1751,12 @@ export default function App() {
           }
         }
 
+        // Check Body (Priority over Back items)
         if (!isOverPixel && getPixelAlphaSync(equippedBase?.imageUrl, xp, yp, radius) > 5) {
           isOverPixel = true
         }
 
+        // Check Back Items
         if (!isOverPixel) {
           for (const it of backItems) {
             if (getPixelAlphaSync(it.imageUrl, xp, yp, radius) > 5) {
@@ -1659,39 +1776,84 @@ export default function App() {
     const handleGlobalMouseUp = (e) => {
       setIsMouseDown(false)
       setIsManualDragOver(false)
-      pendingDragRef.current = null
-      pendingDragStartedRef.current = false
-      lastClosetClick.current = { itemId: null, time: 0 }
-      lastGrabInfo.current = { itemId: null, time: 0 }
+
+      const { clientX, clientY } = getPointerCoords(e)
 
       if (draggingItem) {
-        const clientX = e.clientX ?? (e.changedTouches ? e.changedTouches[0]?.clientX : undefined)
-        const clientY = e.clientY ?? (e.changedTouches ? e.changedTouches[0]?.clientY : undefined)
-
         if (clientX !== undefined && clientY !== undefined) {
           const el = document.elementFromPoint(clientX, clientY)
           const isOverStage = el?.closest('.characterStage') || el?.closest('.homeAvatarStage') || el?.closest('.mobileFollowStage')
-          if (isOverStage) {
+
+          let hasMovedEnough = true
+          if (dragStartPos.current) {
+            const dx = clientX - dragStartPos.current.x
+            const dy = clientY - dragStartPos.current.y
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            if (dist < 10) hasMovedEnough = false
+          }
+
+          if (isOverStage && hasMovedEnough) {
             if (draggingItem.category === 'upper') setEquippedUpperId(draggingItem.id)
             else if (draggingItem.category === 'lower') setEquippedLowerId(draggingItem.id)
             else handleEquip(draggingItem)
           }
         }
         setDraggingItem(null)
+        dragStartPos.current = null
       }
+      setPendingDrag(null)
     }
 
     const handleGlobalTouchMove = (e) => {
-      if (!e.touches[0]) return
-      const touch = e.touches[0]
-      lastMousePos.current = { x: touch.clientX, y: touch.clientY }
-      beginPendingDragIfNeeded(touch.clientX, touch.clientY)
-      if ((draggingItem || pendingDragRef.current) && e.cancelable) {
+      const { clientX, clientY } = getPointerCoords(e)
+      if (clientX === undefined) return
+
+      lastMousePos.current = { x: clientX, y: clientY }
+
+      if (pendingDrag && !draggingItem) {
+        const dx = clientX - pendingDrag.x
+        const dy = clientY - pendingDrag.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist > 10) {
+          if (pendingDrag.source === 'avatar') {
+            handleGrabFromAvatar(pendingDrag.item, pendingDrag.stageEl, pendingDrag.x, pendingDrag.y)
+          } else {
+            setDraggingItem(pendingDrag.item)
+            setDragOffset(pendingDrag.offset)
+          }
+          dragStartPos.current = { x: pendingDrag.x, y: pendingDrag.y }
+          setPendingDrag(null)
+        }
+      }
+
+      if (draggingItem && e.cancelable) {
         e.preventDefault()
       }
     }
 
-    window.addEventListener('mousemove', handleGlobalMouseMove)
+    const handleGlobalMouseMoveThrottled = (e) => {
+      handleGlobalMouseMove(e)
+
+      const { clientX, clientY } = getPointerCoords(e)
+
+      if (pendingDrag && !draggingItem) {
+        const dx = clientX - pendingDrag.x
+        const dy = clientY - pendingDrag.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist > 10) {
+          if (pendingDrag.source === 'avatar') {
+            handleGrabFromAvatar(pendingDrag.item, pendingDrag.stageEl, pendingDrag.x, pendingDrag.y)
+          } else {
+            setDraggingItem(pendingDrag.item)
+            setDragOffset(pendingDrag.offset)
+          }
+          dragStartPos.current = { x: pendingDrag.x, y: pendingDrag.y }
+          setPendingDrag(null)
+        }
+      }
+    }
+
+    window.addEventListener('mousemove', handleGlobalMouseMoveThrottled)
     window.addEventListener('touchmove', handleGlobalTouchMove, { passive: false })
     window.addEventListener('mousedown', handleGlobalMouseDown)
     window.addEventListener('mouseup', handleGlobalMouseUp)
@@ -1699,13 +1861,13 @@ export default function App() {
 
     return () => {
       cancelAnimationFrame(rafId.current)
-      window.removeEventListener('mousemove', handleGlobalMouseMove)
+      window.removeEventListener('mousemove', handleGlobalMouseMoveThrottled)
       window.removeEventListener('touchmove', handleGlobalTouchMove)
       window.removeEventListener('mousedown', handleGlobalMouseDown)
       window.removeEventListener('mouseup', handleGlobalMouseUp)
       window.removeEventListener('touchend', handleGlobalMouseUp)
     }
-  }, [draggingItem, isManualDragOver, handleEquip])
+  }, [draggingItem, isManualDragOver, handleEquip, pendingDrag])
 
   useEffect(() => {
     let timer
@@ -1880,67 +2042,8 @@ export default function App() {
     })
   )
 
-  const allItems = useMemo(() => [...DEFAULT_ITEMS, ...customItems], [customItems])
 
-  const upperItems = useMemo(
-    () => allItems.filter((item) => item.category === 'upper'),
-    [allItems]
-  )
-  const lowerItems = useMemo(
-    () => allItems.filter((item) => item.category === 'lower'),
-    [allItems]
-  )
-  const accessoryItems = useMemo(
-    () => allItems.filter((item) => item.category === 'accessory'),
-    [allItems]
-  )
 
-  const qrShareableItems = useMemo(
-    () => allItems.filter((item) => item.qrShareable),
-    [allItems]
-  )
-
-  const equippedBase = useMemo(
-    () => allItems.find((item) => item.id === equippedBaseId) || DEFAULT_BASE_ITEMS[0],
-    [allItems, equippedBaseId]
-  )
-  const equippedUpper = useMemo(
-    () => allItems.find((item) => item.id === equippedUpperId) || null,
-    [allItems, equippedUpperId]
-  )
-  const equippedLower = useMemo(
-    () => allItems.find((item) => item.id === equippedLowerId) || null,
-    [allItems, equippedLowerId]
-  )
-  const equippedAccessories = useMemo(
-    () => allItems.filter((item) => equippedAccessoryIds.includes(item.id)),
-    [allItems, equippedAccessoryIds]
-  )
-
-  const selectedQrItem = useMemo(
-    () => qrShareableItems.find((item) => item.id === selectedQrItemId) || null,
-    [qrShareableItems, selectedQrItemId]
-  )
-
-  const layeredEquippedItems = useMemo(() => {
-    const layers = {
-      lower: equippedLower,
-      upper: equippedUpper,
-      'accessory-1': equippedAccessories[0] || null,
-      'accessory-2': equippedAccessories[1] || null,
-      'accessory-3': equippedAccessories[2] || null,
-      'accessory-4': equippedAccessories[3] || null,
-      'accessory-5': equippedAccessories[4] || null,
-    }
-
-    return ensureLayerOrder(equippedLayerOrder)
-      .filter((layerKey) => layerKey !== 'base')
-      .map((layerKey) => ({
-        layerKey,
-        item: layers[layerKey] || null,
-      }))
-      .filter((entry) => entry.item)
-  }, [equippedLower, equippedUpper, equippedAccessories, equippedLayerOrder])
 
   // --- Gallery Distribution Restriction ---
   const hasImportedItems = useMemo(() => {
@@ -2007,7 +2110,7 @@ export default function App() {
     ].filter(Boolean)
 
     urls.forEach(url => {
-      if (!pixelCache.has(url)) {
+      if (!PIXEL_CACHE.has(url)) {
         // Just calling it will trigger the load and cache
         getPixelAlpha(url, 0, 0).catch(() => { })
       }
@@ -2032,19 +2135,6 @@ export default function App() {
     }
   }, [activeTab])
 
-  const isEquipped = (item) => {
-    if (item.category === 'upper') return equippedUpperId === item.id
-    if (item.category === 'lower') return equippedLowerId === item.id
-    if (item.category === 'accessory') return equippedAccessoryIds.includes(item.id)
-    return false
-  }
-
-  const isFavorite = (item) => {
-    if (item.category === 'upper') return favoriteUpperId === item.id
-    if (item.category === 'lower') return favoriteLowerId === item.id
-    if (item.category === 'accessory') return favoriteAccessoryIds.includes(item.id)
-    return false
-  }
 
   const getDisplayCreatorName = (item) => {
     if (!item) return ''
@@ -2504,9 +2594,12 @@ export default function App() {
     }
 
     const handleStagePointerDown = (e) => {
+      const { clientX, clientY } = getPointerCoords(e)
+      if (clientX === undefined) return
+
       const rect = e.currentTarget.getBoundingClientRect()
-      const xp = (e.clientX - rect.left) / rect.width
-      const yp = (e.clientY - rect.top) / rect.height
+      const xp = (clientX - rect.left) / rect.width
+      const yp = (clientY - rect.top) / rect.height
 
       const layerOrder = ensureLayerOrder(equippedLayerOrder)
       const frontItems = layerOrder
@@ -2521,44 +2614,36 @@ export default function App() {
       const isTouch = e.pointerType === 'touch'
       const radius = isTouch ? 15 : 6
 
-      const startAvatarDrag = (item) => {
-        pendingDragRef.current = {
-          source: 'avatar',
-          item,
-          startX: e.clientX,
-          startY: e.clientY,
-          offset: { x: e.clientX - rect.left, y: e.clientY - rect.top },
-          event: {
-            type: 'mousedown',
-            button: 0,
-            cancelable: false,
-            clientX: e.clientX,
-            clientY: e.clientY,
-            currentTarget: e.currentTarget,
-            preventDefault: () => {},
-          },
-        }
-        pendingDragStartedRef.current = false
-      }
-
       // 1. Check Front Items (Accessories, Clothing)
       for (const item of frontItems) {
         if (getPixelAlphaSync(item.imageUrl, xp, yp, radius) > 5) {
-          startAvatarDrag(item)
+          setPendingDrag({
+            x: clientX,
+            y: clientY,
+            item,
+            source: 'avatar',
+            stageEl: e.currentTarget
+          })
           return
         }
       }
 
-      // 2. Check Base Character (Ears, Body) - Priority over Back Items
+      // 2. Check Base Character (Ears, Body)
       if (getPixelAlphaSync(equippedBase?.imageUrl, xp, yp, radius) > 5) {
         handleCharacterClick()
-        return // Hits the body, so we stop and don't check items behind it
+        return
       }
 
-      // 3. Check Back Items (Scroll, etc.) - Only if body wasn't hit
+      // 3. Check Back Items
       for (const item of backItems) {
         if (getPixelAlphaSync(item.imageUrl, xp, yp, radius) > 5) {
-          startAvatarDrag(item)
+          setPendingDrag({
+            x: clientX,
+            y: clientY,
+            item,
+            source: 'avatar',
+            stageEl: e.currentTarget
+          })
           return
         }
       }
@@ -2704,65 +2789,33 @@ export default function App() {
       <div
         key={item.id}
         className={`itemCard ${favorite ? 'glow-favorite' : ''}`}
+        onPointerDown={async (e) => {
+          if (e.pointerType === 'mouse' && e.button !== 0) return
+          const { clientX, clientY } = getPointerCoords(e)
+          if (clientX === undefined) return
+
+          const previewEl = e.currentTarget.querySelector('.itemPreview')
+          if (previewEl) {
+            const prect = previewEl.getBoundingClientRect()
+            const xp = (clientX - prect.left) / prect.width
+            const yp = (clientY - prect.top) / prect.height
+            const radius = e.pointerType === 'touch' ? 10 : 5
+            const alpha = await getPixelAlpha(item.imageUrl, xp, yp, radius)
+            if (alpha <= 5) return
+
+            const offset = { x: clientX - prect.left, y: clientY - prect.top }
+            setPendingDrag({ x: clientX, y: clientY, item, source: 'closet', offset })
+          } else {
+            setPendingDrag({ x: clientX, y: clientY, item, source: 'closet', offset: { x: 100, y: 150 } })
+          }
+
+          lastMousePos.current = { x: clientX, y: clientY }
+          if (currentCursorPos.current.x === 0) {
+            currentCursorPos.current = { x: clientX, y: clientY }
+          }
+        }}
         onMouseEnter={() => {
-          // Pre-cache pixel data when hovering in closet
           getPixelAlpha(item.imageUrl, 0, 0).catch(() => { })
-        }}
-        onMouseDown={async (e) => {
-          if (e.button !== 0) return
-          const previewEl = e.currentTarget.querySelector('.itemPreview')
-          let offset = { x: 100, y: 150 }
-
-          if (previewEl) {
-            const prect = previewEl.getBoundingClientRect()
-            const xp = (e.clientX - prect.left) / prect.width
-            const yp = (e.clientY - prect.top) / prect.height
-            const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 5)
-            if (alpha <= 5) return
-            offset = { x: e.clientX - prect.left, y: e.clientY - prect.top }
-          }
-
-          pendingDragRef.current = {
-            source: 'closet',
-            item,
-            startX: e.clientX,
-            startY: e.clientY,
-            offset,
-          }
-          pendingDragStartedRef.current = false
-          lastMousePos.current = { x: e.clientX, y: e.clientY }
-          if (currentCursorPos.current.x === 0) {
-            currentCursorPos.current = { x: e.clientX, y: e.clientY }
-          }
-          e.preventDefault()
-        }}
-        onTouchStart={async (e) => {
-          if (!e.touches[0]) return
-          const touch = e.touches[0]
-          const previewEl = e.currentTarget.querySelector('.itemPreview')
-          let offset = { x: 100, y: 150 }
-
-          if (previewEl) {
-            const prect = previewEl.getBoundingClientRect()
-            const xp = (touch.clientX - prect.left) / prect.width
-            const yp = (touch.clientY - prect.top) / prect.height
-            const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 10)
-            if (alpha <= 5) return
-            offset = { x: touch.clientX - prect.left, y: touch.clientY - prect.top }
-          }
-
-          pendingDragRef.current = {
-            source: 'closet',
-            item,
-            startX: touch.clientX,
-            startY: touch.clientY,
-            offset,
-          }
-          pendingDragStartedRef.current = false
-          lastMousePos.current = { x: touch.clientX, y: touch.clientY }
-          if (currentCursorPos.current.x === 0) {
-            currentCursorPos.current = { x: touch.clientX, y: touch.clientY }
-          }
         }}
       >
         <div className="itemPreview">
@@ -2797,8 +2850,7 @@ export default function App() {
         <div className="itemActions">
           <button
             className="secondaryButton small"
-            onMouseDown={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation()
               if (item.category === 'upper') {
@@ -2837,18 +2889,18 @@ export default function App() {
                   : 'つける'}
           </button>
 
-          <button className="secondaryButton small" onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); handleToggleFavorite(item) }}>
+          <button className="secondaryButton small" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); handleToggleFavorite(item); }}>
             {isFavorite(item) ? 'お気に入り解除' : 'お気に入り登録'}
           </button>
 
           {item.source === 'custom' && (
-            <button className="secondaryButton small" onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setSelectedQrItemId(item.id) }}>
+            <button className="secondaryButton small" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setSelectedQrItemId(item.id); }}>
               QRにする
             </button>
           )}
 
           {item.source !== 'default' && (
-            <button className="dangerButton small" onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); handleDeleteCustomItem(item.id) }}>
+            <button className="dangerButton small" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); handleDeleteCustomItem(item.id); }}>
               削除
             </button>
           )}
@@ -3346,10 +3398,6 @@ export default function App() {
                   <div
                     ref={mobileClosetFollowRef}
                     className="mobileClosetFollowCard"
-                    style={{
-                      transform: `translateY(${mobilePreviewTop}px)`,
-                      transition: 'transform 0.02s ease-out'
-                    }}
                   >
                     <div className="mobileClosetFollowInner">
                       <div className="mobileFollowAvatarWrap">
