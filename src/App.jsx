@@ -1144,6 +1144,7 @@ export default function App() {
   const mobileClosetFollowRef = useRef(null)
   const desktopClosetPreviewRef = useRef(null)
   const previewAudioRef = useRef(null)
+  const bgFileInputRef = useRef(null)
 
   const [activeTab, setActiveTab] = useState(initialSave.activeTab)
   const [closetTab, setClosetTab] = useState(initialSave.closetTab)
@@ -1329,6 +1330,7 @@ export default function App() {
   const [showPostDialog, setShowPostDialog] = useState(false);
   const [isDistributable, setIsDistributable] = useState(true);
   const [postBackground, setPostBackground] = useState('none');
+  const [customBgUrl, setCustomBgUrl] = useState('');
 
   const RESERVED_NAMES = ['ふれろっぷ', 'ふれろぷ']
   const OWNER_CODE = 'akakuro0411'
@@ -1485,7 +1487,11 @@ export default function App() {
       <div className="galleryContainer">
         {/* 撮影用の隠し要素 (徹底隔離＆クリーンルーム) */}
         <div className="capture-clean-room">
-          <div ref={galleryCaptureRef} className={`capture-canvas-target bg-${postBackground}`}>
+          <div
+            ref={galleryCaptureRef}
+            className={`capture-canvas-target bg-${postBackground}`}
+            style={postBackground === 'custom' ? { backgroundImage: `url(${customBgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+          >
             <div className="capture-avatar-fit">
               {renderAvatarLayers('capture-avatar-layers')}
             </div>
@@ -3109,6 +3115,28 @@ export default function App() {
                         title={bg.name}
                       />
                     ))}
+                    <button
+                      type="button"
+                      className={`bgOption bg-custom ${postBackground === 'custom' ? 'selected' : ''}`}
+                      onClick={() => bgFileInputRef.current?.click()}
+                      title="画像を選択"
+                    >
+                      {customBgUrl ? <img src={customBgUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📷'}
+                    </button>
+                    <input
+                      ref={bgFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const url = URL.createObjectURL(file);
+                          setCustomBgUrl(url);
+                          setPostBackground('custom');
+                        }
+                      }}
+                    />
                   </div>
                 </label>
                 <label className={`checkboxLabel ${hasImportedItems ? 'disabled' : ''}`}>
