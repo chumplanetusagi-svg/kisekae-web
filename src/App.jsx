@@ -1485,7 +1485,7 @@ export default function App() {
         {/* 撮影用の隠し要素 (徹底隔離＆クリーンルーム) */}
         <div className="capture-clean-room">
           <div ref={galleryCaptureRef} className="capture-canvas-target">
-            <div className="capture-avatar-fit" style={{ transform: 'scale(1.6)' }}>
+            <div className="capture-avatar-fit">
               {renderAvatarLayers('capture-avatar-layers')}
             </div>
           </div>
