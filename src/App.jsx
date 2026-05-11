@@ -1593,6 +1593,16 @@ export default function App() {
 
     const rafId = { current: requestAnimationFrame(updateCursor) }
 
+    const lockClothesTouchScroll = () => {
+      document.documentElement.classList.add('is-clothes-drag-lock')
+      document.body.classList.add('is-clothes-drag-lock')
+    }
+
+    const unlockClothesTouchScroll = () => {
+      document.documentElement.classList.remove('is-clothes-drag-lock')
+      document.body.classList.remove('is-clothes-drag-lock')
+    }
+
     const beginPendingDragIfNeeded = (clientX, clientY) => {
       const pending = pendingDragRef.current
       if (!pointerIsDownRef.current || !pending || draggingItem || pendingDragStartedRef.current) return
@@ -1603,6 +1613,7 @@ export default function App() {
       if (distance < 10) return
 
       pendingDragStartedRef.current = true
+      lockClothesTouchScroll()
       setDragOffset(pending.offset || { x: 100, y: 150 })
 
       if (pending.source === 'avatar') {
@@ -1663,6 +1674,11 @@ export default function App() {
       setIsMouseDown(true)
     }
 
+    const handleGlobalTouchStart = () => {
+      pointerIsDownRef.current = true
+      setIsMouseDown(true)
+    }
+
     const handleGlobalMouseUp = (e) => {
       pointerIsDownRef.current = false
       pendingInputSeqRef.current += 1
@@ -1670,6 +1686,7 @@ export default function App() {
       setIsManualDragOver(false)
       pendingDragRef.current = null
       pendingDragStartedRef.current = false
+      unlockClothesTouchScroll()
       lastClosetClick.current = { itemId: null, time: 0 }
       lastGrabInfo.current = { itemId: null, time: 0 }
 
@@ -1701,15 +1718,20 @@ export default function App() {
     }
 
     window.addEventListener('mousemove', handleGlobalMouseMove)
+    window.addEventListener('touchstart', handleGlobalTouchStart, { passive: true })
     window.addEventListener('touchmove', handleGlobalTouchMove, { passive: false })
+    window.addEventListener('touchcancel', handleGlobalMouseUp)
     window.addEventListener('mousedown', handleGlobalMouseDown)
     window.addEventListener('mouseup', handleGlobalMouseUp)
     window.addEventListener('touchend', handleGlobalMouseUp)
 
     return () => {
       cancelAnimationFrame(rafId.current)
+      unlockClothesTouchScroll()
       window.removeEventListener('mousemove', handleGlobalMouseMove)
+      window.removeEventListener('touchstart', handleGlobalTouchStart)
       window.removeEventListener('touchmove', handleGlobalTouchMove)
+      window.removeEventListener('touchcancel', handleGlobalMouseUp)
       window.removeEventListener('mousedown', handleGlobalMouseDown)
       window.removeEventListener('mouseup', handleGlobalMouseUp)
       window.removeEventListener('touchend', handleGlobalMouseUp)
@@ -2811,6 +2833,9 @@ export default function App() {
           if (currentCursorPos.current.x === 0) {
             currentCursorPos.current = { x: touch.clientX, y: touch.clientY }
           }
+          document.documentElement.classList.add('is-clothes-drag-lock')
+          document.body.classList.add('is-clothes-drag-lock')
+          if (e.cancelable) e.preventDefault()
         }}
       >
         <div className="itemPreview">
@@ -3100,11 +3125,11 @@ export default function App() {
           )}
           <div className="native-cursor-wrapper">
             <img
-              src={(isMouseDown || isHoveringInteractive)
+              src={isMouseDown
                 ? (customCursorHoverUrl || '/cursor_hover.png')
                 : (customCursorUrl || '/cursor_normal.png')
               }
-              className="native-cursor-replacement"
+              className={`native-cursor-replacement ${isMouseDown ? 'is-pressed' : ''} ${isHoveringInteractive ? 'is-hovering' : ''}`}
               alt=""
             />
           </div>

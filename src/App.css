@@ -3386,3 +3386,20 @@ body,
     transition: none !important;
   }
 }
+
+/* When a clothing item is grabbed on mobile, stop the page from scrolling so drag-and-drop is easier. */
+html.is-clothes-drag-lock,
+body.is-clothes-drag-lock {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+}
+
+.native-cursor-replacement {
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+.native-cursor-replacement.is-pressed {
+  transform: translate(2px, 2px) scale(0.92);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45)) brightness(0.92);
+}
