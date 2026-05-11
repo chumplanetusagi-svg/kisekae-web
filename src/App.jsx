@@ -1215,6 +1215,9 @@ export default function App() {
   const currentCursorPos = useRef({ x: 0, y: 0 })
   const pendingDragRef = useRef(null)
   const pendingDragStartedRef = useRef(false)
+  const pointerIsDownRef = useRef(false)
+  const pendingInputSeqRef = useRef(0)
+  const lastTouchAtRef = useRef(0)
   const lastGrabInfo = useRef({ itemId: null, time: 0 })
   const lastClosetClick = useRef({ itemId: null, time: 0 })
   const [mobilePreviewTop, setMobilePreviewTop] = useState(0)
@@ -1592,7 +1595,7 @@ export default function App() {
 
     const beginPendingDragIfNeeded = (clientX, clientY) => {
       const pending = pendingDragRef.current
-      if (!pending || draggingItem || pendingDragStartedRef.current) return
+      if (!pointerIsDownRef.current || !pending || draggingItem || pendingDragStartedRef.current) return
 
       const dx = clientX - pending.startX
       const dy = clientY - pending.startY
@@ -1654,9 +1657,15 @@ export default function App() {
       setIsHoveringInteractive(isOver)
     }
 
-    const handleGlobalMouseDown = () => setIsMouseDown(true)
+    const handleGlobalMouseDown = () => {
+      if (Date.now() - lastTouchAtRef.current < 700) return
+      pointerIsDownRef.current = true
+      setIsMouseDown(true)
+    }
 
     const handleGlobalMouseUp = (e) => {
+      pointerIsDownRef.current = false
+      pendingInputSeqRef.current += 1
       setIsMouseDown(false)
       setIsManualDragOver(false)
       pendingDragRef.current = null
@@ -2704,13 +2713,25 @@ export default function App() {
       <div
         key={item.id}
         className={`itemCard ${favorite ? 'glow-favorite' : ''}`}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        onDoubleClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
         onMouseEnter={() => {
           // Pre-cache pixel data when hovering in closet
           getPixelAlpha(item.imageUrl, 0, 0).catch(() => { })
         }}
         onMouseDown={async (e) => {
           if (e.button !== 0) return
-          const previewEl = e.currentTarget.querySelector('.itemPreview')
+          if (Date.now() - lastTouchAtRef.current < 700) return
+          pointerIsDownRef.current = true
+          const inputSeq = ++pendingInputSeqRef.current
+          const cardEl = e.currentTarget
+          const previewEl = cardEl.querySelector('.itemPreview')
           let offset = { x: 100, y: 150 }
 
           if (previewEl) {
@@ -2718,9 +2739,12 @@ export default function App() {
             const xp = (e.clientX - prect.left) / prect.width
             const yp = (e.clientY - prect.top) / prect.height
             const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 5)
+            if (inputSeq !== pendingInputSeqRef.current || !pointerIsDownRef.current) return
             if (alpha <= 5) return
             offset = { x: e.clientX - prect.left, y: e.clientY - prect.top }
           }
+
+          if (inputSeq !== pendingInputSeqRef.current || !pointerIsDownRef.current) return
 
           pendingDragRef.current = {
             source: 'closet',
@@ -2738,8 +2762,12 @@ export default function App() {
         }}
         onTouchStart={async (e) => {
           if (!e.touches[0]) return
+          lastTouchAtRef.current = Date.now()
+          pointerIsDownRef.current = true
+          const inputSeq = ++pendingInputSeqRef.current
           const touch = e.touches[0]
-          const previewEl = e.currentTarget.querySelector('.itemPreview')
+          const cardEl = e.currentTarget
+          const previewEl = cardEl.querySelector('.itemPreview')
           let offset = { x: 100, y: 150 }
 
           if (previewEl) {
@@ -2747,9 +2775,12 @@ export default function App() {
             const xp = (touch.clientX - prect.left) / prect.width
             const yp = (touch.clientY - prect.top) / prect.height
             const alpha = await getPixelAlpha(item.imageUrl, xp, yp, 10)
+            if (inputSeq !== pendingInputSeqRef.current || !pointerIsDownRef.current) return
             if (alpha <= 5) return
             offset = { x: touch.clientX - prect.left, y: touch.clientY - prect.top }
           }
+
+          if (inputSeq !== pendingInputSeqRef.current || !pointerIsDownRef.current) return
 
           pendingDragRef.current = {
             source: 'closet',
@@ -2800,6 +2831,7 @@ export default function App() {
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
             onClick={(e) => {
+              e.preventDefault()
               e.stopPropagation()
               if (item.category === 'upper') {
                 if (equippedUpperId === item.id) {
