@@ -1267,7 +1267,7 @@ export default function App() {
     {
       id: 'voice-ohayo',
       title: 'おはようボイス',
-      description: '今日も１日がんばろうね!',
+      description: 'おはよう！今日も１日たのしんでいこうね！',
       type: 'free',
       fileUrl: assetUrl('downloads/ohayo.mp3'),
       fileSize: '0.8MB'
@@ -1275,7 +1275,7 @@ export default function App() {
     {
       id: 'voice-oyasumi',
       title: 'おやすみボイス',
-      description: '１日お疲れ様。ゆっくり休んでね。',
+      description: '僕がキミにおやすみなさいをしに行くよ！',
       type: 'free',
       fileUrl: assetUrl('downloads/oyasumi.mp3'),
       fileSize: '0.9MB'
@@ -1283,7 +1283,7 @@ export default function App() {
     {
       id: 'voice-otsukare',
       title: 'お疲れ様ボイス',
-      description: 'いつもがんばっててとってもえらい！',
+      description: 'お疲れのキミを僕が癒してあげよう！',
       type: 'free',
       fileUrl: assetUrl('downloads/otsukare.mp3'),
       fileSize: '1.2MB'
@@ -1291,7 +1291,7 @@ export default function App() {
     {
       id: 'voice-ganbare',
       title: 'がんばれボイス',
-      description: '僕が応援するね！君ならきっとできるよ！',
+      description: '僕が僕を鼓舞する！',
       type: 'free',
       fileUrl: assetUrl('downloads/ganbare.mp3'),
       fileSize: '0.7MB'
@@ -1299,7 +1299,7 @@ export default function App() {
     {
       id: 'voice-shukkin',
       title: '出勤ボイス',
-      description: 'いってらっしゃい！忘れ物はないかな？',
+      description: 'いつもの変わらない出勤スタイル。',
       type: 'free',
       fileUrl: assetUrl('downloads/shukkin.mp3'),
       fileSize: '0.8MB'
@@ -1307,7 +1307,7 @@ export default function App() {
     {
       id: 'voice-mother-talk',
       title: 'お母さま掛け合いボイス',
-      description: 'お母さまと僕のかけあい……',
+      description: 'お母さまに僕が怒られてるボイス。',
       type: 'free',
       fileUrl: assetUrl('downloads/mother_talk.mp3'),
       fileSize: '2.5MB'
@@ -1317,7 +1317,7 @@ export default function App() {
       title: '1周年記念イラスト',
       description: '1周年を記念して描き下ろした特別な壁紙イラスト。',
       type: 'password',
-      password: '0511',
+      password: 'ropu0511',
       fileUrl: assetUrl('downloads/anniv_1st_illust.png'),
       fileSize: '4.2MB'
     }
