@@ -161,7 +161,7 @@ a {
 
 .appShell {
   min-height: 100vh;
-  padding: 24px;
+  padding: 24px 24px 0 24px;
   position: relative;
   z-index: 1;
   font-family: 'Shippori Mincho', serif;
@@ -1198,7 +1198,7 @@ a {}
 
   /* High-priority Mobile Layout Fix for Closet Open */
   .appShell.closet-open {
-    padding-bottom: 120px !important;
+    padding-bottom: 40px !important;
   }
 
   .closet-open .appFrame {
@@ -1213,7 +1213,7 @@ a {}
   }
 
   .appShell {
-    padding: 16px;
+    padding: 16px 16px 0 16px;
   }
 
   .pageTitle {
@@ -3097,6 +3097,116 @@ a {}
   object-fit: contain !important;
   transform: none !important;
 }
+
+/* Capture Backgrounds */
+.capture-canvas-target.bg-none { background: #1a1412 !important; }
+.capture-canvas-target.bg-paper { background: #e8d5b5 !important; }
+.capture-canvas-target.bg-sky { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%) !important; }
+.capture-canvas-target.bg-night { background: linear-gradient(180deg, #09203f 0%, #537895 100%) !important; }
+.capture-canvas-target.bg-rose { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; }
+
+/* BG Selector UI */
+.bgSelector {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.bgOption {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  padding: 0;
+  overflow: hidden;
+}
+
+.bgOption.selected {
+  border-color: var(--text-deep);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(212, 184, 149, 0.4);
+}
+
+.bgOption.bg-none { background: #1a1412; }
+.bgOption.bg-paper { background: #e8d5b5; }
+.bgOption.bg-sky { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); }
+.bgOption.bg-night { background: linear-gradient(180deg, #09203f 0%, #537895 100%); }
+.bgOption.bg-rose { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+
+.tabDecorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.tabDecorations .gearDecoration {
+  position: absolute;
+  opacity: 0.08;
+  animation: spinGear 20s linear infinite;
+}
+
+.tabDecorations .gearDecoration.silver { animation-duration: 25s; animation-direction: reverse; }
+.tabDecorations .gearDecoration.bronze { animation-duration: 30s; }
+
+/* Capture Backgrounds */
+.capture-canvas-target.bg-none { background: #1a1412 !important; }
+.capture-canvas-target.bg-paper { background: #e8d5b5 !important; }
+.capture-canvas-target.bg-sky { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%) !important; }
+.capture-canvas-target.bg-night { background: linear-gradient(180deg, #09203f 0%, #537895 100%) !important; }
+.capture-canvas-target.bg-rose { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; }
+
+/* BG Selector UI */
+.bgSelector {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.bgOption {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  padding: 0;
+  overflow: hidden;
+}
+
+.bgOption.selected {
+  border-color: var(--text-deep);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(212, 184, 149, 0.4);
+}
+
+.bgOption.bg-none { background: #1a1412; }
+.bgOption.bg-paper { background: #e8d5b5; }
+.bgOption.bg-sky { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); }
+.bgOption.bg-night { background: linear-gradient(180deg, #09203f 0%, #537895 100%); }
+.bgOption.bg-rose { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+
+.tabDecorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.tabDecorations .gearDecoration {
+  position: absolute;
+  opacity: 0.08;
+  animation: spinGear 20s linear infinite;
+}
+
+.tabDecorations .gearDecoration.silver { animation-duration: 25s; animation-direction: reverse; }
+.tabDecorations .gearDecoration.bronze { animation-duration: 30s; }
 
 /* ===== Cursor Settings Panel (Restored) ===== */
 .cursorSettingsBox {

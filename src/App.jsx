@@ -1328,6 +1328,7 @@ export default function App() {
   const [isFetchingGallery, setIsFetchingGallery] = useState(false);
   const [showPostDialog, setShowPostDialog] = useState(false);
   const [isDistributable, setIsDistributable] = useState(true);
+  const [postBackground, setPostBackground] = useState('none');
 
   const RESERVED_NAMES = ['ふれろっぷ', 'ふれろぷ']
   const OWNER_CODE = 'akakuro0411'
@@ -1484,11 +1485,26 @@ export default function App() {
       <div className="galleryContainer">
         {/* 撮影用の隠し要素 (徹底隔離＆クリーンルーム) */}
         <div className="capture-clean-room">
-          <div ref={galleryCaptureRef} className="capture-canvas-target">
+          <div ref={galleryCaptureRef} className={`capture-canvas-target bg-${postBackground}`}>
             <div className="capture-avatar-fit">
               {renderAvatarLayers('capture-avatar-layers')}
             </div>
           </div>
+        </div>
+        <div className="tabDecorations">
+          {galleryGearConfigs.map(g => (
+            <div
+              key={`gear-${g.id}`}
+              className={`gearDecoration ${g.type}`}
+              style={{
+                left: g.x,
+                top: g.y,
+                width: g.size,
+                height: g.size,
+                transform: `rotate(${g.rotation}rad)`
+              }}
+            />
+          ))}
         </div>
         <header className="galleryHeader">
           <div className="galleryTitleArea">
@@ -1845,6 +1861,7 @@ export default function App() {
 
   const qrGearConfigs = useMemo(() => generateGears(1600, 1180, 5, true), [])
   const homeGearConfigs = useMemo(() => generateGears(1200, 680, 4, true), [])
+  const galleryGearConfigs = useMemo(() => generateGears(1600, 1200, 6, true), [])
 
   const randomPositions = useMemo(() => {
     return {
@@ -3073,6 +3090,26 @@ export default function App() {
                 <label className="fieldLabel">
                   コンセプト
                   <textarea className="textArea" value={concept} onChange={(e) => setConcept(e.target.value)} maxLength={40} />
+                </label>
+                <label className="fieldLabel">
+                  背景設定（撮影用）
+                  <div className="bgSelector">
+                    {[
+                      { id: 'none', name: '標準' },
+                      { id: 'paper', name: '紙' },
+                      { id: 'sky', name: '空' },
+                      { id: 'night', name: '夜' },
+                      { id: 'rose', name: '薔薇' },
+                    ].map(bg => (
+                      <button
+                        key={bg.id}
+                        type="button"
+                        className={`bgOption bg-${bg.id} ${postBackground === bg.id ? 'selected' : ''}`}
+                        onClick={() => setPostBackground(bg.id)}
+                        title={bg.name}
+                      />
+                    ))}
+                  </div>
                 </label>
                 <label className={`checkboxLabel ${hasImportedItems ? 'disabled' : ''}`}>
                   <input
