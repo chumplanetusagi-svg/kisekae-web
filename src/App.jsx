@@ -1329,8 +1329,25 @@ export default function App() {
   const [isFetchingGallery, setIsFetchingGallery] = useState(false);
   const [showPostDialog, setShowPostDialog] = useState(false);
   const [isDistributable, setIsDistributable] = useState(true);
-  const [postBackground, setPostBackground] = useState('none');
+  const [postBackground, setPostBackground] = useState('default');
   const [customBgUrl, setCustomBgUrl] = useState('');
+
+  // Random gears for the default capture background
+  const [captureGears, setCaptureGears] = useState([]);
+  useEffect(() => {
+    if (showPostDialog) {
+      const gears = Array.from({ length: 15 }).map((_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 80 + Math.random() * 180,
+        rotation: Math.random() * 360,
+        type: ['gold', 'silver', 'bronze'][Math.floor(Math.random() * 3)],
+        speed: 15 + Math.random() * 20
+      }));
+      setCaptureGears(gears);
+    }
+  }, [showPostDialog]);
 
   const RESERVED_NAMES = ['ふれろっぷ', 'ふれろぷ']
   const OWNER_CODE = 'akakuro0411'
@@ -1492,6 +1509,24 @@ export default function App() {
             className={`capture-canvas-target bg-${postBackground}`}
             style={postBackground === 'custom' ? { backgroundImage: `url(${customBgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
           >
+            {postBackground === 'default' && (
+              <div className="capture-gears-layer">
+                {captureGears.map(g => (
+                  <div
+                    key={g.id}
+                    className={`capture-gear gear-${g.type}`}
+                    style={{
+                      left: `${g.x}%`,
+                      top: `${g.y}%`,
+                      width: `${g.size}px`,
+                      height: `${g.size}px`,
+                      transform: `rotate(${g.rotation}deg)`,
+                      animationDuration: `${g.speed}s`
+                    }}
+                  />
+                ))}
+              </div>
+            )}
             <div className="capture-avatar-fit">
               {renderAvatarLayers('capture-avatar-layers')}
             </div>
@@ -3100,21 +3135,14 @@ export default function App() {
                 <label className="fieldLabel">
                   背景設定（撮影用）
                   <div className="bgSelector">
-                    {[
-                      { id: 'none', name: '標準' },
-                      { id: 'paper', name: '紙' },
-                      { id: 'sky', name: '空' },
-                      { id: 'night', name: '夜' },
-                      { id: 'rose', name: '薔薇' },
-                    ].map(bg => (
-                      <button
-                        key={bg.id}
-                        type="button"
-                        className={`bgOption bg-${bg.id} ${postBackground === bg.id ? 'selected' : ''}`}
-                        onClick={() => setPostBackground(bg.id)}
-                        title={bg.name}
-                      />
-                    ))}
+                    <button
+                      type="button"
+                      className={`bgOption bg-default ${postBackground === 'default' ? 'selected' : ''}`}
+                      onClick={() => setPostBackground('default')}
+                      title="デフォルト（歯車）"
+                    >
+                      ⚙️
+                    </button>
                     <button
                       type="button"
                       className={`bgOption bg-custom ${postBackground === 'custom' ? 'selected' : ''}`}
