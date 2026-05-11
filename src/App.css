@@ -498,6 +498,7 @@ a {}
   height: 100%;
   object-fit: contain;
   pointer-events: auto;
+  transform: translateY(65%) scale(1.2);
 }
 
 .closetContainer {
@@ -3140,9 +3141,17 @@ a {}
   transform-origin: center center;
 }
 
-.capture-gear.gear-gold { background-image: url('/images/gear_gold.png'); }
-.capture-gear.gear-silver { background-image: url('/images/gear_silver.png'); }
-.capture-gear.gear-bronze { background-image: url('/images/gear_bronze.png'); }
+.capture-gear.gear-gold {
+  background-image: url('/images/gear_gold.png');
+}
+
+.capture-gear.gear-silver {
+  background-image: url('/images/gear_silver.png');
+}
+
+.capture-gear.gear-bronze {
+  background-image: url('/images/gear_bronze.png');
+}
 
 .capture-gears-layer {
   position: absolute;
@@ -3159,9 +3168,17 @@ a {}
   animation: spinGear linear infinite;
 }
 
-.capture-gear.gear-gold { background-image: url('/images/gear_gold.png'); }
-.capture-gear.gear-silver { background-image: url('/images/gear_silver.png'); }
-.capture-gear.gear-bronze { background-image: url('/images/gear_bronze.png'); }
+.capture-gear.gear-gold {
+  background-image: url('/images/gear_gold.png');
+}
+
+.capture-gear.gear-silver {
+  background-image: url('/images/gear_silver.png');
+}
+
+.capture-gear.gear-bronze {
+  background-image: url('/images/gear_bronze.png');
+}
 
 /* Ensure character layers inside capture room are contained */
 .capture-avatar-fit .layerImage {
@@ -3174,11 +3191,25 @@ a {}
 }
 
 /* Capture Backgrounds */
-.capture-canvas-target.bg-none { background: #1a1412 !important; }
-.capture-canvas-target.bg-paper { background: #e8d5b5 !important; }
-.capture-canvas-target.bg-sky { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%) !important; }
-.capture-canvas-target.bg-night { background: linear-gradient(180deg, #09203f 0%, #537895 100%) !important; }
-.capture-canvas-target.bg-rose { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; }
+.capture-canvas-target.bg-none {
+  background: #1a1412 !important;
+}
+
+.capture-canvas-target.bg-paper {
+  background: #e8d5b5 !important;
+}
+
+.capture-canvas-target.bg-sky {
+  background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+.capture-canvas-target.bg-night {
+  background: linear-gradient(180deg, #09203f 0%, #537895 100%) !important;
+}
+
+.capture-canvas-target.bg-rose {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
 
 /* BG Selector UI */
 .bgSelector {
@@ -3210,12 +3241,29 @@ a {}
   box-shadow: 0 0 15px rgba(212, 184, 149, 0.4);
 }
 
-.bgOption.bg-none { background: #1a1412; }
-.bgOption.bg-paper { background: #e8d5b5; }
-.bgOption.bg-sky { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); }
-.bgOption.bg-night { background: linear-gradient(180deg, #09203f 0%, #537895 100%); }
-.bgOption.bg-rose { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.bgOption.bg-custom { border-style: dashed; }
+.bgOption.bg-none {
+  background: #1a1412;
+}
+
+.bgOption.bg-paper {
+  background: #e8d5b5;
+}
+
+.bgOption.bg-sky {
+  background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.bgOption.bg-night {
+  background: linear-gradient(180deg, #09203f 0%, #537895 100%);
+}
+
+.bgOption.bg-rose {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.bgOption.bg-custom {
+  border-style: dashed;
+}
 
 .tabDecorations {
   position: absolute;
@@ -3232,8 +3280,14 @@ a {}
   z-index: -1;
 }
 
-.tabDecorations .gearDecoration.silver { animation-duration: 25s; animation-direction: reverse; }
-.tabDecorations .gearDecoration.bronze { animation-duration: 30s; }
+.tabDecorations .gearDecoration.silver {
+  animation-duration: 25s;
+  animation-direction: reverse;
+}
+
+.tabDecorations .gearDecoration.bronze {
+  animation-duration: 30s;
+}
 
 /* ===== Cursor Settings Panel (Restored) ===== */
 .cursorSettingsBox {
@@ -3549,4 +3603,9 @@ body.is-clothes-drag-lock {
 .native-cursor-replacement.is-pressed {
   transform: translate(2px, 2px) scale(0.92);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45)) brightness(0.92);
+}
+
+/* --- Gallery capture fix: lower only the character group so the head is not cut off in posted gallery images --- */
+.capture-avatar-fit .capture-avatar-layers {
+  transform: translateY(78px) !important;
 }
