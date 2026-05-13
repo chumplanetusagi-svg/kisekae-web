@@ -783,10 +783,10 @@ async function drawAvatarCanvas({
   const { back, front } = splitAccessoryImageUrls(accessoryImageUrls)
   const urls = [...back, baseImageUrl, lowerImageUrl, upperImageUrl, ...front].filter(Boolean)
 
-  const charScale = 1.2 // Even larger to match desired framing
+  const charScale = 0.8 // Standardized size for better framing
   const charSize = size * charScale
-  const charX = -(charSize - size) / 2 // Center horizontally when scaled
-  const charY = size * 0.65 // Extremely lowered per user's "more and more lower" request
+  const charX = (size - charSize) / 2 // Center horizontally
+  const charY = size * 0.15 // Positioned to show whole character with head space
 
   for (const url of urls) {
     const img = await loadImage(url)
